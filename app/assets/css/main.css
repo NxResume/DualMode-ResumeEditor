@@ -1,0 +1,48 @@
+@import '@unocss/reset/tailwind.css';
+
+:root {
+  --primary-color: #3b82f6;
+  --secondary-color: #1e40af;
+}
+
+.dark {
+  --primary-color: #60a5fa;
+  --secondary-color: #3b82f6;
+}
+
+/* 编辑器样式 */
+.cm-editor {
+  height: 100%;
+  font-family: 'Fira Code', monospace;
+}
+
+.cm-editor .cm-content {
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* 预览区域样式 */
+.preview-container {
+  background: white;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+  margin: 0 auto;
+  max-width: 21cm;
+  min-height: 29.7cm;
+}
+
+.dark .preview-container {
+  background: #1a1a1a;
+  color: #e5e5e5;
+}
+
+/* 分页样式 */
+.page-break {
+  page-break-after: always;
+  border-bottom: 1px dashed #ccc;
+  margin: 2rem 0;
+}
+
+.dark .page-break {
+  border-bottom-color: #444;
+}
