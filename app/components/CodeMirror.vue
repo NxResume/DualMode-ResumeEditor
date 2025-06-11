@@ -23,7 +23,6 @@ onMounted(() => {
   const state = EditorState.create({
     doc: props.modelValue,
     extensions: [
-      // basicSetup,
       keymap.of(defaultKeymap as any),
       markdown(),
       EditorView.lineWrapping,

@@ -13,27 +13,32 @@ export function useMarkdown(content: string) {
       return params.trim() === 'left'
     },
     render(tokens: any[], idx: number) {
+      // 判断容器是开始还是结束
       if (tokens[idx].nesting === 1) {
-        // 打开父容器 + 左容器
-        return `<div class="lr-container"><div class="left">`
+        // 打开 lr-container 和 left 容器
+        return '<div class="lr-container"><div class="left">'
       }
       else {
-        // 闭合左容器，并打开右容器（注意顺序）
-        return `</div>`
+        // 关闭 left 容器
+        return '</div>'
       }
     },
   })
 
   // 注册右容器插件
   md.use(remarkContainer, 'right', {
+    validate(params: string) {
+      return params.trim() === 'right'
+    },
     render(tokens: any[], idx: number) {
+      // 判断容器是开始还是结束
       if (tokens[idx].nesting === 1) {
-        // 右容器开始标签（已在上一个容器处理）
+        // 打开 right 容器
         return '<div class="right">'
       }
       else {
-        // 闭合右容器 + 父容器
-        return `</div></div>`
+        // 关闭 right 容器，并且关闭 lr-container
+        return '</div></div>'
       }
     },
   })
