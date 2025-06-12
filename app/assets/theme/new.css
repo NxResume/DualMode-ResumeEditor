@@ -1,0 +1,12 @@
+@import './common.css';
+
+@font-face {
+  font-family: 'pingfang-sc';
+  src: url(https://cdn.mdedit.online/font/PingFang-Medium-sub.ttf);
+  font-weight: 400;
+  font-style: normal;
+}
+
+.markdown-body p {
+  color: #747474;
+}

@@ -1,0 +1,73 @@
+.markdown-body h1 {
+  font-size: 30px;
+  color: #000;
+  padding: 0;
+  line-height: 1.5;
+  font-weight: 900;
+}
+
+.markdown-body h2 {
+  background-image: url(https://z.wiki/u/kaGrwY);
+  background-repeat: no-repeat;
+  background-position: 0 center;
+  display: block;
+  padding: 0 0 0 20px;
+  border-bottom: 0;
+  line-height: inherit;
+  font-size: 20px;
+  font-weight: 700;
+  margin: 5px 0;
+}
+
+.markdown-body h3 {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.markdown-body {
+  line-height: 1.9;
+  font-size: 14px;
+}
+
+.markdown-body ul li {
+  list-style-type: square;
+}
+
+.markdown-body ul {
+  padding-left: 1.3em;
+  overflow: hidden;
+}
+
+.markdown-body li {
+  color: #666666;
+}
+
+.markdown-body h1 {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.markdown-body p {
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 0px;
+  font-size: 14px;
+}
+
+.icon-md {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.lr-container .left {
+  float: left;
+}
+
+.lr-container .right {
+  float: right;
+}
+
+.lr-container {
+  overflow: hidden;
+  margin: 10px 0;
+}

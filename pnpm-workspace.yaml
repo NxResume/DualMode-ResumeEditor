@@ -19,6 +19,7 @@ catalogs:
   dev:
     '@antfu/eslint-config': ^4.13.3
     '@types/codemirror': ^5.60.16
+    '@types/markdown-it': ^14.1.2
     '@types/markdown-it-container': ^2.0.10
     eslint: ^9.28.0
     eslint-plugin-format: ^1.0.1
@@ -37,8 +38,10 @@ catalogs:
     jspdf: ^3.0.1
     markdown-it: ^14.0.0
     markdown-it-container: ^4.0.0
+    markdown-it-regex: ^0.2.2
     pinia: ^3.0.2
     vue: ^3.5.16
+
   icons:
     '@iconify-json/carbon': ^1.2.8
     '@iconify-json/twemoji': ^1.2.2

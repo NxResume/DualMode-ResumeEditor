@@ -2,7 +2,7 @@
 import html2canvas from 'html2canvas'
 import { autoPaginate, DEFAULT_CONFIG } from '~/utils/pagination'
 
-import '@/assets/theme/github.css'
+import '@/assets/theme/new.css'
 
 const props = defineProps<{
   content: string
@@ -125,27 +125,6 @@ onMounted(handleAutoPaginate)
 </template>
 
 <style>
-.lr-container .left {
-  width: 50%;
-  float: left;
-}
-
-.lr-container .right {
-  width: 50%;
-  float: right;
-}
-
-.lr-container {
-  /* 方案1：推荐 */
-  overflow: hidden;
-
-  /* 或方案3：推荐 */
-  /* &::after { content: ""; display: table; clear: both; } */
-
-  padding: 15px;
-  /* 可选：增加内边距 */
-}
-
 /* 分页样式 */
 .rs-page-item-wrapper {
   width: 100%;

@@ -1,11 +1,13 @@
 import MarkdownIt from 'markdown-it'
 import remarkContainer from 'markdown-it-container'
+import iconPlugin from '~/utils/markdown-it-icon'
 
 export function useMarkdown(content: string) {
   const md = new MarkdownIt({
     html: true,
     linkify: true,
     typographer: true,
+    breaks: true,
   })
 
   md.use(remarkContainer, 'left', {
@@ -42,6 +44,8 @@ export function useMarkdown(content: string) {
       }
     },
   })
+
+  md.use(iconPlugin)
 
   return {
     html: md.render(content),

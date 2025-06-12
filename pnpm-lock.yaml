@@ -37,6 +37,12 @@ catalogs:
     '@types/codemirror':
       specifier: ^5.60.16
       version: 5.60.16
+    '@types/markdown-it':
+      specifier: ^14.1.2
+      version: 14.1.2
+    '@types/markdown-it-container':
+      specifier: ^2.0.10
+      version: 2.0.10
     eslint:
       specifier: ^9.28.0
       version: 9.28.0
@@ -83,6 +89,9 @@ catalogs:
     markdown-it-container:
       specifier: ^4.0.0
       version: 4.0.0
+    markdown-it-regex:
+      specifier: ^0.2.2
+      version: 0.2.2
     pinia:
       specifier: ^3.0.2
       version: 3.0.2
@@ -144,8 +153,11 @@ importers:
       '@types/codemirror':
         specifier: catalog:dev
         version: 5.60.16
+      '@types/markdown-it':
+        specifier: catalog:dev
+        version: 14.1.2
       '@types/markdown-it-container':
-        specifier: ^2.0.10
+        specifier: catalog:dev
         version: 2.0.10
       '@unocss/eslint-config':
         specifier: catalog:build
@@ -186,6 +198,9 @@ importers:
       markdown-it-container:
         specifier: catalog:frontend
         version: 4.0.0
+      markdown-it-regex:
+        specifier: catalog:frontend
+        version: 0.2.2
       nuxt:
         specifier: ^3.17.5
         version: 3.17.5(@parcel/watcher@2.5.1)(@types/node@22.15.29)(db0@0.3.2)(eslint@9.28.0(jiti@2.4.2))(ioredis@5.6.1)(magicast@0.3.5)(optionator@0.9.4)(rollup@4.41.1)(terser@5.39.0)(typescript@5.8.3)(vite@6.3.5(@types/node@22.15.29)(jiti@2.4.2)(terser@5.39.0)(yaml@2.7.0))(vue-tsc@2.2.10(typescript@5.8.3))(yaml@2.7.0)
@@ -4286,6 +4301,9 @@ packages:
 
   markdown-it-container@4.0.0:
     resolution: {integrity: sha512-HaNccxUH0l7BNGYbFbjmGpf5aLHAMTinqRZQAEQbMr2cdD3z91Q6kIo1oUn1CQndkT03jat6ckrdRYuwwqLlQw==}
+
+  markdown-it-regex@0.2.2:
+    resolution: {integrity: sha512-Db/QKAwTuDZT0wVNA5WNI2lZOSDyA6xcOax9KxWlsVqGJKw/hd6s8WRycwzvAvjaMy/0EYg0GmrMvIGEiBRwyQ==}
 
   markdown-it@14.1.0:
     resolution: {integrity: sha512-a54IwgWPaeBCAAsv13YgmALOF1elABB08FxO9i+r4VFk5Vl4pKokRPeX8u5TCgSsPi6ec1otfLjdOpVcgbpshg==}
@@ -11111,6 +11129,8 @@ snapshots:
       source-map-js: 1.2.1
 
   markdown-it-container@4.0.0: {}
+
+  markdown-it-regex@0.2.2: {}
 
   markdown-it@14.1.0:
     dependencies:
