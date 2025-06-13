@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import testMd from '@/pages/test.md?raw'
 import { useResumeStore } from '@/stores/resume'
 import MarkdownPreview from '~/components/MarkdownPreview.vue'
 
@@ -10,14 +11,12 @@ const resumeStore = useResumeStore()
 
 // 初始化简历内容
 if (!resumeStore.content) {
-  resumeStore.setContent('')
+  resumeStore.setContent(testMd)
 }
 </script>
 
 <template>
-  <div class="mx-auto max-w-[794px]">
-    <div class="p-8 rounded-lg bg-white shadow-lg dark:bg-gray-800">
-      <MarkdownPreview :content="resumeStore.content" />
-    </div>
+  <div class="mx-auto h-[94%] max-w-[794px] shadow-2xl overflow-auto">
+    <MarkdownPreview :content="resumeStore.content" />
   </div>
 </template>
