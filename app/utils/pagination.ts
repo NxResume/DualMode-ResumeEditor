@@ -24,16 +24,6 @@ export function getElementHeight(element: HTMLElement): number {
     const paddingBottom = Number.parseFloat(style.paddingBottom)
     const totalHeight = element.offsetHeight + marginTop + marginBottom + paddingTop + paddingBottom
 
-    // console.log('元素高度计算详情:', {
-    //   tagName: element.tagName,
-    //   offsetHeight: element.offsetHeight,
-    //   marginTop,
-    //   marginBottom,
-    //   paddingTop,
-    //   paddingBottom,
-    //   totalHeight,
-    // })
-
     return totalHeight
   }
   catch (error) {
@@ -150,16 +140,6 @@ export function autoPaginate(
     // 遍历所有元素
     for (const element of elements) {
       const elementHeight = getElementHeight(element)
-
-      // // 添加调试信息
-      // console.log('当前元素信息:', {
-      //   tagName: element.tagName,
-      //   className: element.className,
-      //   elementHeight,
-      //   currentPageHeight,
-      //   remainingHeight: maxPageHeight - currentPageHeight,
-      //   willOverflow: currentPageHeight + elementHeight > maxPageHeight,
-      // })
 
       // 如果当前元素高度超过页面高度，需要特殊处理
       if (elementHeight > maxPageHeight) {
