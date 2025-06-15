@@ -60,3 +60,9 @@ onUnmounted(() => {
 <template>
   <div ref="editorRef" class="h-full" />
 </template>
+
+<style>
+.ͼ1.cm-focused {
+  outline: 2px solid rgba(39, 5, 125, 0.393);
+}
+</style>
