@@ -16,7 +16,7 @@ if (!resumeStore.content) {
 </script>
 
 <template>
-  <div class="mx-auto h-[94%] max-w-[794px] shadow-2xl overflow-auto">
+  <div class="mx-auto h-[88%] max-w-[794px] shadow-2xl">
     <MarkdownPreview :content="resumeStore.content" />
   </div>
 </template>

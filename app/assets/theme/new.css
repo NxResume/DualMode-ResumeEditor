@@ -10,3 +10,17 @@
 .markdown-body p {
   color: #747474;
 }
+
+.markdown-body h2::before {
+  content: '';
+  position: absolute;
+  left: -20px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  background-image: url(../icon/LineiconsLineiconsSymbol.svg);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}

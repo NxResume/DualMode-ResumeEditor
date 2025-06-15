@@ -6,22 +6,27 @@
   font-weight: 900;
 }
 
+.markdown-body h1 {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
 .markdown-body h2 {
-  background-image: url(https://z.wiki/u/kaGrwY);
+  position: relative;
   background-repeat: no-repeat;
-  background-position: 0 center;
+  background-position: 0 0.5em;  /* 改为相对于文字行高的位置 */
   display: block;
-  padding: 0 0 0 20px;
-  border-bottom: 0;
-  line-height: inherit;
+  margin: 5px 0;
+  margin-left: 20px;
   font-size: 20px;
   font-weight: 700;
-  margin: 5px 0;
 }
 
 .markdown-body h3 {
   font-size: 15px;
   font-weight: 600;
+  margin-top: 0px;
+  margin-bottom: 2px;
 }
 
 .markdown-body {
@@ -29,8 +34,12 @@
   font-size: 14px;
 }
 
-.markdown-body ul li {
-  list-style-type: square;
+.markdown-body .md-icon-svg {
+  display: inline-block;
+  color: #747474;
+  width: 16px;
+  height: 16px;
+  vertical-align: middle;
 }
 
 .markdown-body ul {
@@ -40,11 +49,7 @@
 
 .markdown-body li {
   color: #666666;
-}
-
-.markdown-body h1 {
-  padding-top: 10px;
-  padding-bottom: 10px;
+  list-style-type: square;
 }
 
 .markdown-body p {

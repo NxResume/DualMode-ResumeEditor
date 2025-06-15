@@ -45,7 +45,9 @@ export function useMarkdown(content: string) {
     },
   })
 
-  md.use(iconPlugin)
+  md.use(iconPlugin, {
+    type: 'svg',
+  })
 
   return {
     html: md.render(content),

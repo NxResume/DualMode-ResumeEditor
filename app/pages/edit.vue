@@ -36,7 +36,7 @@ const currentMode = ref<'source' | 'mixed'>('source')
   </div>
 </div> -->
 <template>
-  <div class="flex h-[calc(100%-73px)]">
+  <div class="flex h-full">
     <!-- 左侧编辑器 -->
     <div class="p-2 rounded-lg bg-white flex-none h-full w-480px shadow-lg overflow-x-hidden overflow-y-auto dark:bg-gray-800">
       <CodeMirror v-model="resumeStore.content" :mode="currentMode" />
