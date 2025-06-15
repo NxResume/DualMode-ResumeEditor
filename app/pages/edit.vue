@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import CodeMirror from '@/components/CodeMirror.vue'
+import ExportButton from '@/components/ExportButton.vue'
 import MarkdownPreview from '@/components/MarkdownPreview.vue'
 import { useResumeStore } from '@/stores/resume'
 
@@ -18,6 +19,10 @@ definePageMeta({
 const resumeStore = useResumeStore()
 
 const currentMode = ref<'source' | 'mixed'>('source')
+
+async function handleExport() {
+  return previewRef.value?.exportToPDF()
+}
 </script>
 
 <template>
@@ -28,13 +33,10 @@ const currentMode = ref<'source' | 'mixed'>('source')
     </div>
     <!-- 右侧预览 -->
     <div ref="el" class="px-20 bg-[#606060] flex-shrink flex-grow flex-basis-0 relative overflow-auto">
-      <button
-        class="download-btn"
-        @click="previewRef?.exportToPDF()"
-      >
-        <div class="i-ri-download-2-line" />
-        <span>导出 PDF</span>
-      </button>
+      <ExportButton
+        variant="default"
+        :on-export="handleExport"
+      />
       <div
         class="w-full"
         :style="{
@@ -64,18 +66,6 @@ const currentMode = ref<'source' | 'mixed'>('source')
 }
 
 .return-btn .i-ri-arrow-left-line {
-  @apply text-lg;
-}
-
-.download-btn {
-  @apply fixed z-10 top-6 right-6 flex items-center gap-2 px-4 py-2.5 bg-white/90 backdrop-blur-sm rounded-full shadow-lg text-gray-700 cursor-pointer transition-all duration-300 ease-in-out hover:bg-white hover:shadow-xl hover:scale-105;
-}
-
-.download-btn span {
-  @apply text-sm font-medium;
-}
-
-.download-btn .i-ri-download-2-line {
   @apply text-lg;
 }
 </style>

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import ExportButton from '@/components/ExportButton.vue'
 import testMd from '@/pages/test.md?raw'
 import { useResumeStore } from '@/stores/resume'
 import MarkdownPreview from '~/components/MarkdownPreview.vue'
@@ -16,8 +17,8 @@ if (!resumeStore.content) {
   resumeStore.setContent(testMd)
 }
 
-function exportResume() {
-  previewRef.value.exportToPDF()
+async function handleExport() {
+  return previewRef.value?.exportToPDF()
 }
 </script>
 
@@ -43,12 +44,10 @@ function exportResume() {
                 编辑
               </button>
             </NuxtLink>
-            <button
-              class="text-sm text-white px-4 py-2 rounded-lg bg-blue-500 cursor-pointer transition-colors hover:bg-blue-600"
-              @click="exportResume"
-            >
-              导出 PDF
-            </button>
+            <ExportButton
+              variant="header"
+              :on-export="handleExport"
+            />
           </div>
         </div>
       </nav>
