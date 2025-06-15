@@ -89,6 +89,10 @@ function handleAutoPaginate() {
 watch(() => props.content, handleAutoPaginate)
 
 onMounted(handleAutoPaginate)
+
+defineExpose({
+  exportToPDF,
+})
 </script>
 
 <template>
@@ -96,13 +100,6 @@ onMounted(handleAutoPaginate)
     <div ref="previewRef" class="preview-container">
       <div class="rs-page-item-wrapper" :class="theme" />
     </div>
-
-    <button
-      class="export-button"
-      @click="exportToPDF"
-    >
-      导出图片
-    </button>
   </div>
 </template>
 

@@ -4,6 +4,7 @@ import MarkdownPreview from '@/components/MarkdownPreview.vue'
 import { useResumeStore } from '@/stores/resume'
 
 const el = useTemplateRef('el')
+const previewRef = ref<InstanceType<typeof MarkdownPreview>>()
 const { width } = useElementSize(el)
 
 const scalePre = computed(() => {
@@ -42,7 +43,14 @@ const currentMode = ref<'source' | 'mixed'>('source')
       <CodeMirror v-model="resumeStore.content" :mode="currentMode" />
     </div>
     <!-- 右侧预览 -->
-    <div ref="el" class="px-20 bg-[#606060] flex-shrink flex-grow flex-basis-0 overflow-auto">
+    <div ref="el" class="px-20 bg-[#606060] flex-shrink flex-grow flex-basis-0 relative overflow-auto">
+      <button
+        class="download-btn"
+        @click="previewRef?.exportToPDF()"
+      >
+        <div class="i-ri-download-2-line" />
+        <span>导出 PDF</span>
+      </button>
       <div
         class="w-full"
         :style="{
@@ -50,8 +58,40 @@ const currentMode = ref<'source' | 'mixed'>('source')
           transformOrigin: 'top left',
         }"
       >
-        <MarkdownPreview :content="resumeStore.content" />
+        <MarkdownPreview ref="previewRef" :content="resumeStore.content" />
       </div>
+      <NuxtLink to="/">
+        <button class="return-btn">
+          <div class="i-ri-arrow-left-line" />
+          <span>返回</span>
+        </button>
+      </NuxtLink>
     </div>
   </div>
 </template>
+
+<style>
+.return-btn {
+  @apply fixed z-10 bottom-6 right-6 flex items-center gap-2 px-4 py-2.5 bg-white/90 backdrop-blur-sm rounded-full shadow-lg text-gray-700 cursor-pointer transition-all duration-300 ease-in-out hover:bg-white hover:shadow-xl hover:scale-105;
+}
+
+.return-btn span {
+  @apply text-sm font-medium;
+}
+
+.return-btn .i-ri-arrow-left-line {
+  @apply text-lg;
+}
+
+.download-btn {
+  @apply fixed z-10 top-6 right-6 flex items-center gap-2 px-4 py-2.5 bg-white/90 backdrop-blur-sm rounded-full shadow-lg text-gray-700 cursor-pointer transition-all duration-300 ease-in-out hover:bg-white hover:shadow-xl hover:scale-105;
+}
+
+.download-btn span {
+  @apply text-sm font-medium;
+}
+
+.download-btn .i-ri-download-2-line {
+  @apply text-lg;
+}
+</style>

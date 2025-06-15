@@ -3,13 +3,6 @@
 
 <template>
   <div class="h-100vh relative">
-    <NuxtLink
-      to="/edit"
-      class="edit"
-    >
-      <i class="fas fa-edit mr-2" />
-      编辑简历
-    </NuxtLink>
     <main class="h-full">
       <slot />
     </main>

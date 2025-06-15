@@ -3,6 +3,8 @@ import testMd from '@/pages/test.md?raw'
 import { useResumeStore } from '@/stores/resume'
 import MarkdownPreview from '~/components/MarkdownPreview.vue'
 
+const previewRef = ref()
+
 definePageMeta({
   layout: 'default',
 })
@@ -12,6 +14,10 @@ const resumeStore = useResumeStore()
 // 初始化简历内容
 if (!resumeStore.content) {
   resumeStore.setContent(testMd)
+}
+
+function exportResume() {
+  previewRef.value.exportToPDF()
 }
 </script>
 
@@ -32,10 +38,15 @@ if (!resumeStore.content) {
             </div>
           </div>
           <div class="flex items-center space-x-4">
-            <button class="text-sm text-gray-600 px-4 py-2 hover:text-gray-900">
-              保存
-            </button>
-            <button class="text-sm text-white px-4 py-2 rounded-lg bg-blue-500 transition-colors hover:bg-blue-600">
+            <NuxtLink to="/edit">
+              <button class="text-sm text-gray-600 px-4 py-2 cursor-pointer hover:text-gray-900">
+                编辑
+              </button>
+            </NuxtLink>
+            <button
+              class="text-sm text-white px-4 py-2 rounded-lg bg-blue-500 cursor-pointer transition-colors hover:bg-blue-600"
+              @click="exportResume"
+            >
               导出 PDF
             </button>
           </div>
@@ -123,7 +134,7 @@ if (!resumeStore.content) {
         </div>
         <div class="p-6">
           <div class="max-w-none">
-            <MarkdownPreview :content="resumeStore.content" />
+            <MarkdownPreview ref="previewRef" :content="resumeStore.content" />
           </div>
         </div>
       </section>
