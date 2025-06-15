@@ -14,7 +14,7 @@
 .markdown-body h2 {
   position: relative;
   background-repeat: no-repeat;
-  background-position: 0 0.5em;  /* 改为相对于文字行高的位置 */
+  background-position: 0 0.5em; /* 改为相对于文字行高的位置 */
   display: block;
   margin: 5px 0;
   margin-left: 20px;

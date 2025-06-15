@@ -17,25 +17,9 @@ definePageMeta({
 
 const resumeStore = useResumeStore()
 
-// const editorModes = [
-//   { label: '源码模式', value: 'source' as const },
-//   { label: '混合模式', value: 'mixed' as const },
-// ] as const
-
 const currentMode = ref<'source' | 'mixed'>('source')
 </script>
 
-<!-- <div class="mb-4 flex items-center justify-between">
-  <div class="flex gap-2 items-center">
-    <button
-      v-for="mode in editorModes" :key="mode.value" class="px-3 py-1 rounded"
-      :class="currentMode === mode.value ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-gray-700'"
-      @click="currentMode = mode.value"
-    >
-      {{ mode.label }}
-    </button>
-  </div>
-</div> -->
 <template>
   <div class="flex h-full">
     <!-- 左侧编辑器 -->
