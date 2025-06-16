@@ -4,12 +4,15 @@ import { useResumeStore } from '@/stores/resume'
 import MarkdownPreview from '~/components/MarkdownPreview.vue'
 
 const previewRef = ref()
+const previewEl = useTemplateRef('previewEl')
 
 definePageMeta({
   layout: 'default',
 })
 
 const resumeStore = useResumeStore()
+
+const { enter, isFullscreen } = useFullscreen(previewEl)
 async function handleExport() {
   return previewRef.value?.exportToPDF()
 }
@@ -98,14 +101,19 @@ async function handleExport() {
       </section>
 
       <!-- Editor Section -->
-      <section id="editor" class="rounded-2xl bg-white shadow-xl overflow-hidden">
-        <div class="p-6 border-b border-gray-200">
-          <h2 class="text-lg text-gray-900 font-medium">
-            编辑简历
-          </h2>
-          <p class="text-sm text-gray-500 mt-1">
-            使用 Markdown 语法编写你的简历
-          </p>
+      <section id="editor" class="rounded-2xl bg-white shadow-xl relative overflow-hidden">
+        <div class="card-wrapper">
+          <div>
+            <h2 class="text-lg text-gray-900 font-medium">
+              编辑简历
+            </h2>
+            <p class="text-sm text-gray-500 mt-1">
+              使用 Markdown 语法编写你的简历
+            </p>
+          </div>
+          <NuxtLink to="/edit" class="flex items-center justify-center">
+            <div class="i-ri-edit-box-line icon-btn" />
+          </NuxtLink>
         </div>
         <textarea
           v-model="resumeStore.content"
@@ -116,15 +124,23 @@ async function handleExport() {
 
       <!-- Preview Section -->
       <section class="mt-8 rounded-2xl bg-white shadow-xl overflow-hidden">
-        <div class="p-6 border-b border-gray-200">
-          <h2 class="text-lg text-gray-900 font-medium">
-            预览效果
-          </h2>
-          <p class="text-sm text-gray-500 mt-1">
-            实时查看简历效果
-          </p>
+        <div class="card-wrapper">
+          <div>
+            <h2 class="text-lg text-gray-900 font-medium">
+              预览效果
+            </h2>
+            <p class="text-sm text-gray-500 mt-1">
+              实时查看简历效果
+            </p>
+          </div>
+          <div class="i-ri-fullscreen-line icon-btn" @click="enter" />
         </div>
-        <div class="p-6">
+        <div
+          ref="previewEl" class="p-6"
+          :class="{
+            'overflow-auto h-full': isFullscreen,
+          }"
+        >
           <div class="max-w-none">
             <MarkdownPreview ref="previewRef" :content="resumeStore.content" />
           </div>
@@ -134,8 +150,8 @@ async function handleExport() {
   </div>
 </template>
 
-<style>
-.prose {
-  max-width: none;
+<style scoped>
+.card-wrapper {
+  @apply p-6 border-b border-gray-200 flex items-center justify-between;
 }
 </style>
