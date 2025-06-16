@@ -5,12 +5,17 @@ import MarkdownPreview from '~/components/MarkdownPreview.vue'
 
 const previewRef = ref()
 const previewEl = useTemplateRef('previewEl')
+const { locale } = useI18n<{ locale: 'en' | 'zh' }>()
 
 definePageMeta({
   layout: 'default',
 })
 
 const resumeStore = useResumeStore()
+
+const editPath = computed(() => {
+  return locale.value === 'en' ? '/en/edit' : '/edit'
+})
 
 const { enter, isFullscreen } = useFullscreen(previewEl)
 async function handleExport() {
@@ -35,7 +40,7 @@ async function handleExport() {
             </div>
           </div>
           <div class="flex items-center space-x-4">
-            <NuxtLink to="/edit">
+            <NuxtLink :to="editPath">
               <button class="text-sm text-gray-600 px-4 py-2 cursor-pointer hover:text-gray-900">
                 {{ $t('nav.editor') }}
               </button>
@@ -111,7 +116,7 @@ async function handleExport() {
               {{ $t('editor.description') }}
             </p>
           </div>
-          <NuxtLink to="/edit" class="flex items-center justify-center">
+          <NuxtLink :to="editPath" class="flex items-center justify-center">
             <div class="i-ri-edit-box-line icon-btn" />
           </NuxtLink>
         </div>
