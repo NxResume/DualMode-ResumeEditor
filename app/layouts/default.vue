@@ -6,6 +6,10 @@
     <main class="h-full">
       <slot />
     </main>
+    <div class="flex flex-col gap-2 bottom-4 right-4 fixed z-50">
+      <LanguageSwitcher />
+      <!-- <ThemeSwitcher /> -->
+    </div>
   </div>
 </template>
 

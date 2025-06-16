@@ -1,0 +1,30 @@
+{
+  "app": {
+    "title": "Markdown Resume Editor",
+    "description": "Create beautiful resumes with Markdown, featuring real-time preview and one-click PDF export"
+  },
+  "nav": {
+    "editor": "Editor",
+    "guide": "Guide",
+    "templates": "Templates"
+  },
+  "guide": {
+    "title": "Quick Start",
+    "step1": "1. Edit Content",
+    "step1Desc": "Write your resume content using Markdown syntax",
+    "step2": "2. Real-time Preview",
+    "step2Desc": "View your resume effect in real-time on the right",
+    "step3": "3. Export PDF",
+    "step3Desc": "Export to PDF with one click"
+  },
+  "editor": {
+    "title": "Edit Resume",
+    "description": "Write your resume using Markdown syntax",
+    "preview": "Preview Effect",
+    "previewDesc": "View your resume effect in real-time"
+  },
+  "export": {
+    "exporting": "Exporting...",
+    "exportPdf": "Export PDF"
+  }
+}

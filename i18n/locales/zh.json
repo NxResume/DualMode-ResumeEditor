@@ -1,0 +1,30 @@
+{
+  "app": {
+    "title": "Markdown 简历编辑器",
+    "description": "使用 Markdown 轻松创建精美的简历，支持实时预览，一键导出 PDF"
+  },
+  "nav": {
+    "editor": "编辑器",
+    "guide": "使用指南",
+    "templates": "模板"
+  },
+  "guide": {
+    "title": "快速开始",
+    "step1": "1. 编辑内容",
+    "step1Desc": "使用 Markdown 语法编写你的简历内容",
+    "step2": "2. 实时预览",
+    "step2Desc": "右侧实时查看简历效果",
+    "step3": "3. 导出 PDF",
+    "step3Desc": "一键导出为 PDF 文件"
+  },
+  "editor": {
+    "title": "编辑简历",
+    "description": "使用 Markdown 语法编写你的简历",
+    "preview": "预览效果",
+    "previewDesc": "实时查看简历效果"
+  },
+  "export": {
+    "exporting": "导出中...",
+    "exportPdf": "导出 PDF"
+  }
+}

@@ -26,18 +26,18 @@ async function handleExport() {
         <div class="flex items-center justify-between">
           <div class="flex items-center space-x-8">
             <h1 class="text-xl text-gray-900 font-semibold">
-              Resume Editor
+              {{ $t('app.title') }}
             </h1>
             <div class="hidden space-x-6 md:flex">
-              <a href="#editor" class="text-gray-600 hover:text-gray-900">编辑器</a>
-              <a href="#guide" class="text-gray-600 hover:text-gray-900">使用指南</a>
-              <a href="#templates" class="text-gray-600 hover:text-gray-900">模板</a>
+              <a href="#editor" class="text-gray-600 hover:text-gray-900">{{ $t('nav.editor') }}</a>
+              <a href="#guide" class="text-gray-600 hover:text-gray-900">{{ $t('nav.guide') }}</a>
+              <a href="#templates" class="text-gray-600 hover:text-gray-900">{{ $t('nav.templates') }}</a>
             </div>
           </div>
           <div class="flex items-center space-x-4">
             <NuxtLink to="/edit">
               <button class="text-sm text-gray-600 px-4 py-2 cursor-pointer hover:text-gray-900">
-                编辑
+                {{ $t('nav.editor') }}
               </button>
             </NuxtLink>
             <ExportButton
@@ -54,10 +54,10 @@ async function handleExport() {
       <div class="mx-auto px-4 py-12 max-w-4xl lg:px-8 sm:px-6">
         <div class="text-center">
           <h2 class="text-3xl text-gray-900 font-bold sm:text-4xl">
-            专业的 Markdown 简历编辑器
+            {{ $t('app.title') }}
           </h2>
           <p class="text-lg text-gray-600 mt-4">
-            使用 Markdown 轻松创建精美的简历，支持实时预览，一键导出 PDF
+            {{ $t('app.description') }}
           </p>
         </div>
       </div>
@@ -69,31 +69,31 @@ async function handleExport() {
       <section id="guide" class="mb-12">
         <div class="p-6 rounded-2xl bg-white shadow-sm">
           <h3 class="text-lg text-gray-900 font-medium mb-4">
-            快速开始
+            {{ $t('guide.title') }}
           </h3>
           <div class="gap-6 grid grid-cols-1 md:grid-cols-3">
             <div class="p-4 rounded-lg bg-gray-50">
               <div class="text-blue-500 font-medium mb-2">
-                1. 编辑内容
+                {{ $t('guide.step1') }}
               </div>
               <p class="text-sm text-gray-600">
-                使用 Markdown 语法编写你的简历内容
+                {{ $t('guide.step1Desc') }}
               </p>
             </div>
             <div class="p-4 rounded-lg bg-gray-50">
               <div class="text-blue-500 font-medium mb-2">
-                2. 实时预览
+                {{ $t('guide.step2') }}
               </div>
               <p class="text-sm text-gray-600">
-                右侧实时查看简历效果
+                {{ $t('guide.step2Desc') }}
               </p>
             </div>
             <div class="p-4 rounded-lg bg-gray-50">
               <div class="text-blue-500 font-medium mb-2">
-                3. 导出 PDF
+                {{ $t('guide.step3') }}
               </div>
               <p class="text-sm text-gray-600">
-                一键导出为 PDF 文件
+                {{ $t('guide.step3Desc') }}
               </p>
             </div>
           </div>
@@ -105,10 +105,10 @@ async function handleExport() {
         <div class="card-wrapper">
           <div>
             <h2 class="text-lg text-gray-900 font-medium">
-              编辑简历
+              {{ $t('editor.title') }}
             </h2>
             <p class="text-sm text-gray-500 mt-1">
-              使用 Markdown 语法编写你的简历
+              {{ $t('editor.description') }}
             </p>
           </div>
           <NuxtLink to="/edit" class="flex items-center justify-center">
@@ -127,10 +127,10 @@ async function handleExport() {
         <div class="card-wrapper">
           <div>
             <h2 class="text-lg text-gray-900 font-medium">
-              预览效果
+              {{ $t('editor.preview') }}
             </h2>
             <p class="text-sm text-gray-500 mt-1">
-              实时查看简历效果
+              {{ $t('editor.previewDesc') }}
             </p>
           </div>
           <div class="i-ri-fullscreen-line icon-btn" @click="enter" />

@@ -8,6 +8,7 @@ export default defineNuxtConfig({
     '@nuxtjs/color-mode',
     '@vite-pwa/nuxt',
     '@nuxt/eslint',
+    '@nuxtjs/i18n',
   ],
   devtools: { enabled: true },
   app: {
@@ -79,6 +80,26 @@ export default defineNuxtConfig({
       nuxt: {
         sortConfigKeys: true,
       },
+    },
+  },
+  i18n: {
+    locales: [
+      {
+        code: 'zh',
+        file: 'zh.json',
+        name: '中文',
+      },
+      {
+        code: 'en',
+        file: 'en.json',
+        name: 'English',
+      },
+    ],
+    defaultLocale: 'zh',
+    detectBrowserLanguage: {
+      useCookie: true, // 禁用 Cookie 保存语言
+      cookieKey: 'i18n_redirected',
+      redirectOn: 'root',
     },
   },
   pwa,
