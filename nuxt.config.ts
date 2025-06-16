@@ -25,7 +25,6 @@ export default defineNuxtConfig({
         { name: 'description', content: '一个专业的 Markdown 简历编辑器，支持实时预览和一键导出 PDF' },
         { name: 'keywords', content: '简历, Markdown, 编辑器, PDF, 在线工具' },
         { name: 'author', content: 'Resume Editor Team' },
-        { name: 'apple-mobile-web-app-capable', content: 'yes' },
         { name: 'apple-mobile-web-app-status-bar-style', content: 'black-translucent' },
         { name: 'theme-color', media: '(prefers-color-scheme: light)', content: '#ffffff' },
         { name: 'theme-color', media: '(prefers-color-scheme: dark)', content: '#1a1a1a' },
