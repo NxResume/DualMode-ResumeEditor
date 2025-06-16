@@ -2,7 +2,7 @@
 import { toPng } from 'html-to-image'
 import { autoPaginate, DEFAULT_CONFIG } from '~/utils/pagination'
 
-import '@/assets/theme/new.css'
+import '@/assets/theme/default.css'
 
 const props = defineProps<{
   content: string

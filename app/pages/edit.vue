@@ -5,6 +5,7 @@ import MarkdownPreview from '@/components/MarkdownPreview.vue'
 import { useResumeStore } from '@/stores/resume'
 
 const el = useTemplateRef('el')
+const leftRef = ref<InstanceType<typeof CodeMirror>>()
 const previewRef = ref<InstanceType<typeof MarkdownPreview>>()
 const { width } = useElementSize(el)
 
@@ -20,6 +21,8 @@ const resumeStore = useResumeStore()
 
 const currentMode = ref<'source' | 'mixed'>('source')
 
+useScrollSync(leftRef, el)
+
 async function handleExport() {
   return previewRef.value?.exportToPDF()
 }
@@ -28,7 +31,7 @@ async function handleExport() {
 <template>
   <div class="flex h-full">
     <!-- 左侧编辑器 -->
-    <div class="p-2 rounded-lg bg-white flex-none h-full w-480px shadow-lg overflow-x-hidden overflow-y-auto dark:bg-gray-800">
+    <div ref="leftRef" class="p-2 rounded-lg bg-white flex-none h-full w-480px shadow-lg overflow-x-hidden overflow-y-auto dark:bg-gray-800">
       <CodeMirror v-model="resumeStore.content" :mode="currentMode" />
     </div>
     <!-- 右侧预览 -->

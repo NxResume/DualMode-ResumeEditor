@@ -1,5 +1,7 @@
-import { defineStore } from 'pinia'
+import { useLocalStorage } from '@vueuse/core'
+import { defineStore, skipHydrate } from 'pinia'
 import { ref } from 'vue'
+import tm1 from '~/templates/tm1.md?raw'
 
 export interface ResumeData {
   content: string
@@ -9,7 +11,7 @@ export interface ResumeData {
 
 export const useResumeStore = defineStore('resume', () => {
   // state
-  const content = ref('')
+  const content = useLocalStorage('resume', tm1)
   const theme = ref('default')
   const plugins = ref<string[]>([])
 
@@ -34,7 +36,7 @@ export const useResumeStore = defineStore('resume', () => {
 
   return {
     // state
-    content,
+    content: skipHydrate(content),
     theme,
     plugins,
     // actions

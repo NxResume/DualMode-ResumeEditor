@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import ExportButton from '@/components/ExportButton.vue'
-import testMd from '@/pages/test.md?raw'
 import { useResumeStore } from '@/stores/resume'
 import MarkdownPreview from '~/components/MarkdownPreview.vue'
 
@@ -11,12 +10,6 @@ definePageMeta({
 })
 
 const resumeStore = useResumeStore()
-
-// 初始化简历内容
-if (!resumeStore.content) {
-  resumeStore.setContent(testMd)
-}
-
 async function handleExport() {
   return previewRef.value?.exportToPDF()
 }
