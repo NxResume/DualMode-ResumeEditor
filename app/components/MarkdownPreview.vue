@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { toPng } from 'html-to-image'
-import { autoPaginate, DEFAULT_CONFIG } from '~/utils/pagination'
+import reTheme, { ThemeName } from 'resume-theme'
 
-import '@/assets/theme/default.css'
+import { autoPaginate, DEFAULT_CONFIG } from '~/utils/pagination'
+import 'resume-theme/themes'
 
 const props = defineProps<{
   content: string
@@ -12,6 +13,10 @@ const theme = 'markdown-body'
 
 const md = computed(() => useMarkdown(props.content))
 const previewRef = ref<HTMLElement | null>(null)
+
+onMounted(() => {
+  reTheme.setTheme(ThemeName.Default)
+})
 
 async function exportToPDF() {
   if (!previewRef.value)

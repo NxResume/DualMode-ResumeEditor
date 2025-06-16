@@ -119,6 +119,10 @@ overrides:
 importers:
 
   .:
+    dependencies:
+      resume-theme:
+        specifier: ^0.1.5
+        version: 0.1.5
     devDependencies:
       '@antfu/eslint-config':
         specifier: catalog:dev
@@ -5378,6 +5382,9 @@ packages:
   resolve@2.0.0-next.5:
     resolution: {integrity: sha512-U7WjGVG9sH8tvjW5SmGbQuui75FiyjAX72HX15DwBBwF9dNiQZRQAg9nnPhYy+TUnE0+VcrttuvNI8oSxZcocA==}
     hasBin: true
+
+  resume-theme@0.1.5:
+    resolution: {integrity: sha512-cU+PBP7O1dANj9pQQcs+StArGwmbfxzxcEE4OR5sehNwsFUBecw4+6YVIhZZysUwJhtREgmvcAVnCdEX5xlVuA==}
 
   reusify@1.0.4:
     resolution: {integrity: sha512-U9nH88a3fc/ekCF1l0/UP1IosiuIjyTh7hBvXVMHYgVcfGvt897Xguj2UOLDeI5BG2m7/uwyaLVT6fbtCwTyzw==}
@@ -12735,6 +12742,8 @@ snapshots:
       is-core-module: 2.16.1
       path-parse: 1.0.7
       supports-preserve-symlinks-flag: 1.0.0
+
+  resume-theme@0.1.5: {}
 
   reusify@1.0.4: {}
 

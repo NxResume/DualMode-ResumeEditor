@@ -46,6 +46,10 @@ export default defineNuxtConfig({
     preference: 'system',
     fallback: 'light',
   },
+
+  build: {
+    transpile: ['resume-theme'],
+  },
   future: {
     compatibilityVersion: 4,
   },
