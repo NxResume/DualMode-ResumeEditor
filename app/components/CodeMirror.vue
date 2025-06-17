@@ -170,6 +170,10 @@ onUnmounted(() => {
   @apply border-l-4 border-gray-300 pl-4 italic mb-4;
 }
 
+.prose p a {
+  @apply mx-1;
+}
+
 .prose a {
   @apply text-blue-600 hover:underline;
 }
