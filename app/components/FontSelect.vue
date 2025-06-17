@@ -19,7 +19,7 @@ onMounted(() => {
 
 <template>
   <Select v-model="settingStore.fontname">
-    <SelectTrigger class="bg-white h-6 w-[120px] cursor-pointer">
+    <SelectTrigger class="text-xs bg-white h-6 w-[100px] cursor-pointer">
       <SelectValue placeholder="Select a font" />
     </SelectTrigger>
     <SelectContent>

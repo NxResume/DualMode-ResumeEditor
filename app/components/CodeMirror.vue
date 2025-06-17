@@ -63,6 +63,7 @@ onUnmounted(() => {
 
 <style>
 .ͼ1.cm-focused {
-  outline: 2px solid rgba(39, 5, 125, 0.393);
+  outline: 2px solid #000;
+  @apply rounded-xs;
 }
 </style>
