@@ -22,11 +22,19 @@ catalogs:
     '@types/codemirror': ^5.60.16
     '@types/markdown-it': ^14.1.2
     '@types/markdown-it-container': ^2.0.10
+    '@unocss/preset-wind3': ^66.2.1
+    clsx: ^2.1.1
     eslint: ^9.28.0
     eslint-plugin-format: ^1.0.1
+    lucide-vue-next: ^0.516.0
+    reka-ui: ^2.3.1
+    shadcn-nuxt: 2.2.0
+    tailwind-merge: ^3.3.1
     typescript: ^5.8.3
-    vue-tsc: ^2.2.10
+    unocss-preset-animations: ^1.2.1
+    unocss-preset-shadcn: ^0.5.0
 
+    vue-tsc: ^2.2.10
   frontend:
     '@codemirror/commands': ^6.3.2
     '@codemirror/lang-markdown': ^6.3.2

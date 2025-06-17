@@ -9,6 +9,7 @@ export default defineNuxtConfig({
     '@vite-pwa/nuxt',
     '@nuxt/eslint',
     '@nuxtjs/i18n',
+    'shadcn-nuxt',
   ],
   devtools: { enabled: true },
   app: {
@@ -106,4 +107,12 @@ export default defineNuxtConfig({
     },
   },
   pwa,
+
+  shadcn: {
+    /**
+     * Prefix for all the imported component
+     */
+    prefix: '',
+    componentDir: '~/components/ui',
+  },
 })

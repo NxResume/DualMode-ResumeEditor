@@ -9,6 +9,8 @@ import {
   transformerDirectives,
   transformerVariantGroup,
 } from 'unocss'
+import presetAnimations from 'unocss-preset-animations'
+import { presetShadcn } from 'unocss-preset-shadcn'
 
 export default defineConfig({
   shortcuts: [
@@ -30,9 +32,32 @@ export default defineConfig({
       },
       processors: createLocalFontProcessor(),
     }),
+    presetShadcn(
+      // {
+      //   color: 'red',
+      //   // With default setting for SolidUI, you need to set the darkSelector option.
+      //   darkSelector: '[data-kb-theme="dark"]',
+      // },
+      // {
+      //   // If you are using reka ui.
+      //   componentLibrary: 'reka',
+      // },
+    ),
+    presetAnimations(),
   ],
   transformers: [
     transformerDirectives(),
     transformerVariantGroup(),
   ],
+
+  content: {
+    pipeline: {
+      include: [
+        // the default
+        /\.(vue|svelte|[jt]sx|mdx?|astro|elm|php|phtml|html)($|\?)/,
+        // include js/ts files
+        '(components|src)/**/*.{js,ts}',
+      ],
+    },
+  },
 })
