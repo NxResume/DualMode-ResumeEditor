@@ -32,7 +32,11 @@ watch(() => settingStore.isScrollable, () => {
   immediate: true,
 })
 
-async function handleExport() {
+async function handleExport(type: 'pdf' | 'png') {
+  if (type === 'png') {
+    return previewRef.value?.exportToImage()
+  }
+
   return previewRef.value?.exportToPDF()
 }
 </script>
@@ -48,7 +52,7 @@ async function handleExport() {
     </div>
     <!-- 右侧预览 -->
     <div ref="el" class="px-20 bg-[#606060] flex-shrink flex-grow flex-basis-0 relative overflow-auto">
-      <ExportButton variant="default" :on-export="handleExport" />
+      <ExportButton variant="default" :on-export="() => handleExport('pdf')" />
       <div
         class="w-full" :style="{
           scale: scalePre || 1,
@@ -63,7 +67,7 @@ async function handleExport() {
         </button>
       </NuxtLink>
       <ClientOnly>
-        <Plugin />
+        <Plugin :download-img="() => handleExport('png')" />
       </ClientOnly>
     </div>
   </div>

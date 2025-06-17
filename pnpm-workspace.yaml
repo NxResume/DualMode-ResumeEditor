@@ -45,6 +45,7 @@ catalogs:
     font-awesome: ^4.7.0
     html-to-image: ^1.11.13
     jspdf: ^3.0.1
+    jszip: ^3.10.1
     markdown-it: ^14.0.0
     markdown-it-container: ^4.0.0
     markdown-it-regex: ^0.2.2

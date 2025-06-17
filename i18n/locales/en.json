@@ -26,5 +26,10 @@
   "export": {
     "exporting": "Exporting...",
     "exportPdf": "Export PDF"
+  },
+  "plugin": {
+    "followScroll": "Follow Scroll",
+    "fullscreen": "Fullscreen",
+    "screenshot": "Screenshot"
   }
 }

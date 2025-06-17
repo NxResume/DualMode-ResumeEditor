@@ -75,6 +75,71 @@ async function exportToPDF() {
   pdf.save('resume.pdf')
 }
 
+async function exportToImage() {
+  if (!previewRef.value)
+    return
+
+  const wrapper = previewRef.value.querySelector('.rs-page-item-wrapper')
+  if (!wrapper)
+    return
+
+  const pages = wrapper.querySelectorAll('.rs-page-item')
+  if (pages.length === 0)
+    return
+
+  // 如果只有一页，直接导出
+  if (pages.length === 1) {
+    const dataUrl = await toPng(pages[0] as HTMLElement, {
+      quality: 1.0,
+      pixelRatio: 2,
+      skipFonts: false,
+      filter: () => true,
+      style: {
+        transform: 'none',
+      },
+    })
+
+    // 创建下载链接
+    const link = document.createElement('a')
+    link.download = 'resume.png'
+    link.href = dataUrl
+    link.click()
+    return
+  }
+
+  // 如果有多页，创建 zip 文件
+  const JSZip = (await import('jszip')).default
+  const zip = new JSZip()
+
+  // 遍历每一页并添加到 zip
+  for (let i = 0; i < pages.length; i++) {
+    const page = pages[i] as HTMLElement
+    const dataUrl = await toPng(page, {
+      quality: 1.0,
+      pixelRatio: 2,
+      skipFonts: false,
+      filter: () => true,
+      style: {
+        transform: 'none',
+      },
+    })
+
+    // 将 base64 转换为 blob
+    const base64Data = dataUrl.split(',')[1]
+    const blob = await fetch(`data:image/png;base64,${base64Data}`).then(res => res.blob())
+
+    // 添加到 zip
+    zip.file(`resume-page-${i + 1}.png`, blob)
+  }
+
+  // 生成并下载 zip
+  const content = await zip.generateAsync({ type: 'blob' })
+  const link = document.createElement('a')
+  link.download = 'resume-pages.zip'
+  link.href = URL.createObjectURL(content)
+  link.click()
+}
+
 // 提取重复逻辑为独立函数
 function handleAutoPaginate() {
   nextTick(() => {
@@ -97,6 +162,7 @@ onMounted(handleAutoPaginate)
 
 defineExpose({
   exportToPDF,
+  exportToImage,
 })
 </script>
 
@@ -154,12 +220,17 @@ defineExpose({
   width: 794px;
 }
 
-/* 添加导出按钮样式 */
-.export-button {
+/* 导出按钮容器样式 */
+.export-buttons {
   position: fixed;
   right: 20px;
   bottom: 20px;
   z-index: 100;
+  display: flex;
+  gap: 10px;
+}
+
+.export-button {
   padding: 12px 24px;
   background-color: #3b82f6;
   color: white;

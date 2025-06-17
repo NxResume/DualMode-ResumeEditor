@@ -43,6 +43,7 @@
     "font-awesome": "catalog:frontend",
     "html-to-image": "catalog:frontend",
     "jspdf": "catalog:frontend",
+    "jszip": "catalog:frontend",
     "lucide-vue-next": "catalog:dev",
     "markdown-it": "catalog:frontend",
     "markdown-it-container": "catalog:frontend",
