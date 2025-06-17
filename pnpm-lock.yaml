@@ -46,6 +46,9 @@ catalogs:
     '@types/markdown-it-container':
       specifier: ^2.0.10
       version: 2.0.10
+    '@types/turndown':
+      specifier: ^5.0.5
+      version: 5.0.5
     '@unocss/preset-wind3':
       specifier: ^66.2.1
       version: 66.2.1
@@ -122,9 +125,6 @@ catalogs:
     markdown-it-regex:
       specifier: ^0.2.2
       version: 0.2.2
-    marked:
-      specifier: ^15.0.12
-      version: 15.0.12
     pinia:
       specifier: ^3.0.2
       version: 3.0.2
@@ -202,7 +202,7 @@ importers:
         specifier: catalog:dev
         version: 2.0.10
       '@types/turndown':
-        specifier: ^5.0.5
+        specifier: catalog:dev
         version: 5.0.5
       '@unocss/eslint-config':
         specifier: catalog:build
@@ -258,9 +258,6 @@ importers:
       markdown-it-regex:
         specifier: catalog:frontend
         version: 0.2.2
-      marked:
-        specifier: catalog:frontend
-        version: 15.0.12
       nuxt:
         specifier: ^3.17.5
         version: 3.17.5(@parcel/watcher@2.5.1)(@types/node@22.15.29)(db0@0.3.2)(eslint@9.28.0(jiti@2.4.2))(ioredis@5.6.1)(magicast@0.3.5)(optionator@0.9.4)(rollup@4.41.1)(terser@5.39.0)(typescript@5.8.3)(vite@6.3.5(@types/node@22.15.29)(jiti@2.4.2)(terser@5.39.0)(yaml@2.7.0))(vue-tsc@2.2.10(typescript@5.8.3))(yaml@2.7.0)
@@ -4572,11 +4569,6 @@ packages:
 
   markdown-table@3.0.4:
     resolution: {integrity: sha512-wiYz4+JrLyb/DqW2hkFJxP7Vd7JuTDm77fvbM8VfEQdmSMqcImWeeRbHwZjBjIFki/VaMK2BhFi7oUUZeM5bqw==}
-
-  marked@15.0.12:
-    resolution: {integrity: sha512-8dD6FusOQSrpv9Z1rdNMdlSgQOIP880DHqnohobOmYLElGEqAL/JvxvuxZO16r4HtjTlfPRDC1hbvxC9dPN2nA==}
-    engines: {node: '>= 18'}
-    hasBin: true
 
   math-intrinsics@1.1.0:
     resolution: {integrity: sha512-/IXtbwEk5HTPyEwyKX6hGkYXxM9nbj64B+ilVJnC/R6B0pH5G4V3b0pVbL7DBj4tkhBAppbQUlf6F6Xl9LHu1g==}
@@ -11737,8 +11729,6 @@ snapshots:
       uc.micro: 2.1.0
 
   markdown-table@3.0.4: {}
-
-  marked@15.0.12: {}
 
   math-intrinsics@1.1.0: {}
 
