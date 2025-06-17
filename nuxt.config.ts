@@ -70,7 +70,7 @@ export default defineNuxtConfig({
     prerender: {
       crawlLinks: false,
       routes: ['/', '/edit'],
-      ignore: ['/hi'],
+      ignore: ['/assets/**'],
     },
   },
   vite: {
