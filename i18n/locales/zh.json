@@ -32,6 +32,8 @@
     "fullscreen": "全屏",
     "screenshot": "截图",
     "source": "源码模式",
-    "wysiwyg": "所见即所得模式"
+    "wysiwyg": "所见即所得模式",
+    "iconList": "图标列表",
+    "iconListTooltip": "Icon 图标调用规范：来自 iconify.design 资源库的图标，使用时需在名称前添加 'icon:' 前缀（如 'icon:font-awesome-home'），具体用法可参考官方文档。"
   }
 }

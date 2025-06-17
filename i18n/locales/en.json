@@ -32,6 +32,8 @@
     "fullscreen": "Fullscreen",
     "screenshot": "Screenshot",
     "source": "Source Mode",
-    "wysiwyg": "WYSIWYG Mode"
+    "wysiwyg": "WYSIWYG Mode",
+    "iconList": "Icon List",
+    "iconListTooltip": "Icon calling specification: For icons from the iconify.design resource library, add the 'icon:' prefix before the name when using (e.g., 'icon:font-awesome-home'), and refer to the official documentation for specific usage."
   }
 }

@@ -53,12 +53,12 @@ const { toggle } = useFullscreen(document.body)
         <TooltipTrigger>
           <NuxtLink to="https://icon-sets.iconify.design/ri/" target="_blank" class="item">
             <div class="i-ri-emotion-line" />
-            <Label for="icon-list" class="label">图标列表</Label>
+            <Label for="icon-list" class="label">{{ t('plugin.iconList') }}</Label>
           </NuxtLink>
         </TooltipTrigger>
         <TooltipContent>
           <p class="w-50">
-            Icon 图标使用，来自 iconify.design 文档中使用需要加"icon:"前缀.
+            {{ t('plugin.iconListTooltip') }}
           </p>
         </TooltipContent>
       </Tooltip>
