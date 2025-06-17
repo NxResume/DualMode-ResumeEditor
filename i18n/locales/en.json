@@ -30,6 +30,8 @@
   "plugin": {
     "followScroll": "Follow Scroll",
     "fullscreen": "Fullscreen",
-    "screenshot": "Screenshot"
+    "screenshot": "Screenshot",
+    "source": "Source Mode",
+    "wysiwyg": "WYSIWYG Mode"
   }
 }

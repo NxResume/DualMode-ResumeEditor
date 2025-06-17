@@ -18,7 +18,10 @@ const { toggle } = useFullscreen(document.body)
       <FontSelect />
     </div>
     <div class="item">
-      <Switch id="airplane-mode" :model-value="settingstore.isScrollable" @update:model-value="settingstore.isScrollable = $event" />
+      <Switch
+        id="airplane-mode" :model-value="settingstore.isScrollable"
+        @update:model-value="settingstore.isScrollable = $event"
+      />
       <Label for="airplane-mode" class="label">{{ t('plugin.followScroll') }}</Label>
     </div>
     <div class="item">
@@ -29,6 +32,16 @@ const { toggle } = useFullscreen(document.body)
       <div class="i-ri-image-line icon-btn" @click.stop="downloadImg" />
       <Label class="label">{{ t('plugin.screenshot') }}</Label>
     </div>
+    <div class="item">
+      <Switch
+        id="editor-mode" :model-value="settingstore.editorMode === 'source'"
+        @update:model-value="settingstore.editorMode = $event ? 'source' : 'wysiwyg'"
+      />
+      <Label for="editor-mode" class="label">
+        {{ settingstore.editorMode === 'source' ? t('plugin.source')
+          : t('plugin.wysiwyg')
+        }}</Label>
+    </div>
   </div>
 </template>
 
@@ -38,6 +51,6 @@ const { toggle } = useFullscreen(document.body)
 }
 
 .label {
-  @apply text-white font-normal text-xs!;
+  @apply text-white font-normal text-xs !;
 }
 </style>

@@ -5,6 +5,8 @@ import { fontList } from '~/constants'
 const useSettingsStore = defineStore('settings', () => {
   const isScrollable = useStorage('isScrollable', false)
   const fontname = useStorage('fontname', 'default')
+  const editorMode = useStorage<'source' | 'wysiwyg'>('editorMode', 'source')
+
   const fontMap = computed(() => {
     return fontList?.find(font => font.name === fontname.value)
   })
@@ -34,6 +36,7 @@ const useSettingsStore = defineStore('settings', () => {
   return {
     isScrollable: skipHydrate(isScrollable),
     fontname: skipHydrate(fontname),
+    editorMode: skipHydrate(editorMode),
     fontMap,
     loadFont,
   }

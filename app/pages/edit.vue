@@ -6,7 +6,7 @@ import { useResumeStore } from '@/stores/resume'
 import useSettingsStore from '~/stores/settings'
 
 const settingStore = useSettingsStore()
-
+const resumeStore = useResumeStore()
 const el = useTemplateRef('el')
 const leftRef = ref<InstanceType<typeof CodeMirror>>()
 const previewRef = ref<InstanceType<typeof MarkdownPreview>>()
@@ -19,10 +19,6 @@ const scalePre = computed(() => {
 definePageMeta({
   layout: 'default',
 })
-
-const resumeStore = useResumeStore()
-
-const currentMode = ref<'source' | 'mixed'>('source')
 
 watch(() => settingStore.isScrollable, () => {
   if (settingStore.isScrollable) {
@@ -48,7 +44,9 @@ async function handleExport(type: 'pdf' | 'png') {
       ref="leftRef"
       class="p-2 rounded-lg bg-white flex-none h-full w-480px shadow-lg overflow-x-hidden overflow-y-auto dark:bg-gray-800"
     >
-      <CodeMirror v-model="resumeStore.content" :mode="currentMode" />
+      <ClientOnly>
+        <CodeMirror v-model="resumeStore.content" :mode="settingStore.editorMode" />
+      </ClientOnly>
     </div>
     <!-- 右侧预览 -->
     <div ref="el" class="px-20 bg-[#606060] flex-shrink flex-grow flex-basis-0 relative overflow-auto">

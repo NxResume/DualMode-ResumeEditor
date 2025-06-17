@@ -30,6 +30,8 @@
   "plugin": {
     "followScroll": "跟随滚动",
     "fullscreen": "全屏",
-    "screenshot": "截图"
+    "screenshot": "截图",
+    "source": "源码模式",
+    "wysiwyg": "所见即所得模式"
   }
 }
