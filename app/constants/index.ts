@@ -10,7 +10,7 @@ export const fontList = [
   {
     name: 'Work Sans',
     value: 'Work-Sans',
-    assets: '/assets/font-preview/Work-Sans.woff2',
+    assets: '/assets/preview-fonts/Work-Sans.woff2',
   },
   {
     name: '苹果方正',
