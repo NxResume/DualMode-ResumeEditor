@@ -27,4 +27,9 @@ export const fontList = [
     value: 'Times New Roman',
     assets: '/assets/fonts/TimesNewRoman.ttf',
   },
+  {
+    name: '阿里巴巴普惠体',
+    value: 'AlibabaSans-Regular',
+    assets: '/assets/fonts/AlibabaSans-Regular.woff',
+  },
 ]
