@@ -31,14 +31,6 @@ const { toggle } = useFullscreen(document.body)
       <Label for="airplane-mode" class="label">{{ t('plugin.followScroll') }}</Label>
     </div>
     <div class="item">
-      <div class="i-ri-fullscreen-line icon-btn" @click.stop="toggle" />
-      <Label class="label">{{ t('plugin.fullscreen') }}</Label>
-    </div>
-    <div class="item">
-      <div class="i-ri-image-line icon-btn" @click.stop="downloadImg" />
-      <Label class="label">{{ t('plugin.screenshot') }}</Label>
-    </div>
-    <div class="item">
       <Switch
         id="editor-mode" :model-value="settingstore.editorMode === 'source'"
         @update:model-value="settingstore.editorMode = $event ? 'source' : 'wysiwyg'"
@@ -63,6 +55,14 @@ const { toggle } = useFullscreen(document.body)
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>
+    <div class="item">
+      <div class="i-ri-image-line icon-btn" @click.stop="downloadImg" />
+      <Label class="label">{{ t('plugin.screenshot') }}</Label>
+    </div>
+    <div class="item">
+      <div class="i-ri-fullscreen-line icon-btn" @click.stop="toggle" />
+      <Label class="label">{{ t('plugin.fullscreen') }}</Label>
+    </div>
   </div>
 </template>
 
