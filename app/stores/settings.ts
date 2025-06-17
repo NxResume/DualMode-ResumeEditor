@@ -8,7 +8,7 @@ const useSettingsStore = defineStore('settings', () => {
   const editorMode = useStorage<'source' | 'wysiwyg'>('nuxt-resume-editor-editorMode', 'source')
 
   const fontMap = computed(() => {
-    return fontList?.find(font => font.name === fontname.value)
+    return fontList?.find(font => font.value === fontname.value)
   })
 
   const loadFont = () => {
