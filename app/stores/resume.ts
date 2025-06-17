@@ -11,7 +11,7 @@ export interface ResumeData {
 
 export const useResumeStore = defineStore('resume', () => {
   // state
-  const content = useLocalStorage('resume', tm1)
+  const content = useLocalStorage('nuxt-resume-editor-resume', tm1)
   const theme = ref('default')
   const plugins = ref<string[]>([])
 

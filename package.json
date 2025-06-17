@@ -1,4 +1,5 @@
 {
+  "name": "nuxt-resume-editor",
   "type": "module",
   "private": true,
   "packageManager": "pnpm@10.11.1",

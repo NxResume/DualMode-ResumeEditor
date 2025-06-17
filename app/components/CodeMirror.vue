@@ -151,11 +151,11 @@ onUnmounted(() => {
 }
 
 .prose ul {
-  @apply list-disc list-inside mb-4;
+  @apply list-disc mb-4;
 }
 
 .prose ol {
-  @apply list-decimal list-inside mb-4;
+  @apply list-decimal mb-4;
 }
 
 .prose code {

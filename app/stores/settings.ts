@@ -3,9 +3,9 @@ import { skipHydrate } from 'pinia'
 import { fontList } from '~/constants'
 
 const useSettingsStore = defineStore('settings', () => {
-  const isScrollable = useStorage('isScrollable', false)
-  const fontname = useStorage('fontname', 'default')
-  const editorMode = useStorage<'source' | 'wysiwyg'>('editorMode', 'source')
+  const isScrollable = useStorage('nuxt-resume-editor-isScrollable', false)
+  const fontname = useStorage('nuxt-resume-editor-fontname', 'default')
+  const editorMode = useStorage<'source' | 'wysiwyg'>('nuxt-resume-editor-editorMode', 'source')
 
   const fontMap = computed(() => {
     return fontList?.find(font => font.name === fontname.value)

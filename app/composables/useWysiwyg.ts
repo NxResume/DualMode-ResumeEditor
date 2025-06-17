@@ -18,6 +18,17 @@ export function useWysiwyg(props: { modelValue: string }, emit: (event: 'update:
     headingStyle: 'atx',
     codeBlockStyle: 'fenced',
     emDelimiter: '*',
+    bulletListMarker: '-',
+  })
+
+  turndown.addRule('twoSpaceList', {
+    filter: 'li',
+    replacement: (content) => {
+      // 获取列表标记（如 `-`、`*`）
+      const bullet = turndown.options.bulletListMarker || '*'
+      // 移除内容前的所有空格，添加 2 个空格
+      return `${bullet} ${content.trimStart()}\n`
+    },
   })
 
   // 添加自定义规则
