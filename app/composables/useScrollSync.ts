@@ -7,7 +7,7 @@ export function useScrollSync(leftRef: Ref<any>, rightRef: Ref<any>) {
   const { y: rightScrollY } = useScroll(rightRef)
 
   // 监听左边编辑器的滚动，更新右边预览的滚动位置
-  watchEffect(() => {
+  const stopLeft = watchEffect(() => {
     if (leftRef.value && rightRef.value) {
       const leftHeight = leftRef.value.scrollHeight
       const rightHeight = rightRef.value.scrollHeight
@@ -19,7 +19,7 @@ export function useScrollSync(leftRef: Ref<any>, rightRef: Ref<any>) {
   })
 
   // 监听右边预览的滚动，更新左边编辑器的滚动位置
-  watchEffect(() => {
+  const stopRight = watchEffect(() => {
     if (leftRef.value && rightRef.value) {
       const leftHeight = leftRef.value.scrollHeight
       const rightHeight = rightRef.value.scrollHeight
@@ -29,4 +29,10 @@ export function useScrollSync(leftRef: Ref<any>, rightRef: Ref<any>) {
       leftRef.value.scrollTop = scrollRatio * leftHeight
     }
   })
+
+  // 返回一个停止函数
+  return () => {
+    stopLeft()
+    stopRight()
+  }
 }

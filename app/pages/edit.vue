@@ -22,7 +22,12 @@ definePageMeta({
 
 watch(() => settingStore.isScrollable, () => {
   if (settingStore.isScrollable) {
-    useScrollSync(leftRef, el)
+    const stop = useScrollSync(leftRef, el)
+    watch(() => settingStore.isScrollable, (newValue) => {
+      if (!newValue) {
+        stop()
+      }
+    })
   }
 }, {
   immediate: true,
