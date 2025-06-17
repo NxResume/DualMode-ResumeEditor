@@ -24,7 +24,7 @@ onMounted(() => {
     </SelectTrigger>
     <SelectContent>
       <SelectGroup>
-        <SelectItem v-for="item in fontList" :key="item.value" class="text-xs cursor-pointer" :value="item.name">
+        <SelectItem v-for="item in fontList" :key="item.value" class="text-xs cursor-pointer" :value="item.value">
           {{ item.name }}
         </SelectItem>
       </SelectGroup>
