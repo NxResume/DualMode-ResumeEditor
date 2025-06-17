@@ -1,6 +1,12 @@
 <script lang="ts" setup>
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
 import useSettingsStore from '~/stores/settings'
 
 defineProps<{
@@ -42,6 +48,21 @@ const { toggle } = useFullscreen(document.body)
           : t('plugin.wysiwyg')
         }}</Label>
     </div>
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger>
+          <NuxtLink to="https://icon-sets.iconify.design/ri/" target="_blank" class="item">
+            <div class="i-ri-emotion-line" />
+            <Label for="icon-list" class="label">图标列表</Label>
+          </NuxtLink>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p class="w-50">
+            Icon 图标使用，来自 iconify.design 文档中使用需要加"icon:"前缀.
+          </p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   </div>
 </template>
 
