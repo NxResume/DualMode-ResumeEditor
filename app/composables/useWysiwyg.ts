@@ -92,7 +92,11 @@ export function useWysiwyg(props: { modelValue: string }, emit: (event: 'update:
   }
 
   // 监听内容变化
-  watch(() => props.modelValue, updatePreview)
+  watch(() => props.modelValue, (newValue) => {
+    if (previewRef.value) {
+      previewRef.value.innerHTML = md.render(newValue)
+    }
+  })
 
   // 组件挂载时初始化内容
   onMounted(() => {

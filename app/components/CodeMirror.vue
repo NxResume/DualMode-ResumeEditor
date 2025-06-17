@@ -16,7 +16,7 @@ const emit = defineEmits<{
 }>()
 
 const editorRef = ref<HTMLElement>()
-let view: EditorView
+let view: EditorView | undefined
 
 // 配置 Turndown 转换器
 const turndown = new TurndownService({
@@ -37,11 +37,34 @@ const { previewRef, handlePaste, handleWysiwygEdit, updatePreview } = useWysiwyg
 // 监听模式变化
 watch(() => props.mode, (newMode) => {
   if (newMode === 'wysiwyg') {
-    updatePreview()
+    // 在切换到 WYSIWYG 模式时，确保内容同步
+    if (view) {
+      const currentContent = view.state.doc.toString()
+      if (currentContent !== props.modelValue) {
+        emit('update:modelValue', currentContent)
+      }
+    }
+    // 确保在内容更新后再更新预览
+    nextTick(() => {
+      updatePreview()
+    })
+  }
+  else {
+    // 在切换到 source 模式时，确保编辑器内容是最新的
+    nextTick(() => {
+      if (view) {
+        // 先销毁旧的编辑器实例
+        view.destroy()
+        view = undefined
+      }
+      // 重新初始化编辑器
+      initEditor()
+    })
   }
 })
 
-onMounted(() => {
+// 初始化编辑器
+function initEditor() {
   if (!editorRef.value)
     return
 
@@ -63,8 +86,13 @@ onMounted(() => {
     state,
     parent: editorRef.value,
   })
+}
+
+onMounted(() => {
+  initEditor()
 })
 
+// 监听内容变化
 watch(() => props.modelValue, (newValue) => {
   if (view && newValue !== view.state.doc.toString()) {
     view.dispatch({
