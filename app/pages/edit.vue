@@ -60,7 +60,6 @@ async function handleExport() {
       <NuxtLink to="/">
         <button class="return-btn">
           <div class="i-ri-arrow-left-line" />
-          <!-- <span>返回</span> -->
         </button>
       </NuxtLink>
       <ClientOnly>
@@ -70,9 +69,12 @@ async function handleExport() {
   </div>
 </template>
 
-<style>
+<style scoped>
 .return-btn {
-  @apply fixed z-10 top-2 left-34% flex items-center gap-2 px-4 py-2.5 bg-white/90 backdrop-blur-sm rounded-full shadow-lg text-gray-700 cursor-pointer transition-all duration-300 ease-in-out hover:bg-white hover:shadow-xl hover:scale-105;
+  @apply flex items-center gap-2 px-4 py-2.5;
+  @apply fixed z-10 top-0 left-34% rounded-md;
+  @apply text-white backdrop-blur-sm cursor-pointer transition-all duration-300 ease-in-out;
+  @apply hover:scale-110;
 }
 
 .return-btn span {
