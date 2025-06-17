@@ -6,3 +6,4 @@ dist
 .nuxt
 .env
 .idea/
+public/assets/fonts
