@@ -1,9 +1,13 @@
 <script lang="ts" setup>
 const routes = useRoute()
 
-watchEffect(() => {
-  const isEdit = routes.path.includes('/edit')
-  document.documentElement.style.setProperty('--nuxt-btn-link', isEdit ? '#fff' : '#000')
+onMounted(() => {
+  watchEffect(() => {
+    if (import.meta.client) {
+      const isEdit = routes.path.includes('/edit')
+      document.documentElement.style.setProperty('--nuxt-btn-link', isEdit ? '#fff' : '#000')
+    }
+  })
 })
 </script>
 
