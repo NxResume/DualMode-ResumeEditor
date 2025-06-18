@@ -9,7 +9,7 @@ const settingStore = useSettingsStore()
 const resumeStore = useResumeStore()
 const el = useTemplateRef('el')
 const leftRef = ref<InstanceType<typeof CodeMirror>>()
-const previewRef = ref<InstanceType<typeof MarkdownPreview>>()
+const codeMirrorRef = ref<InstanceType<typeof MarkdownPreview>>()
 const { width } = useElementSize(el)
 
 const scalePre = computed(() => {
@@ -20,7 +20,8 @@ definePageMeta({
   layout: 'default',
 })
 
-watch(() => settingStore.isScrollable, () => {
+// app/pages/edit.vue
+watch(() => [settingStore.isScrollable, settingStore.editorMode], () => {
   if (settingStore.isScrollable) {
     const stop = useScrollSync(leftRef, el)
     watch(() => settingStore.isScrollable, (newValue) => {
@@ -35,10 +36,10 @@ watch(() => settingStore.isScrollable, () => {
 
 async function handleExport(type: 'pdf' | 'png') {
   if (type === 'png') {
-    return previewRef.value?.exportToImage()
+    return codeMirrorRef.value?.exportToImage()
   }
 
-  return previewRef.value?.exportToPDF()
+  return codeMirrorRef.value?.exportToPDF()
 }
 </script>
 
@@ -62,7 +63,7 @@ async function handleExport(type: 'pdf' | 'png') {
           transformOrigin: 'top left',
         }"
       >
-        <MarkdownPreview ref="previewRef" :content="resumeStore.content" />
+        <MarkdownPreview ref="codeMirrorRef" :content="resumeStore.content" />
       </div>
       <NuxtLink to="/">
         <button class="return-btn">

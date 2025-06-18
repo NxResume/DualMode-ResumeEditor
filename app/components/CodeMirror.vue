@@ -3,7 +3,6 @@ import { defaultKeymap } from '@codemirror/commands'
 import { markdown } from '@codemirror/lang-markdown'
 import { EditorState } from '@codemirror/state'
 import { EditorView, keymap } from '@codemirror/view'
-import TurndownService from 'turndown'
 import { useWysiwyg } from '~/composables/useWysiwyg'
 
 const props = defineProps<{
@@ -17,19 +16,6 @@ const emit = defineEmits<{
 
 const editorRef = ref<HTMLElement>()
 let view: EditorView | undefined
-
-// 配置 Turndown 转换器
-const turndown = new TurndownService({
-  headingStyle: 'atx',
-  codeBlockStyle: 'fenced',
-  emDelimiter: '*',
-})
-
-// 添加自定义规则
-turndown.addRule('strikethrough', {
-  filter: ['del', 's'],
-  replacement: (content: string) => `~~${content}~~`,
-})
 
 // 使用 WYSIWYG composable
 const { previewRef, handlePaste, handleWysiwygEdit, updatePreview } = useWysiwyg(props, emit)
@@ -116,7 +102,7 @@ onUnmounted(() => {
     <div
       v-else
       ref="previewRef"
-      class="prose-sm p-4 h-full max-w-none overflow-auto prose"
+      class="p-4 h-full overflow-visible prose"
       contenteditable="true"
       @input="handleWysiwygEdit"
       @paste="handlePaste"
