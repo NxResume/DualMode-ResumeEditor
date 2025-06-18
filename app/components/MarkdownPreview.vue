@@ -1,5 +1,7 @@
 <script setup lang="ts">
+import { isClient } from '@vueuse/core'
 import { toPng } from 'html-to-image'
+import { useResumeStore } from '~/stores/resume'
 import { autoPaginate, DEFAULT_CONFIG } from '~/utils/pagination'
 
 const props = defineProps<{
@@ -147,11 +149,11 @@ function handleAutoPaginate() {
   })
 }
 
-// 监听内容变化
-watch(() => props.content, handleAutoPaginate)
+watch([() => props.content], handleAutoPaginate, {
+  immediate: true,
+})
 
 onMounted(handleAutoPaginate)
-
 defineExpose({
   exportToPDF,
   exportToImage,

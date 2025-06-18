@@ -65,5 +65,6 @@ export const useResumeStore = defineStore('resume', () => {
     setTheme,
     addPlugin,
     removePlugin,
+    applyTheme,
   }
 })
