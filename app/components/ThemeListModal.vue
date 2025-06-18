@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import type { ThemeName } from 'resume-theme'
-import reTheme from 'resume-theme'
+import type { ThemeName } from '~/utils'
 import { useI18n } from 'vue-i18n'
 import { Button } from '@/components/ui/button'
 import {
@@ -12,6 +11,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
+import { reTheme } from '~/utils'
 
 const resumeStore = useResumeStore()
 const { t } = useI18n()
@@ -63,7 +63,7 @@ function handleThemeSelect(theme: ThemeName) {
           </div>
           <div class="theme-label">
             {{ theme.label }}
-            <div v-if="theme.isSelected" class="theme-selected-icon i-ri-check-line" />
+            <div v-if="theme.isSelected" class="theme-selected-icon i-ri-checkbox-circle-line" />
           </div>
         </div>
       </div>
@@ -85,15 +85,15 @@ function handleThemeSelect(theme: ThemeName) {
 }
 
 .theme-selected-icon {
-  @apply absolute top-2 right-2 text-primary text-xl bg-white rounded-full p-1;
+  @apply absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-2xl bg-primary/90 rounded-full p-1.5 shadow-lg backdrop-blur-sm;
 }
 
 .theme-image {
-  @apply w-200px overflow-hidden;
+  @apply overflow-hidden;
 }
 
 .theme-image img {
-  @apply h-full object-cover transition-transform duration-200 hover:scale-105;
+  @apply w-full object-cover transition-transform duration-200 hover:scale-105;
 }
 
 .theme-label {

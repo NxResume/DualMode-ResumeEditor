@@ -1,8 +1,8 @@
 import { isClient, useLocalStorage } from '@vueuse/core'
 import { defineStore, skipHydrate } from 'pinia'
-import retheme, { ThemeName } from 'resume-theme'
 import { ref } from 'vue'
 import tm1 from '~/templates/tm1.md?raw'
+import { reTheme, ThemeName } from '~/utils'
 
 export interface ResumeData {
   content: string
@@ -37,7 +37,7 @@ export const useResumeStore = defineStore('resume', () => {
 
   const applyTheme = () => {
     nextTick(() => {
-      retheme.setTheme(theme.value)
+      reTheme.setTheme(theme.value)
     })
   }
 

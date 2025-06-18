@@ -1,9 +1,7 @@
 <script setup lang="ts">
 import { toPng } from 'html-to-image'
-import reTheme, { ThemeName } from 'resume-theme'
-
+import { reTheme, ThemeName } from '~/utils'
 import { autoPaginate, DEFAULT_CONFIG } from '~/utils/pagination'
-import 'resume-theme/themes'
 
 const props = defineProps<{
   content: string
