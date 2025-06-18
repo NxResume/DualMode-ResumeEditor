@@ -41,11 +41,15 @@ export const useResumeStore = defineStore('resume', () => {
     })
   }
 
-  if (isClient) {
-    watch(theme, applyTheme, {
-      immediate: true,
-    })
-  }
+  onMounted(() => {
+    if (isClient) {
+      applyTheme()
+
+      watch(theme, applyTheme, {
+        immediate: true,
+      })
+    }
+  })
 
   return {
     // state
