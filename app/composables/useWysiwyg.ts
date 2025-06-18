@@ -37,6 +37,18 @@ export function useWysiwyg(props: { modelValue: string }, emit: (event: 'update:
     replacement: (content: string) => `~~${content}~~`,
   })
 
+  // 添加规则以保留特定的 HTML 标签
+  turndown.addRule('preserveTags', {
+    filter: (node) => {
+      return node.nodeType === 1
+        && node.nodeName.toLowerCase() === 'a'
+        && (node as HTMLElement).classList.contains('p')
+    },
+    replacement: (content, node) => {
+      return (node as HTMLElement).outerHTML
+    },
+  })
+
   // 更新内容并保持光标位置
   const updateContent = (content: string, callback?: () => void) => {
     emit('update:modelValue', content)
