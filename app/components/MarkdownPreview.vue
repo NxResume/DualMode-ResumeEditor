@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { isClient } from '@vueuse/core'
 import { toPng } from 'html-to-image'
 import { useResumeStore } from '~/stores/resume'
 import { autoPaginate, DEFAULT_CONFIG } from '~/utils/pagination'
@@ -134,26 +133,35 @@ async function exportToImage() {
   link.click()
 }
 
+// 监听内容变化
+const resumeStore = useResumeStore()
 // 提取重复逻辑为独立函数
 function handleAutoPaginate() {
   nextTick(() => {
-    if (previewRef.value) {
-      const wrapper = previewRef.value.querySelector('.rs-page-item-wrapper')
-      if (wrapper) {
-        autoPaginate(wrapper as HTMLElement, md.value.html, {
-          ...DEFAULT_CONFIG,
-          themeClass: theme,
-        })
+    setTimeout(() => {
+      if (previewRef.value) {
+        const wrapper = previewRef.value.querySelector('.rs-page-item-wrapper')
+        if (wrapper) {
+          autoPaginate(wrapper as HTMLElement, md.value.html, {
+            ...DEFAULT_CONFIG,
+            themeClass: theme,
+            themeName: resumeStore.theme,
+          })
+        }
       }
-    }
+    }, 0)
   })
 }
 
-watch([() => props.content], handleAutoPaginate, {
+watch([() => props.content, () => resumeStore.theme], () => {
+  handleAutoPaginate()
+}, {
   immediate: true,
 })
 
-onMounted(handleAutoPaginate)
+onMounted(() => {
+  handleAutoPaginate()
+})
 defineExpose({
   exportToPDF,
   exportToImage,

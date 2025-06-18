@@ -46,14 +46,16 @@ export const useResumeStore = defineStore('resume', () => {
     if (isClient) {
       // 确保先应用当前主题
       applyTheme()
-
-      watch(theme, () => {
-        applyTheme()
-      }, {
-        immediate: true,
-      })
     }
   })
+
+  if (isClient) {
+    watch(theme, () => {
+      applyTheme()
+    }, {
+      immediate: true,
+    })
+  }
 
   return {
     // state

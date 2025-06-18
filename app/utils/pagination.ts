@@ -4,6 +4,7 @@ export interface PaginationConfig {
   padding: number
   noSplitTags: string[]
   themeClass: string
+  themeName: string
 }
 
 // 默认配置
@@ -12,7 +13,14 @@ export const DEFAULT_CONFIG: PaginationConfig = {
   padding: 36,
   noSplitTags: ['img', 'table', 'pre', 'code'],
   themeClass: 'prose',
+  themeName: 'default',
 }
+
+// 特殊主题列表
+export const themeListNoSpecial = [
+  'blueSimplicity',
+  'blackToppedSimple',
+]
 
 // 获取元素的实际高度
 export function getElementHeight(element: HTMLElement): number {
@@ -116,8 +124,6 @@ export function autoPaginate(
   try {
     // 合并配置
     const config = { ...DEFAULT_CONFIG, ...customConfig }
-    const maxPageHeight = config.pageHeight - (config.padding * 2)
-
     // 清空现有内容
     wrapper.innerHTML = ''
 
@@ -130,18 +136,25 @@ export function autoPaginate(
     // 获取所有需要分页的元素
     const elements = Array.from(tempContainer.children) as HTMLElement[]
 
-    // 创建第一页
+    // 创建第一页 + 添加页码跟踪
     let currentPage = createNewPage()
+    let currentPageIndex = 1 // 当前页码从 1 开始
     wrapper.appendChild(currentPage)
 
     // 当前页面已使用的高度
     let currentPageHeight = 0
 
+    // 判断当前主题是否属于特殊主题
+    const isSpecialTheme = themeListNoSpecial.includes(config.themeName)
     // 遍历所有元素
     for (const element of elements) {
       const elementHeight = getElementHeight(element)
+      // 如果是特殊主题且是第一页，移除 padding-top
+      const maxPageHeight = isSpecialTheme && currentPageIndex === 1
+        ? config.pageHeight - config.padding
+        : config.pageHeight - config.padding * 2
 
-      // 如果当前元素高度超过页面高度，需要特殊处理
+      // 如果当前元素高度超过页面最大高度
       if (elementHeight > maxPageHeight) {
         // 如果元素可以被分割
         if (canSplitElement(element, config)) {
@@ -154,15 +167,31 @@ export function autoPaginate(
               currentPageHeight,
               maxPageHeight,
             )
+
             currentPage = newPage
             currentPageHeight = newPageHeight
+
+            // 新建页面后页码递增
+            currentPageIndex++
+
+            // 如果是特殊主题且是第一页，移除 padding-top
+            if (isSpecialTheme && currentPageIndex === 1) {
+              currentPage.style.paddingTop = '0px'
+            }
           }
         }
         else {
           // 不可分割的元素，直接创建新页面
           wrapper.appendChild(createPageSplit())
           currentPage = createNewPage()
+          currentPageIndex++ // 页码递增
           wrapper.appendChild(currentPage)
+
+          // 如果是特殊主题且是第一页，移除 padding-top
+          if (isSpecialTheme && currentPageIndex === 1) {
+            currentPage.style.paddingTop = '0px'
+          }
+
           currentPage.appendChild(element)
           currentPageHeight = elementHeight
         }
@@ -172,7 +201,14 @@ export function autoPaginate(
         if (currentPageHeight + elementHeight > maxPageHeight) {
           wrapper.appendChild(createPageSplit())
           currentPage = createNewPage()
+          currentPageIndex++ // 页码递增
           wrapper.appendChild(currentPage)
+
+          // 如果是特殊主题且是第一页，移除 padding-top
+          if (isSpecialTheme && currentPageIndex === 1) {
+            currentPage.style.paddingTop = '0px'
+          }
+
           currentPageHeight = 0
         }
 
