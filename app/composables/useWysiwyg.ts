@@ -25,20 +25,16 @@ export function useWysiwyg(props: { modelValue: string }, emit: (event: 'update:
   turndown.addRule('twoSpaceList', {
     filter: 'li',
     replacement: (content) => {
-      // 获取列表标记（如 `-`、`*`）
       const bullet = turndown.options.bulletListMarker || '*'
-      // 移除内容前的所有空格，添加 2 个空格
       return `${bullet} ${content.trimStart()}\n`
     },
   })
 
-  // 添加自定义规则
   turndown.addRule('strikethrough', {
     filter: ['del', 's'],
     replacement: (content: string) => `~~${content}~~`,
   })
 
-  // 添加规则以保留特定的 HTML 标签
   turndown.addRule('preserveTags', {
     filter: (node) => {
       return node.nodeType === 1
@@ -59,6 +55,78 @@ export function useWysiwyg(props: { modelValue: string }, emit: (event: 'update:
     nextTick(() => {
       isUpdating = false
     })
+  }
+
+  // 处理标题和内容控件
+  const handleFormat = (type: 'h1' | 'h2' | 'h3' | 'h4' | 'p') => {
+    if (!previewRef.value)
+      return
+
+    const selection = window.getSelection()
+    if (!selection || !selection.rangeCount)
+      return
+
+    const range = selection.getRangeAt(0)
+    const selectedContent = range.toString()
+    const parentElement = range.commonAncestorContainer.parentElement
+
+    if (!parentElement)
+      return
+
+    // 如果已经是目标类型，不做任何改变
+    if (parentElement.tagName.toLowerCase() === type) {
+      return
+    }
+
+    // 创建新的元素
+    const newElement = document.createElement(type)
+
+    const isCollapsed = range.collapsed
+
+    if (selectedContent) {
+      // 如果有选中内容，替换它
+      newElement.textContent = selectedContent
+      range.deleteContents()
+      range.insertNode(newElement)
+    }
+    else {
+      // 如果没有选中内容，将当前段落转换为目标类型
+      // 保存当前元素的所有子节点
+      const childNodes = Array.from(parentElement.childNodes)
+
+      // 将子节点移动到新元素中
+      childNodes.forEach((child) => {
+        newElement.appendChild(child)
+      })
+
+      // 替换当前元素
+      parentElement.parentNode?.replaceChild(newElement, parentElement)
+    }
+
+    // 恢复光标位置
+    nextTick(() => {
+      if (!selection || !newElement)
+        return
+
+      const newRange = document.createRange()
+
+      if (isCollapsed) {
+        // 如果之前是折叠的选区，将光标放在新元素的开始位置
+        newRange.setStart(newElement, 0)
+        newRange.setEnd(newElement, 0)
+      }
+      else {
+        // 如果有选中内容，将选区设置为整个新元素
+        newRange.selectNodeContents(newElement)
+      }
+
+      selection.removeAllRanges()
+      selection.addRange(newRange)
+    })
+
+    // 更新内容
+    const markdown = turndown.turndown(previewRef.value.innerHTML)
+    updateContent(markdown)
   }
 
   // 处理粘贴事件
@@ -96,7 +164,6 @@ export function useWysiwyg(props: { modelValue: string }, emit: (event: 'update:
     if (!target)
       return
 
-    // 防止空内容
     if (!target.innerHTML.trim()) {
       updateContent('')
       return
@@ -129,7 +196,6 @@ export function useWysiwyg(props: { modelValue: string }, emit: (event: 'update:
   // 组件挂载时初始化内容
   onMounted(() => {
     if (previewRef.value) {
-      // 初始化内容
       previewRef.value.innerHTML = md.render(props.modelValue)
     }
   })
@@ -139,5 +205,6 @@ export function useWysiwyg(props: { modelValue: string }, emit: (event: 'update:
     handlePaste,
     handleWysiwygEdit,
     updatePreview,
+    handleFormat,
   }
 }
