@@ -38,6 +38,7 @@
     "@vite-pwa/nuxt": "catalog:build",
     "@vueuse/core": "catalog:frontend",
     "@vueuse/nuxt": "catalog:build",
+    "class-variance-authority": "catalog:dev",
     "clsx": "catalog:dev",
     "codemirror": "catalog:frontend",
     "eslint": "catalog:dev",

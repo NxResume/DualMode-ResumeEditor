@@ -1,6 +1,5 @@
 packages: []
 
-catalog:
 catalogs:
   build:
     '@nuxt/devtools': ^2.5.0
@@ -25,6 +24,7 @@ catalogs:
     '@types/markdown-it-container': ^2.0.10
     '@types/turndown': ^5.0.5
     '@unocss/preset-wind3': ^66.2.1
+    class-variance-authority: ^0.7.1
     clsx: ^2.1.1
     eslint: ^9.28.0
     eslint-plugin-format: ^1.0.1

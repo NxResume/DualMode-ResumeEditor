@@ -1,5 +1,6 @@
-import { useLocalStorage } from '@vueuse/core'
+import { isClient, useLocalStorage } from '@vueuse/core'
 import { defineStore, skipHydrate } from 'pinia'
+import retheme, { ThemeName } from 'resume-theme'
 import { ref } from 'vue'
 import tm1 from '~/templates/tm1.md?raw'
 
@@ -12,7 +13,7 @@ export interface ResumeData {
 export const useResumeStore = defineStore('resume', () => {
   // state
   const content = useLocalStorage('nuxt-resume-editor-resume', tm1)
-  const theme = ref('default')
+  const theme = useLocalStorage<ThemeName>('nuxt-resume-editor-theme', ThemeName.Default)
   const plugins = ref<string[]>([])
 
   // actions
@@ -20,7 +21,7 @@ export const useResumeStore = defineStore('resume', () => {
     content.value = newContent
   }
 
-  function setTheme(newTheme: string) {
+  function setTheme(newTheme: ThemeName) {
     theme.value = newTheme
   }
 
@@ -34,10 +35,22 @@ export const useResumeStore = defineStore('resume', () => {
     plugins.value = plugins.value.filter(p => p !== plugin)
   }
 
+  const applyTheme = () => {
+    nextTick(() => {
+      retheme.setTheme(theme.value)
+    })
+  }
+
+  if (isClient) {
+    watch(theme, applyTheme, {
+      immediate: true,
+    })
+  }
+
   return {
     // state
     content: skipHydrate(content),
-    theme,
+    theme: skipHydrate(theme),
     plugins,
     // actions
     setContent,

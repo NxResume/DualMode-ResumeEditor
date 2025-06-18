@@ -28,6 +28,7 @@
     "exportPdf": "Export PDF"
   },
   "plugin": {
+    "theme": "Theme",
     "followScroll": "Follow Scroll",
     "fullscreen": "Fullscreen",
     "screenshot": "Screenshot",
@@ -35,5 +36,9 @@
     "wysiwyg": "WYSIWYG Mode",
     "iconList": "Icon List",
     "iconListTooltip": "Icon calling specification: For icons from the iconify.design resource library, add the 'icon:' prefix before the name when using (e.g., 'icon:font-awesome-home'), and refer to the official documentation for specific usage."
+  },
+  "themeList": {
+    "title": "Theme List",
+    "description": "Select a resume theme style you like, click to apply"
   }
 }
