@@ -8,13 +8,8 @@ const props = defineProps<{
 }>()
 
 const theme = 'markdown-body'
-
 const md = computed(() => useMarkdown(props.content))
 const previewRef = ref<HTMLElement | null>(null)
-
-onMounted(() => {
-  reTheme.setTheme(ThemeName.Default)
-})
 
 async function exportToPDF() {
   if (!previewRef.value)

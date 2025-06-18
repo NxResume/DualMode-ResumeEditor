@@ -4,8 +4,8 @@
 
 上海| 群众| 上海交通大学 | 软件工程
 
-[icon:ri/home-office-line https://test.com](https://test.com)
-[icon:ri/github-line https://github.com/test](https://github.com/test) (**star>200+**)
+[icon:ri/home-office-line https://ryanuo.cc](https://ryanuo.cc)
+[icon:ri/github-line https://github.com/ryanuo](https://github.com/ryanuo) (**star>200+**)
 :::
 
 ::: right
