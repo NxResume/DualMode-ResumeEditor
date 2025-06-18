@@ -62,7 +62,7 @@ function handleThemeSelect(theme: ThemeName) {
             <img :src="theme.image" :alt="theme.label" srcset="">
           </div>
           <div class="theme-label">
-            {{ theme.label }}
+            <!-- {{ theme.label }} -->
             <div v-if="theme.isSelected" class="theme-selected-icon i-ri-checkbox-circle-line" />
           </div>
         </div>
@@ -96,9 +96,9 @@ function handleThemeSelect(theme: ThemeName) {
   @apply w-full object-cover transition-transform duration-200 hover:scale-105;
 }
 
-.theme-label {
+/* .theme-label {
   @apply p-3 text-center font-medium text-gray-700 flex items-center justify-center gap-2;
-}
+} */
 
 .dialogContent {
   @apply overflow-auto max-h-[80vh] max-w-[80%] pt-0 px-0;
