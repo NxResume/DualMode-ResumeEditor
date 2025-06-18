@@ -4,6 +4,7 @@ import { nextTick, onMounted, ref, watch } from 'vue'
 
 export function useWysiwyg(props: { modelValue: string }, emit: (event: 'update:modelValue', value: string) => void) {
   const previewRef = ref<HTMLElement | null>(null)
+  let isUpdating = false
 
   // 配置 Markdown 渲染器
   const md = new MarkdownIt({
@@ -49,11 +50,14 @@ export function useWysiwyg(props: { modelValue: string }, emit: (event: 'update:
     },
   })
 
-  // 更新内容并保持光标位置
-  const updateContent = (content: string, callback?: () => void) => {
+  // 更新内容
+  const updateContent = (content: string) => {
+    if (isUpdating)
+      return
+    isUpdating = true
     emit('update:modelValue', content)
     nextTick(() => {
-      callback?.()
+      isUpdating = false
     })
   }
 
@@ -63,10 +67,7 @@ export function useWysiwyg(props: { modelValue: string }, emit: (event: 'update:
 
     try {
       const text = event.clipboardData?.getData('text/plain') || ''
-      if (!text)
-        return
-
-      if (!previewRef.value)
+      if (!text || !previewRef.value)
         return
 
       const selection = window.getSelection()
@@ -77,7 +78,7 @@ export function useWysiwyg(props: { modelValue: string }, emit: (event: 'update:
       range.deleteContents()
       range.insertNode(document.createTextNode(text))
 
-      // 更新内容并保持光标位置
+      // 更新内容
       const markdown = turndown.turndown(previewRef.value.innerHTML)
       updateContent(markdown)
     }
@@ -88,6 +89,9 @@ export function useWysiwyg(props: { modelValue: string }, emit: (event: 'update:
 
   // 处理 WYSIWYG 编辑
   const handleWysiwygEdit = (event: Event) => {
+    if (isUpdating)
+      return
+
     const target = event.target as HTMLElement
     if (!target)
       return
@@ -98,32 +102,34 @@ export function useWysiwyg(props: { modelValue: string }, emit: (event: 'update:
       return
     }
 
-    // 更新内容并保持光标位置
+    // 更新内容
     const markdown = turndown.turndown(target.innerHTML)
     updateContent(markdown)
   }
 
   // 更新预览内容
   const updatePreview = () => {
-    if (previewRef.value) {
-      nextTick(() => {
-        if (previewRef.value) {
-          previewRef.value.innerHTML = md.render(props.modelValue)
-        }
-      })
-    }
+    if (!previewRef.value || isUpdating)
+      return
+
+    isUpdating = true
+    previewRef.value.innerHTML = md.render(props.modelValue)
+    nextTick(() => {
+      isUpdating = false
+    })
   }
 
   // 监听内容变化
-  watch(() => props.modelValue, (newValue) => {
+  watch(() => props.modelValue, (_newValue) => {
     if (previewRef.value) {
-      previewRef.value.innerHTML = md.render(newValue)
+      updatePreview()
     }
   })
 
   // 组件挂载时初始化内容
   onMounted(() => {
     if (previewRef.value) {
+      // 初始化内容
       previewRef.value.innerHTML = md.render(props.modelValue)
     }
   })
