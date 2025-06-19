@@ -30,6 +30,10 @@ export const fontList = [
   {
     name: '阿里巴巴普惠体',
     value: 'AlibabaSans-Regular',
-    assets: '/assets/preview-fonts/AlibabaSans-Regular.woff',
+    assets: '/assets/preview-fonts/AlibabaSans-Regular.otf',
   },
 ]
+
+export const WysiwygTags = ['h1', 'h2', 'h3', 'p']
+
+export type WysiwygTagsType = typeof WysiwygTags[number]

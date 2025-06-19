@@ -9,7 +9,7 @@ const settingStore = useSettingsStore()
 const resumeStore = useResumeStore()
 const el = useTemplateRef('el')
 const leftRef = ref<InstanceType<typeof CodeMirror>>()
-const codeMirrorRef = ref<InstanceType<typeof MarkdownPreview>>()
+const preRef = ref<InstanceType<typeof MarkdownPreview>>()
 const { width } = useElementSize(el)
 
 const scalePre = computed(() => {
@@ -36,10 +36,10 @@ watch(() => [settingStore.isScrollable, settingStore.editorMode], () => {
 
 async function handleExport(type: 'pdf' | 'png') {
   if (type === 'png') {
-    return codeMirrorRef.value?.exportToImage()
+    return preRef.value?.exportToImage()
   }
 
-  return codeMirrorRef.value?.exportToPDF()
+  return preRef.value?.exportToPDF()
 }
 </script>
 
@@ -63,7 +63,7 @@ async function handleExport(type: 'pdf' | 'png') {
           transformOrigin: 'top left',
         }"
       >
-        <MarkdownPreview ref="codeMirrorRef" :content="resumeStore.content" />
+        <MarkdownPreview ref="preRef" :content="resumeStore.content" />
       </div>
       <NuxtLink to="/">
         <button class="return-btn">

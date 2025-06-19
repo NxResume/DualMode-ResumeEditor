@@ -4,6 +4,7 @@ import { markdown } from '@codemirror/lang-markdown'
 import { EditorState } from '@codemirror/state'
 import { EditorView, keymap } from '@codemirror/view'
 import { useWysiwyg } from '~/composables/useWysiwyg'
+import { WysiwygTags } from '~/constants'
 
 const props = defineProps<{
   modelValue: string
@@ -17,8 +18,52 @@ const emit = defineEmits<{
 const editorRef = ref<HTMLElement>()
 let view: EditorView | undefined
 
-// 使用 WYSIWYG composable
-const { previewRef, handlePaste, handleWysiwygEdit, updatePreview } = useWysiwyg(props, emit)
+const { previewRef, handlePaste, handleWysiwygEdit, updatePreview, handleFormat } = useWysiwyg(props, emit)
+
+const hoverTag = ref<HTMLElement | null>(null)
+const hoverType = ref<string>('')
+const hoverToolbarStyle = ref<Record<string, string>>({})
+const showToolbar = ref(false)
+const isToolbarActive = ref(false)
+
+function clearHighlight() {
+  if (hoverTag.value) {
+    hoverTag.value.classList.remove('wysiwyg-hover-highlight')
+  }
+}
+
+function onMouseMove(e: MouseEvent) {
+  if (props.mode !== 'wysiwyg')
+    return
+  const target = e.target as HTMLElement
+  if (!target)
+    return
+  const tag = target.tagName.toLowerCase()
+  if (WysiwygTags.includes(tag)) {
+    if (hoverTag.value !== target) {
+      clearHighlight()
+      hoverTag.value = target
+      hoverType.value = tag
+      // 计算控件位置（右侧）
+      const rect = target.getBoundingClientRect()
+      hoverToolbarStyle.value = {
+        top: `${rect.top + window.scrollY}px`,
+        left: `${rect.right + 8 + window.scrollX}px`,
+      }
+      target.classList.add('wysiwyg-hover-highlight')
+    }
+    showToolbar.value = true
+  }
+}
+
+function onMouseLeave() {
+  clearHighlight()
+  hoverTag.value = null
+  hoverType.value = ''
+  if (!isToolbarActive.value) {
+    showToolbar.value = false
+  }
+}
 
 // 监听模式变化
 watch(() => props.mode, (newMode) => {
@@ -102,10 +147,19 @@ onUnmounted(() => {
     <div
       v-else
       ref="previewRef"
-      class="p-4 h-full overflow-visible prose"
+      class="p-4 h-full prose overflow-visible!"
       contenteditable="true"
       @input="handleWysiwygEdit"
       @paste="handlePaste"
+      @mousemove="onMouseMove"
+      @mouseleave="onMouseLeave"
+    />
+    <HoverToolbar
+      :visible="showToolbar"
+      :current-type="hoverType"
+      :types="WysiwygTags"
+      :style="hoverToolbarStyle"
+      @format="handleFormat"
     />
   </div>
 </template>
@@ -258,5 +312,10 @@ onUnmounted(() => {
 .prose th,
 .prose td {
   @apply border border-gray-300 p-2;
+}
+
+.wysiwyg-hover-highlight {
+  background: #e6f7ff !important;
+  transition: background 0.15s;
 }
 </style>

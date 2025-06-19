@@ -1,6 +1,8 @@
+import type { WysiwygTagsType } from '~/constants'
 import MarkdownIt from 'markdown-it'
 import TurndownService from 'turndown'
 import { nextTick, onMounted, ref, watch } from 'vue'
+import { WysiwygTags } from '~/constants'
 
 export function useWysiwyg(props: { modelValue: string }, emit: (event: 'update:modelValue', value: string) => void) {
   const previewRef = ref<HTMLElement | null>(null)
@@ -58,77 +60,60 @@ export function useWysiwyg(props: { modelValue: string }, emit: (event: 'update:
   }
 
   // 处理标题和内容控件
-  const handleFormat = (type: 'h1' | 'h2' | 'h3' | 'h4' | 'p') => {
-    if (!previewRef.value)
-      return
-
-    const selection = window.getSelection()
-    if (!selection || !selection.rangeCount)
-      return
-
-    const range = selection.getRangeAt(0)
-    const selectedContent = range.toString()
-    const parentElement = range.commonAncestorContainer.parentElement
-
-    if (!parentElement)
-      return
-
-    // 如果已经是目标类型，不做任何改变
-    if (parentElement.tagName.toLowerCase() === type) {
-      return
-    }
-
-    // 创建新的元素
-    const newElement = document.createElement(type)
-
-    const isCollapsed = range.collapsed
-
-    if (selectedContent) {
-      // 如果有选中内容，替换它
-      newElement.textContent = selectedContent
-      range.deleteContents()
-      range.insertNode(newElement)
-    }
-    else {
-      // 如果没有选中内容，将当前段落转换为目标类型
-      // 保存当前元素的所有子节点
-      const childNodes = Array.from(parentElement.childNodes)
-
-      // 将子节点移动到新元素中
-      childNodes.forEach((child) => {
-        newElement.appendChild(child)
-      })
-
-      // 替换当前元素
-      parentElement.parentNode?.replaceChild(newElement, parentElement)
-    }
-
-    // 恢复光标位置
-    nextTick(() => {
-      if (!selection || !newElement)
+  const handleFormat = (type: WysiwygTagsType) => {
+    try {
+      if (!previewRef.value)
         return
 
-      const newRange = document.createRange()
+      const selection = window.getSelection()
+      if (!selection || !selection.rangeCount)
+        return
 
-      if (isCollapsed) {
-        // 如果之前是折叠的选区，将光标放在新元素的开始位置
+      const range = selection.getRangeAt(0)
+      let node = range.commonAncestorContainer
+      while (node && node.nodeType === 3) {
+        node = node.parentNode as Node
+      }
+      let block = node as HTMLElement | null
+      while (block && block.parentElement && !WysiwygTags.includes(block.tagName?.toLowerCase?.() as WysiwygTagsType)) {
+        block = block.parentElement
+      }
+      if (!block)
+        return
+
+      // 如果已经是目标类型，不做任何改变
+      if (block.tagName.toLowerCase() === type) {
+        return
+      }
+
+      // 创建新的元素
+      const newElement = document.createElement(type)
+      // 复制原有内容
+      newElement.innerHTML = block.innerHTML
+
+      // 替换当前段落
+      block.parentNode?.replaceChild(newElement, block)
+
+      // 恢复光标位置
+      nextTick(() => {
+        const selection = window.getSelection()
+        if (!selection || !newElement)
+          return
+        const newRange = document.createRange()
         newRange.setStart(newElement, 0)
-        newRange.setEnd(newElement, 0)
-      }
-      else {
-        // 如果有选中内容，将选区设置为整个新元素
-        newRange.selectNodeContents(newElement)
-      }
+        newRange.collapse(true)
+        selection.removeAllRanges()
+        selection.addRange(newRange)
+      })
 
-      selection.removeAllRanges()
-      selection.addRange(newRange)
-    })
-
-    // 更新内容
-    const markdown = turndown.turndown(previewRef.value.innerHTML)
-    updateContent(markdown)
+      // 更新内容
+      const markdown = turndown.turndown(previewRef.value.innerHTML)
+      updateContent(markdown)
+    }
+    catch (error) {
+      console.error('Error in handleFormat:', error)
+    }
   }
-
   // 处理粘贴事件
   const handlePaste = async (event: ClipboardEvent) => {
     event.preventDefault()
