@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { useI18n } from 'vue-i18n'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -21,6 +20,8 @@ const { files, open, reset } = useFileDialog({
 
 // 图片预览URL
 const imagePreviewUrl = ref<string | null>(null)
+
+const dialogOpen = ref(false)
 
 function getIdPhotoSrcFromContent(content: string) {
   const imgTagRegex = /<img\b[^>]*>/gi
@@ -82,6 +83,7 @@ function handleReset() {
   // 移除resumeStore.content中的id-photo图片
   const imgTagRegex = /<img[^>]*id\s*=\s*['"]id-photo['"][^>]*>/gi
   resumeStore.setContent(resumeStore.content.replace(imgTagRegex, ''))
+  dialogOpen.value = false // 关闭 Dialog
 }
 
 // 确认上传
@@ -107,6 +109,7 @@ function handleConfirm() {
           let newContent = resumeStore.content.replace(imgTagRegex, '')
           newContent = `${imgTag}\n\n${newContent.trim()}`
           resumeStore.setContent(newContent)
+          dialogOpen.value = false // 上传成功后关闭 Dialog
         }
         else {
           console.error('图片上传失败:', error.value || '未知错误')
@@ -130,10 +133,11 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <Dialog>
+  <Dialog v-model:open="dialogOpen">
     <DialogTrigger as-child>
       <slot />
     </DialogTrigger>
+
     <DialogContent class="sm:max-w-[500px]">
       <DialogHeader>
         <DialogTitle>{{ t('idPhoto.title') }}</DialogTitle>
@@ -152,24 +156,11 @@ onUnmounted(() => {
             <!-- 图片预览或上传图标 -->
             <div class="rounded-full bg-gray-100 flex h-32 w-32 items-center justify-center overflow-hidden">
               <img
-                v-if="imagePreviewUrl"
-                :src="imagePreviewUrl"
-                :alt="t('idPhoto.photoPreview')"
+                v-if="imagePreviewUrl" :src="imagePreviewUrl" :alt="t('idPhoto.photoPreview')"
                 class="h-full w-full object-cover"
               >
-              <svg
-                v-else
-                class="text-gray-400 h-12 w-12"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                />
+              <svg v-else class="text-gray-400 h-12 w-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
               </svg>
             </div>
 
@@ -200,20 +191,43 @@ onUnmounted(() => {
       </div>
 
       <DialogFooter class="flex justify-between">
-        <Button
-          variant="outline"
-          :disabled="!imagePreviewUrl"
-          @click="handleReset"
-        >
+        <Button variant="outline" class="cursor-pointer" :disabled="!imagePreviewUrl" @click="handleReset">
           {{ t('idPhoto.resetPhoto') }}
         </Button>
-        <Button
-          :disabled="!imagePreviewUrl"
-          @click="handleConfirm"
-        >
+        <Button class="cursor-pointer" :disabled="!imagePreviewUrl" @click="handleConfirm">
           {{ t('idPhoto.confirmUpload') }}
         </Button>
       </DialogFooter>
     </DialogContent>
   </Dialog>
 </template>
+
+<style>
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.DialogOverlay[data-state='open'],
+.DialogContent[data-state='open'] {
+  animation: fadeIn 300ms ease-out;
+}
+
+.DialogOverlay[data-state='closed'],
+.DialogContent[data-state='closed'] {
+  animation: fadeOut 300ms ease-in;
+}
+</style>
