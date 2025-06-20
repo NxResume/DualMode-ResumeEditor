@@ -221,6 +221,7 @@ defineExpose({
 }
 
 .rs-page-item {
+  position: relative;
   width: 794px;
   max-width: 794px;
   min-height: 1070px;
@@ -303,9 +304,9 @@ defineExpose({
   position: absolute;
   z-index: 20;
   width: 140px;
-  top: var(--id-photo-top, 120px);
-  left: var(--id-photo-left, 600px);
-  transform: scale(var(--id-photo-scale, 1));
+  top: var(--id-photo-top, 66px);
+  left: var(--id-photo-left, 391px);
+  transform: scale(var(--id-photo-scale, '0.8 0.8'));
   border-radius: 6px;
 }
 </style>

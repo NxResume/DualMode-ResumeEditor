@@ -5,15 +5,15 @@ import { defineStore, skipHydrate } from 'pinia'
 interface ImagePositionState {
   top: number
   left: number
-  scale: number
+  scale: number | string
 }
 
 export const useImagePositionStore = defineStore('imagePosition', () => {
   // 使用 useStorage 持久化存储整个对象
   const position = useStorage<ImagePositionState>('nuxt-resume-editor-id-photo-position', {
-    top: 120,
-    left: 600,
-    scale: 1,
+    top: 66,
+    left: 391,
+    scale: '0.8 0.8',
   })
 
   // 更新位置

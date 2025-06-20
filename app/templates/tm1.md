@@ -1,3 +1,5 @@
+<img src="https://img.meituan.net/video/a1f54e68b36f706fad00665dda9eeade40300.jpg" id="id-photo" data-id-photo alt="" srcset="">
+
 # 李四 - 全栈开发工程师
 
 ::: left
