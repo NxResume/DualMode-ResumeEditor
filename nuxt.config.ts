@@ -52,7 +52,7 @@ export default defineNuxtConfig({
   },
 
   build: {
-    transpile: ['resume-theme'],
+    transpile: ['resume-theme', 'vue3-moveable'],
   },
   future: {
     compatibilityVersion: 4,
