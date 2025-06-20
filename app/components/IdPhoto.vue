@@ -86,25 +86,29 @@ function handleReset() {
 
 // 确认上传
 function handleConfirm() {
-  // 只处理有文件的情况
   if (files.value && files.value.length > 0) {
     const file = files.value[0]
     if (file) {
-      const reader = new FileReader()
-      reader.onload = function (e) {
-        const base64 = e.target?.result
-        if (typeof base64 === 'string') {
-          // 构造img标签
-          const imgTag = `<img src="${base64}" id="id-photo" data-id-photo alt="" srcset="">`
-          // 先移除已有的id-photo图片
+      const formData = new FormData()
+      formData.append('file', file)
+      useFetch('/flask-upload', {
+        method: 'POST',
+        body: formData,
+      }).then(({ data, error }) => {
+        const result = data.value as {
+          Jobs: string
+        }
+        if (result && result.Jobs) {
+          const imgTag = `<img src="${result.Jobs}" id="id-photo" data-id-photo alt="" srcset="">`
           const imgTagRegex = /<img[^>]*id\s*=\s*['"]id-photo['"][^>]*>/gi
           let newContent = resumeStore.content.replace(imgTagRegex, '')
-          // 插入到内容最前面（或自定义位置）
           newContent = `${imgTag}\n\n${newContent.trim()}`
           resumeStore.setContent(newContent)
         }
-      }
-      reader.readAsDataURL(file)
+        else {
+          console.error('图片上传失败:', error.value || '未知错误')
+        }
+      })
     }
   }
 }

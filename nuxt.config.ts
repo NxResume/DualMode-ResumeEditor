@@ -1,4 +1,8 @@
+import process from 'node:process'
 import { pwa } from './app/config/pwa'
+
+const devApi = 'http://localhost:7777/api/meituan'
+const prodApi = 'https://api.ryanuo.cc/api/meituan'
 
 export default defineNuxtConfig({
   modules: [
@@ -62,6 +66,13 @@ export default defineNuxtConfig({
   },
   compatibilityDate: '2024-08-14',
   nitro: {
+    routeRules: {
+      '/flask-upload': {
+        proxy: process.env.NODE_ENV === 'production' ? prodApi : devApi,
+        cors: true,
+      },
+    },
+
     esbuild: {
       options: {
         target: 'esnext',
@@ -71,6 +82,12 @@ export default defineNuxtConfig({
       crawlLinks: false,
       routes: ['/', '/edit'],
       ignore: ['/assets/**'],
+    },
+    devProxy: {
+      '/flask-upload': {
+        target: 'http://localhost:7777/api/meituan',
+        changeOrigin: true,
+      },
     },
   },
   vite: {

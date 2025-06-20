@@ -140,6 +140,9 @@ catalogs:
     vue:
       specifier: ^3.5.16
       version: 3.5.16
+    vue3-moveable:
+      specifier: ^0.28.0
+      version: 0.28.0
   icons:
     '@iconify-json/ri':
       specifier: ^1.2.5
@@ -158,10 +161,6 @@ overrides:
 importers:
 
   .:
-    dependencies:
-      vue3-moveable:
-        specifier: ^0.28.0
-        version: 0.28.0
     devDependencies:
       '@antfu/eslint-config':
         specifier: catalog:dev
@@ -307,6 +306,9 @@ importers:
       vue-tsc:
         specifier: catalog:dev
         version: 2.2.10(typescript@5.8.3)
+      vue3-moveable:
+        specifier: catalog:frontend
+        version: 0.28.0
 
 packages:
 

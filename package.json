@@ -63,7 +63,8 @@
     "unocss-preset-animations": "catalog:dev",
     "unocss-preset-shadcn": "catalog:dev",
     "vue": "catalog:frontend",
-    "vue-tsc": "catalog:dev"
+    "vue-tsc": "catalog:dev",
+    "vue3-moveable": "catalog:frontend"
   },
   "resolutions": {
     "@nuxt/devtools": "catalog:build",
@@ -71,8 +72,5 @@
     "nuxt": "catalog:build",
     "unplugin": "catalog:build",
     "vite": "catalog:build"
-  },
-  "dependencies": {
-    "vue3-moveable": "^0.28.0"
   }
 }
