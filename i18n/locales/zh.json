@@ -41,5 +41,23 @@
   "themeList": {
     "title": "主题列表",
     "description": "选择一个您喜欢的简历主题样式，点击即可应用"
+  },
+  "imageMoveable": {
+    "dragTooltip": "拖拽移动图片",
+    "scaleTooltip": "拖拽角落调整图片大小",
+    "resetPosition": "重置位置",
+    "resetSize": "重置大小"
+  },
+  "idPhoto": {
+    "title": "上传证件照",
+    "description": "请上传您的证件照，支持 JPG、PNG 格式，文件大小不超过 5MB",
+    "uploadPhoto": "点击上传证件照",
+    "changePhoto": "点击更换证件照",
+    "dragDropHint": "或将文件拖拽到此处",
+    "selectedFile": "已选择:",
+    "fileSize": "大小:",
+    "resetPhoto": "重置头像",
+    "confirmUpload": "确认上传",
+    "photoPreview": "证件照预览"
   }
 }

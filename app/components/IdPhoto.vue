@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -9,6 +10,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
+
+const { t } = useI18n()
 
 const { files, open, reset } = useFileDialog({
   accept: 'image/*', // Set to accept only image files
@@ -70,9 +73,9 @@ onUnmounted(() => {
     </DialogTrigger>
     <DialogContent class="sm:max-w-[500px]">
       <DialogHeader>
-        <DialogTitle>上传证件照</DialogTitle>
+        <DialogTitle>{{ t('idPhoto.title') }}</DialogTitle>
         <DialogDescription>
-          请上传您的证件照，支持 JPG、PNG 格式，文件大小不超过 5MB
+          {{ t('idPhoto.description') }}
         </DialogDescription>
       </DialogHeader>
 
@@ -88,7 +91,7 @@ onUnmounted(() => {
               <img
                 v-if="imagePreviewUrl"
                 :src="imagePreviewUrl"
-                alt="证件照预览"
+                :alt="t('idPhoto.photoPreview')"
                 class="h-full w-full object-cover"
               >
               <svg
@@ -110,23 +113,23 @@ onUnmounted(() => {
             <!-- 上传提示文字 -->
             <div class="space-y-2">
               <p v-if="!imagePreviewUrl" class="text-lg text-gray-900 font-medium">
-                点击上传证件照
+                {{ t('idPhoto.uploadPhoto') }}
               </p>
               <p v-else class="text-lg text-gray-900 font-medium">
-                点击更换证件照
+                {{ t('idPhoto.changePhoto') }}
               </p>
               <p class="text-sm text-gray-500">
-                或将文件拖拽到此处
+                {{ t('idPhoto.dragDropHint') }}
               </p>
             </div>
 
             <!-- 文件信息显示 -->
             <div v-if="files && files.length > 0 && files[0]" class="mt-4">
               <p class="text-sm text-green-600">
-                已选择: {{ files[0].name }}
+                {{ t('idPhoto.selectedFile') }} {{ files[0].name }}
               </p>
               <p class="text-xs text-gray-500">
-                大小: {{ (files[0].size / 1024 / 1024).toFixed(2) }} MB
+                {{ t('idPhoto.fileSize') }} {{ (files[0].size / 1024 / 1024).toFixed(2) }} MB
               </p>
             </div>
           </div>
@@ -139,13 +142,13 @@ onUnmounted(() => {
           :disabled="!files || files.length === 0"
           @click="handleReset"
         >
-          重置头像
+          {{ t('idPhoto.resetPhoto') }}
         </Button>
         <Button
           :disabled="!files || files.length === 0"
           @click="handleConfirm"
         >
-          确认上传
+          {{ t('idPhoto.confirmUpload') }}
         </Button>
       </DialogFooter>
     </DialogContent>

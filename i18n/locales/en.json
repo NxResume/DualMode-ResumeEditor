@@ -41,5 +41,23 @@
   "themeList": {
     "title": "Theme List",
     "description": "Select a resume theme style you like, click to apply"
+  },
+  "imageMoveable": {
+    "dragTooltip": "Drag to move image",
+    "scaleTooltip": "Drag corners to resize image",
+    "resetPosition": "Reset Position",
+    "resetSize": "Reset Size"
+  },
+  "idPhoto": {
+    "title": "Upload ID Photo",
+    "description": "Please upload your ID photo, supports JPG and PNG formats, file size should not exceed 5MB",
+    "uploadPhoto": "Click to upload ID photo",
+    "changePhoto": "Click to change ID photo",
+    "dragDropHint": "or drag and drop file here",
+    "selectedFile": "Selected:",
+    "fileSize": "Size:",
+    "resetPhoto": "Reset Photo",
+    "confirmUpload": "Confirm Upload",
+    "photoPreview": "ID Photo Preview"
   }
 }

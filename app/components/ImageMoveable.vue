@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import Moveable from 'vue3-moveable'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 interface DragEvent {
   transform: string
@@ -32,6 +35,7 @@ function onScale(event: any) {
     :draggable="true"
     :scalable="true"
     :keep-ratio="true"
+    :title="t('imageMoveable.dragTooltip')"
     @drag="onDrag"
     @scale="onScale"
   />
