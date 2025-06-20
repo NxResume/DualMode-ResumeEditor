@@ -55,7 +55,7 @@ async function handleClick() {
 
 /* 默认样式 - 用于编辑页面 */
 .default-btn {
-  @apply fixed z-10 top-2 right-2 px-4 py-2.5 bg-white/90 backdrop-blur-sm rounded-full shadow-lg text-gray-700 hover:bg-white hover:shadow-xl hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed;
+  @apply fixed z-10 top-8.5 right-2 px-4 py-2.5 bg-white/90 backdrop-blur-sm rounded-full shadow-lg text-gray-700 hover:bg-white hover:shadow-xl hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed;
 }
 
 /* 头部样式 - 用于首页 */
