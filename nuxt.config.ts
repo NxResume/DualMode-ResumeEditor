@@ -1,4 +1,3 @@
-import process from 'node:process'
 import { pwa } from './app/config/pwa'
 
 const devApi = 'http://localhost:7777/api/meituan'
