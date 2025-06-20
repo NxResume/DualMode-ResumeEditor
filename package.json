@@ -71,5 +71,8 @@
     "nuxt": "catalog:build",
     "unplugin": "catalog:build",
     "vite": "catalog:build"
+  },
+  "dependencies": {
+    "vue3-moveable": "^0.28.0"
   }
 }

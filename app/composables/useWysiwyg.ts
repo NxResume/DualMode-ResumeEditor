@@ -37,11 +37,12 @@ export function useWysiwyg(props: { modelValue: string }, emit: (event: 'update:
     replacement: (content: string) => `~~${content}~~`,
   })
 
-  turndown.addRule('preserveTags', {
+  turndown.addRule('preserveSpecialElements', {
     filter: (node) => {
-      return node.nodeType === 1
-        && node.nodeName.toLowerCase() === 'a'
-        && (node as HTMLElement).classList.contains('p')
+      return (
+        (node.nodeType === 1 && node.nodeName.toLowerCase() === 'a' && (node as HTMLElement).classList.contains('p'))
+        || (node.nodeType === 1 && node.nodeName.toLowerCase() === 'img' && (node as HTMLElement).hasAttribute('data-id-photo'))
+      )
     },
     replacement: (content, node) => {
       return (node as HTMLElement).outerHTML

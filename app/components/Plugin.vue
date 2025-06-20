@@ -61,6 +61,12 @@ const { toggle } = useFullscreen(document.body)
         <Label class="label">{{ t('plugin.theme') }}</Label>
       </div>
     </ThemeListModal>
+    <IdPhoto>
+      <div class="item">
+        <div class="i-ri-id-card-line icon-btn" />
+        <Label class="label">{{ t('plugin.idPhoto') }}</Label>
+      </div>
+    </IdPhoto>
     <div class="item" @click.stop="downloadImg">
       <div class="i-ri-image-line icon-btn" />
       <Label class="label">{{ t('plugin.screenshot') }}</Label>

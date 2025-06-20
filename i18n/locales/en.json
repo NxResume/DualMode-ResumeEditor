@@ -28,6 +28,7 @@
     "exportPdf": "Export PDF"
   },
   "plugin": {
+    "idPhoto": "ID Photo",
     "theme": "Theme",
     "followScroll": "Follow Scroll",
     "fullscreen": "Fullscreen",

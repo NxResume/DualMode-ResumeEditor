@@ -10,6 +10,7 @@ const props = defineProps<{
 const theme = 'markdown-body'
 const md = computed(() => useMarkdown(props.content))
 const previewRef = ref<HTMLElement | null>(null)
+const isShowMoveabled = ref(false)
 
 async function exportToPDF() {
   if (!previewRef.value)
@@ -153,14 +154,29 @@ function handleAutoPaginate() {
   })
 }
 
+function bindImageClickEvent() {
+  if (!previewRef.value)
+    return
+
+  // 使用事件委托监听 previewRef 内部所有 img[data-id-photo]
+  previewRef.value.addEventListener('click', (event) => {
+    const target = event.target as HTMLElement
+    if (target.tagName.toLowerCase() === 'img' && target.hasAttribute('data-id-photo')) {
+      isShowMoveabled.value = true
+    }
+  })
+}
+
 watch([() => props.content, () => resumeStore.theme], () => {
   handleAutoPaginate()
+  bindImageClickEvent()
 }, {
   immediate: true,
 })
 
 onMounted(() => {
   handleAutoPaginate()
+  bindImageClickEvent()
 })
 defineExpose({
   exportToPDF,
@@ -171,6 +187,7 @@ defineExpose({
 <template>
   <div class="preview-content py-10">
     <div ref="previewRef" class="preview-container">
+      <ImageMoveable v-if="isShowMoveabled" />
       <div class="rs-page-item-wrapper" :class="theme" />
     </div>
   </div>

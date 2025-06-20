@@ -28,6 +28,7 @@
     "exportPdf": "导出 PDF"
   },
   "plugin": {
+    "idPhoto": "证件照",
     "theme": "主题",
     "followScroll": "跟随滚动",
     "fullscreen": "全屏",
