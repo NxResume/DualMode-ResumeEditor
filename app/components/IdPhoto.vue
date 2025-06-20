@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/dialog'
 
 const { t } = useI18n()
+const resumeStore = useResumeStore()
 
 const { files, open, reset } = useFileDialog({
   accept: 'image/*', // Set to accept only image files
@@ -20,6 +21,39 @@ const { files, open, reset } = useFileDialog({
 
 // 图片预览URL
 const imagePreviewUrl = ref<string | null>(null)
+
+function getIdPhotoSrcFromContent(content: string) {
+  const imgTagRegex = /<img\b[^>]*>/gi
+  const srcRegex = /\bsrc\s*=\s*["']([^"']+)["']/i
+  const idRegex = /\bid\s*=\s*["']id-photo["']/i
+
+  const imgTags = content.match(imgTagRegex)
+  if (!imgTags)
+    return null
+
+  for (const tag of imgTags) {
+    if (idRegex.test(tag)) {
+      const srcMatch = tag.match(srcRegex)
+      if (srcMatch)
+        return srcMatch[1]
+    }
+  }
+  return null
+}
+
+watch(() => resumeStore.content, () => {
+  const src = getIdPhotoSrcFromContent(resumeStore.content)
+  if (src) {
+    imagePreviewUrl.value = src
+  }
+})
+
+onMounted(() => {
+  const src = getIdPhotoSrcFromContent(resumeStore.content)
+  if (src) {
+    imagePreviewUrl.value = src
+  }
+})
 
 // 处理文件上传
 function handleFileUpload() {
@@ -45,12 +79,34 @@ function handleReset() {
     URL.revokeObjectURL(imagePreviewUrl.value)
     imagePreviewUrl.value = null
   }
+  // 移除resumeStore.content中的id-photo图片
+  const imgTagRegex = /<img[^>]*id\s*=\s*['"]id-photo['"][^>]*>/gi
+  resumeStore.setContent(resumeStore.content.replace(imgTagRegex, ''))
 }
 
 // 确认上传
 function handleConfirm() {
-  // 这里可以添加确认上传的逻辑
-  // 确认上传操作
+  // 只处理有文件的情况
+  if (files.value && files.value.length > 0) {
+    const file = files.value[0]
+    if (file) {
+      const reader = new FileReader()
+      reader.onload = function (e) {
+        const base64 = e.target?.result
+        if (typeof base64 === 'string') {
+          // 构造img标签
+          const imgTag = `<img src="${base64}" id="id-photo" data-id-photo alt="" srcset="">`
+          // 先移除已有的id-photo图片
+          const imgTagRegex = /<img[^>]*id\s*=\s*['"]id-photo['"][^>]*>/gi
+          let newContent = resumeStore.content.replace(imgTagRegex, '')
+          // 插入到内容最前面（或自定义位置）
+          newContent = `${imgTag}\n\n${newContent.trim()}`
+          resumeStore.setContent(newContent)
+        }
+      }
+      reader.readAsDataURL(file)
+    }
+  }
 }
 
 // 监听文件变化
@@ -139,13 +195,13 @@ onUnmounted(() => {
       <DialogFooter class="flex justify-between">
         <Button
           variant="outline"
-          :disabled="!files || files.length === 0"
+          :disabled="!imagePreviewUrl"
           @click="handleReset"
         >
           {{ t('idPhoto.resetPhoto') }}
         </Button>
         <Button
-          :disabled="!files || files.length === 0"
+          :disabled="!imagePreviewUrl"
           @click="handleConfirm"
         >
           {{ t('idPhoto.confirmUpload') }}

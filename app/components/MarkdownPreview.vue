@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { isClient } from '@vueuse/core'
 import { toPng } from 'html-to-image'
 import { useResumeStore } from '~/stores/resume'
 import { autoPaginate, DEFAULT_CONFIG } from '~/utils/pagination'
@@ -164,12 +165,27 @@ function bindImageClickEvent() {
     if (target.tagName.toLowerCase() === 'img' && target.hasAttribute('data-id-photo')) {
       isShowMoveabled.value = true
     }
+    else {
+      isShowMoveabled.value = false
+    }
   })
 }
 
+const imagePositionStore = useImagePositionStore()
+
+onMounted(() => {
+  nextTick(() => {
+    if (isClient) {
+    // 设置全局 CSS 变量
+      document.documentElement.style.setProperty('--id-photo-top', `${imagePositionStore.position.top}px`)
+      document.documentElement.style.setProperty('--id-photo-left', `${imagePositionStore.position.left}px`)
+      document.documentElement.style.setProperty('--id-photo-scale', imagePositionStore.position.scale.toString())
+    }
+  })
+})
+
 watch([() => props.content, () => resumeStore.theme], () => {
   handleAutoPaginate()
-  bindImageClickEvent()
 }, {
   immediate: true,
 })
@@ -178,6 +194,7 @@ onMounted(() => {
   handleAutoPaginate()
   bindImageClickEvent()
 })
+
 defineExpose({
   exportToPDF,
   exportToImage,
@@ -280,5 +297,15 @@ defineExpose({
 
 .dark .export-button:hover {
   background-color: #1d4ed8;
+}
+
+#id-photo {
+  position: absolute;
+  z-index: 20;
+  width: 140px;
+  top: var(--id-photo-top, 120px);
+  left: var(--id-photo-left, 600px);
+  transform: scale(var(--id-photo-scale, 1));
+  border-radius: 6px;
 }
 </style>
