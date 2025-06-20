@@ -86,12 +86,15 @@ function handleReset() {
 
 // 确认上传
 function handleConfirm() {
+  const uploadUrl = process.env.NODE_ENV === 'production'
+    ? 'https://api.ryanuo.cc/api/meituan'
+    : '/flask-upload'
   if (files.value && files.value.length > 0) {
     const file = files.value[0]
     if (file) {
       const formData = new FormData()
       formData.append('file', file)
-      useFetch('/flask-upload', {
+      useFetch(uploadUrl, {
         method: 'POST',
         body: formData,
       }).then(({ data, error }) => {

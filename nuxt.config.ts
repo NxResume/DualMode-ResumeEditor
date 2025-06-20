@@ -2,7 +2,6 @@ import process from 'node:process'
 import { pwa } from './app/config/pwa'
 
 const devApi = 'http://localhost:7777/api/meituan'
-const prodApi = 'https://api.ryanuo.cc/api/meituan'
 
 export default defineNuxtConfig({
   modules: [
@@ -68,7 +67,7 @@ export default defineNuxtConfig({
   nitro: {
     routeRules: {
       '/flask-upload': {
-        proxy: process.env.NODE_ENV === 'production' ? prodApi : devApi,
+        proxy: devApi,
         cors: true,
       },
     },
@@ -85,7 +84,7 @@ export default defineNuxtConfig({
     },
     devProxy: {
       '/flask-upload': {
-        target: 'http://localhost:7777/api/meituan',
+        target: devApi,
         changeOrigin: true,
       },
     },
