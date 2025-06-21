@@ -16,9 +16,9 @@ const editPath = computed(() => {
 })
 
 const { enter, isFullscreen } = useFullscreen(previewEl)
-async function handleExport() {
-  return previewRef.value?.exportToPDF()
-}
+// async function handleExport() {
+//   return previewRef.value?.exportToPDF()
+// }
 </script>
 
 <template>
@@ -43,10 +43,10 @@ async function handleExport() {
                 {{ $t('nav.editor') }}
               </button>
             </NuxtLink>
-            <ExportButton
+            <!-- <ExportButton
               variant="header"
               :on-export="handleExport"
-            />
+            /> -->
           </div>
         </div>
       </nav>

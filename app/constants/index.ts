@@ -34,6 +34,33 @@ export const fontList = [
   },
 ]
 
+export const pagePaddingList = [
+  {
+    name: '16px',
+    value: 16,
+  },
+  {
+    name: '20px',
+    value: 20,
+  },
+  {
+    name: '24px',
+    value: 24,
+  },
+  {
+    name: '32px',
+    value: 32,
+  },
+  {
+    name: '36px',
+    value: 36,
+  },
+  {
+    name: '40px',
+    value: 40,
+  },
+]
+
 export const WysiwygTags = ['h1', 'h2', 'h3', 'p']
 
 export type WysiwygTagsType = typeof WysiwygTags[number]

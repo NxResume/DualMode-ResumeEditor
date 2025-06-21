@@ -2,6 +2,7 @@
 import { isClient } from '@vueuse/core'
 import { toPng } from 'html-to-image'
 import { useResumeStore } from '~/stores/resume'
+import useSettingsStore from '~/stores/settings'
 import { autoPaginate, DEFAULT_CONFIG } from '~/utils/pagination'
 
 const props = defineProps<{
@@ -137,6 +138,7 @@ async function exportToImage() {
 
 // 监听内容变化
 const resumeStore = useResumeStore()
+const settingsStore = useSettingsStore()
 // 提取重复逻辑为独立函数
 function handleAutoPaginate() {
   nextTick(() => {
@@ -148,6 +150,7 @@ function handleAutoPaginate() {
             ...DEFAULT_CONFIG,
             themeClass: theme,
             themeName: resumeStore.theme,
+            padding: settingsStore.pagePadding,
           })
         }
       }
@@ -184,7 +187,7 @@ onMounted(() => {
   })
 })
 
-watch(() => [props.content, resumeStore.theme], () => {
+watch(() => [props.content, resumeStore.theme, settingsStore.pagePadding], () => {
   handleAutoPaginate()
 })
 
@@ -226,7 +229,7 @@ defineExpose({
   max-height: 1070px;
   background: white;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  padding: 36px;
+  padding: var(--resume-page-padding-size, '36px');
   overflow: hidden;
 }
 
@@ -263,39 +266,6 @@ defineExpose({
   z-index: 100;
   display: flex;
   gap: 10px;
-}
-
-.export-button {
-  padding: 12px 24px;
-  background-color: #3b82f6;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 14px;
-  cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  transition: all 0.3s ease;
-}
-
-.export-button:hover {
-  background-color: #2563eb;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
-
-.export-button:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-/* 添加暗色模式支持 */
-.dark .export-button {
-  background-color: #2563eb;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-}
-
-.dark .export-button:hover {
-  background-color: #1d4ed8;
 }
 
 #id-photo {

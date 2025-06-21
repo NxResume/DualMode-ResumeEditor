@@ -52,7 +52,7 @@ catalogs:
     markdown-it-container: ^4.0.0
     markdown-it-regex: ^0.2.2
     pinia: ^3.0.2
-    resume-theme: ^0.2.3
+    resume-theme: ^0.2.4
     turndown: ^7.2.0
     vue: ^3.5.16
     vue3-moveable: ^0.28.0

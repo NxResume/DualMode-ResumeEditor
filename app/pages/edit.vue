@@ -55,7 +55,6 @@ async function handleExport(type: 'pdf' | 'png') {
     </div>
     <!-- 右侧预览 -->
     <div ref="el" class="px-20 bg-[#606060] flex-shrink flex-grow flex-basis-0 relative overflow-auto">
-      <ExportButton variant="default" :on-export="() => handleExport('pdf')" />
       <div
         class="w-full" :style="{
           scale: scalePre || 1,
@@ -64,31 +63,9 @@ async function handleExport(type: 'pdf' | 'png') {
       >
         <MarkdownPreview ref="preRef" :content="resumeStore.content" />
       </div>
-      <NuxtLink to="/">
-        <button class="return-btn">
-          <div class="i-ri-arrow-left-line" />
-        </button>
-      </NuxtLink>
       <ClientOnly>
-        <Plugin :download-img="() => handleExport('png')" />
+        <Plugin :download-img="() => handleExport('png')" :download-pdf="() => handleExport('pdf')" />
       </ClientOnly>
     </div>
   </div>
 </template>
-
-<style scoped>
-.return-btn {
-  @apply flex items-center gap-2 px-4 py-2.5;
-  @apply fixed z-10 top-0 left-34% rounded-md;
-  @apply text-white backdrop-blur-sm cursor-pointer transition-all duration-300 ease-in-out;
-  @apply hover:scale-110;
-}
-
-.return-btn span {
-  @apply text-sm font-medium;
-}
-
-.return-btn .i-ri-arrow-left-line {
-  @apply text-lg;
-}
-</style>

@@ -6,6 +6,7 @@ const useSettingsStore = defineStore('settings', () => {
   const isScrollable = useStorage('nuxt-resume-editor-isScrollable', false)
   const fontname = useStorage('nuxt-resume-editor-fontname', 'default')
   const editorMode = useStorage<'source' | 'wysiwyg'>('nuxt-resume-editor-editorMode', 'source')
+  const pagePadding = useStorage('nuxt-resume-editor-pagePadding', 36)
 
   const fontMap = computed(() => {
     return fontList?.find(font => font.value === fontname.value)
@@ -29,14 +30,28 @@ const useSettingsStore = defineStore('settings', () => {
     }
   }
 
+  const loadPagePadding = () => {
+    document.documentElement.style.setProperty('--resume-page-padding-size', `${pagePadding.value}px`)
+  }
+
   watch(fontname, () => {
     loadFont()
+  })
+
+  watch(pagePadding, () => {
+    loadPagePadding()
+  })
+
+  onMounted(() => {
+    loadFont()
+    loadPagePadding()
   })
 
   return {
     isScrollable: skipHydrate(isScrollable),
     fontname: skipHydrate(fontname),
     editorMode: skipHydrate(editorMode),
+    pagePadding: skipHydrate(pagePadding),
     fontMap,
     loadFont,
   }
