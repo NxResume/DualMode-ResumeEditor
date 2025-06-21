@@ -15,7 +15,7 @@ interface DragEvent {
 }
 
 function onDrag({ left, top }: DragEvent) {
-  const target = document.querySelector('#id-photo') as HTMLElement
+  const target = document.querySelector('.preview-content #id-photo') as HTMLElement
   if (target) {
     target.style.setProperty('--id-photo-top', `${top}px`)
     target.style.setProperty('--id-photo-left', `${left}px`)
@@ -24,7 +24,7 @@ function onDrag({ left, top }: DragEvent) {
 }
 
 function onScale(event: any) {
-  const target = document.querySelector('#id-photo') as HTMLElement
+  const target = document.querySelector('.preview-content #id-photo') as HTMLElement
   if (target && event.transform) {
     // 提取 scale 数值
     const scaleMatch = event.transform.match(/scale\(([^)]+)\)/)
@@ -38,7 +38,7 @@ function onScale(event: any) {
 <template>
   <Moveable
     class-name="moveable"
-    :target="['#id-photo']"
+    :target="['.preview-content #id-photo']"
     :draggable="true"
     :scalable="true"
     :keep-ratio="true"

@@ -142,7 +142,12 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="h-full">
+  <div
+    class="h-full"
+    :class="{
+      'wysiwyg-mode': mode === 'wysiwyg',
+    }"
+  >
     <div v-if="mode === 'source'" ref="editorRef" class="h-full" />
     <div
       v-else
@@ -165,6 +170,11 @@ onUnmounted(() => {
 </template>
 
 <style>
+.wysiwyg-mode img[data-id-photo=''] {
+  opacity: var(--photo-opacity, 0);
+  display: none;
+}
+
 .ͼ1.cm-focused {
   outline: 2px solid #000;
   @apply rounded-xs;
