@@ -202,7 +202,7 @@ defineExpose({
 <template>
   <div class="preview-content py-10">
     <div ref="previewRef" class="preview-container">
-      <ImageMoveable v-if="isShowMoveabled" />
+      <PluginImageMoveable v-if="isShowMoveabled" />
       <div class="rs-page-item-wrapper" :class="theme" />
     </div>
   </div>

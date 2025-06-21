@@ -1,7 +1,5 @@
 <script setup lang="ts">
-import ExportButton from '@/components/ExportButton.vue'
 import { useResumeStore } from '@/stores/resume'
-import MarkdownPreview from '~/components/MarkdownPreview.vue'
 
 const previewRef = ref()
 const previewEl = useTemplateRef('previewEl')

@@ -1,7 +1,6 @@
 <script setup lang="ts">
+import type { MarkdownPreview } from '#components'
 import CodeMirror from '@/components/CodeMirror.vue'
-import ExportButton from '@/components/ExportButton.vue'
-import MarkdownPreview from '@/components/MarkdownPreview.vue'
 import { useResumeStore } from '@/stores/resume'
 import useSettingsStore from '~/stores/settings'
 
