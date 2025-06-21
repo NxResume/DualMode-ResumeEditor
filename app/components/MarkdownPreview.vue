@@ -184,10 +184,8 @@ onMounted(() => {
   })
 })
 
-watch([() => props.content, () => resumeStore.theme], () => {
+watch(() => [props.content, resumeStore.theme], () => {
   handleAutoPaginate()
-}, {
-  immediate: true,
 })
 
 onMounted(() => {
@@ -213,7 +211,7 @@ defineExpose({
 <style>
 /* 分页样式 */
 .rs-page-item-wrapper {
-  width: 100%;
+  width: fit-content !important;
   display: flex;
   flex-direction: column;
   align-items: center;

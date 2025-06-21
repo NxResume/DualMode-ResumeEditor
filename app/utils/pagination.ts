@@ -25,6 +25,11 @@ export const themeListNoSpecial = [
 // 获取元素的实际高度
 export function getElementHeight(element: HTMLElement): number {
   try {
+    // 排除 img 元素且 id="id-photo" 的元素
+    if (element.tagName.toLowerCase() === 'img' && element.id === 'id-photo') {
+      return 0
+    }
+
     const style = window.getComputedStyle(element)
     const marginTop = Number.parseFloat(style.marginTop)
     const marginBottom = Number.parseFloat(style.marginBottom)

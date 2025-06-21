@@ -19,7 +19,7 @@ const { toggle } = useFullscreen(document.body)
 </script>
 
 <template>
-  <div class="py-1 bg-[#606060] flex gap-4 h-10 w-900px items-center left-39% top-0 fixed">
+  <div class="py-1 bg-[#606060] flex gap-4 h-10 w-900px items-center left-38.8% top-0 fixed">
     <div>
       <FontSelect />
     </div>
