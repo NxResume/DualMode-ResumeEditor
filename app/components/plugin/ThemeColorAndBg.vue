@@ -1,0 +1,266 @@
+<script setup lang="ts">
+import { ChromePicker, tinycolor } from 'vue-color'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
+import { pageBgList, presetColors } from '~/constants'
+import useSettingsStore from '~/stores/settings'
+import 'vue-color/style.css'
+
+const isColorPickerOpen = ref(false)
+const settingsStore = useSettingsStore()
+
+const color = defineModel<string>({
+  default: 'rgb(0,0,0)',
+})
+
+const backgroundList = computed(() => {
+  return pageBgList?.map(item => ({
+    ...item,
+    isSelected: item.value === settingsStore.pageBackground,
+  })) ?? []
+})
+
+const currentColorValue = computed(() => {
+  return settingsStore.pageThemeColor === 'default'
+    ? 'rgb(0,0,0)'
+    : `rgb(${settingsStore.pageThemeColor})`
+})
+
+function selectPresetColor(colorValue: string) {
+  const rgb = tinycolor(colorValue).toRgb()
+  const rgbString = `${rgb.r},${rgb.g},${rgb.b}`
+
+  settingsStore.pageThemeColor = rgbString
+  color.value = colorValue
+}
+
+function handleBackgroundSelect(backgroundValue: string) {
+  settingsStore.pageBackground = backgroundValue
+}
+
+function toggleColorPicker() {
+  isColorPickerOpen.value = !isColorPickerOpen.value
+}
+
+function closeColorPicker() {
+  isColorPickerOpen.value = false
+}
+
+watch(color, (newColor) => {
+  if (newColor && newColor !== currentColorValue.value) {
+    const rgb = tinycolor(newColor).toRgb()
+    settingsStore.pageThemeColor = `${rgb.r},${rgb.g},${rgb.b}`
+  }
+}, { immediate: false })
+
+onMounted(() => {
+  color.value = currentColorValue.value
+})
+</script>
+
+<template>
+  <Dialog>
+    <DialogTrigger as-child>
+      <slot />
+    </DialogTrigger>
+
+    <DialogContent
+      overlay-class="bg-transparent"
+      class="accordionContent p-2 border bg-background h-100vh w-400px shadow-lg left-255px fixed z-50 sm:rounded-l-0"
+    >
+      <DialogHeader class="dialogHeader">
+        <DialogTitle class="text-lg font-semibold">
+          主题与背景设置
+        </DialogTitle>
+        <DialogDescription class="text-sm text-gray-600">
+          自定义主题颜色和背景，打造专属的简历风格
+        </DialogDescription>
+      </DialogHeader>
+
+      <div class="p-4 space-y-6" @click.self="closeColorPicker">
+        <!-- 当前颜色显示 -->
+        <div class="space-y-2">
+          <h3 class="text-sm text-gray-700 font-medium">
+            当前颜色
+          </h3>
+          <div class="flex items-center space-x-3">
+            <div
+              class="border-2 border-gray-200 rounded-lg h-10 w-10 cursor-pointer shadow-sm transition-all hover:scale-105"
+              :style="{ backgroundColor: color }"
+              @click.stop="toggleColorPicker"
+            />
+            <span class="text-sm text-gray-600 font-mono">{{ color }}</span>
+          </div>
+        </div>
+
+        <!-- 预设颜色 -->
+        <div class="space-y-3">
+          <h3 class="text-sm text-gray-700 font-medium">
+            预设颜色
+          </h3>
+          <div class="gap-2 grid grid-cols-6">
+            <div
+              v-for="preset in presetColors"
+              :key="preset.value"
+              class="group cursor-pointer relative"
+              @click="selectPresetColor(preset.value)"
+            >
+              <div
+                class="border-2 border-gray-200 rounded-lg h-8 w-8 shadow-sm transition-all hover:shadow-md hover:scale-110"
+                :style="{ backgroundColor: preset.value }"
+              />
+              <div
+                class="opacity-0 translate-x-1 transform transition-opacity bottom-1 left-1/2 absolute z-10 group-hover:opacity-100"
+              >
+                <span class="text-xs text-gray-600 whitespace-nowrap">{{ preset.name }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 自定义颜色选择器 -->
+        <div class="space-y-3">
+          <h3 class="text-sm text-gray-700 font-medium">
+            自定义颜色
+          </h3>
+          <div class="flex items-center space-x-3">
+            <button
+              class="text-sm px-3 py-2 border border-gray-300 rounded-md transition-colors hover:bg-gray-50"
+              @click="toggleColorPicker"
+            >
+              {{ isColorPickerOpen ? '关闭' : '打开' }}颜色选择器
+            </button>
+          </div>
+          <ChromePicker v-if="isColorPickerOpen" v-model="color" />
+        </div>
+
+        <!-- 背景图片选择 -->
+        <div class="bg-selected-wrapper pt-4 border-t border-gray-200 space-y-3">
+          <h3 class="text-sm text-gray-700 font-medium">
+            背景图片
+          </h3>
+          <div class="themeList">
+            <div
+              v-for="theme in backgroundList"
+              :key="theme.value"
+              class="theme-card"
+              :class="{ 'theme-card-selected': theme.isSelected }"
+              @click="handleBackgroundSelect(theme.value)"
+            >
+              <div
+                class="theme-image"
+                :class="{ 'h-full': theme.value === 'default' }"
+              >
+                <img
+                  v-if="theme.value !== 'default'"
+                  :src="theme.value"
+                  :alt="theme.name"
+                  loading="lazy"
+                >
+              </div>
+              <div class="theme-label">
+                <div
+                  v-if="theme.isSelected"
+                  class="theme-selected-icon i-ri-checkbox-circle-line"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </DialogContent>
+  </Dialog>
+</template>
+
+<style>
+.dialogHeader {
+  @apply sticky top-0 z-10 bg-white pb-2 p-4;
+}
+
+.accordionContent {
+  display: block;
+  overflow: hidden;
+  will-change: transform;
+  transform: translateX(0);
+  transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.accordionContent[data-state='open'] {
+  animation: slideInRight 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.accordionContent[data-state='closed'] {
+  animation: slideOutLeft 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutLeft {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+
+  to {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .accordionContent,
+  .accordionContent[data-state='open'],
+  .accordionContent[data-state='closed'] {
+    animation: none;
+    transition: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .accordionContent {
+    @apply right-2 left-2 w-auto max-w-none;
+  }
+}
+</style>
+
+<style scoped>
+.themeList {
+  @apply grid grid-cols-2 md:grid-cols-4 gap-4;
+}
+
+.theme-card {
+  @apply rounded-lg overflow-hidden border border-gray-200 transition-all duration-200 hover:shadow-lg hover:border-primary cursor-pointer relative;
+}
+
+.theme-card-selected {
+  @apply border-primary shadow-md;
+}
+
+.theme-selected-icon {
+  @apply absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-2xl bg-primary/90 rounded-full p-1.5 shadow-lg bg-white;
+}
+
+.theme-image {
+  @apply overflow-hidden bg-[#000];
+}
+
+.theme-image img {
+  @apply w-full object-cover transition-transform duration-200 hover:scale-105;
+}
+</style>

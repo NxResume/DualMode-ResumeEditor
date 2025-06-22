@@ -63,6 +63,7 @@
     "unocss-preset-animations": "catalog:dev",
     "unocss-preset-shadcn": "catalog:dev",
     "vue": "catalog:frontend",
+    "vue-color": "catalog:frontend",
     "vue-tsc": "catalog:dev",
     "vue3-moveable": "catalog:frontend"
   },

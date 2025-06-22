@@ -6,6 +6,8 @@ const useSettingsStore = defineStore('settings', () => {
   const isScrollable = useStorage('nuxt-resume-editor-isScrollable', false)
   const fontname = useStorage('nuxt-resume-editor-fontname', 'default')
   const editorMode = useStorage<'source' | 'wysiwyg'>('nuxt-resume-editor-editorMode', 'source')
+  const pageBackground = useStorage('nuxt-resume-page-background-image', 'default')
+  const pageThemeColor = useStorage('nuxt-resume-page-theme-color', '0,0,0')
   const pagePadding = useStorage('nuxt-resume-editor-pagePadding', 36)
 
   const fontMap = computed(() => {
@@ -34,6 +36,14 @@ const useSettingsStore = defineStore('settings', () => {
     document.documentElement.style.setProperty('--resume-page-padding-size', `${pagePadding.value}px`)
   }
 
+  const loadPageBackground = () => {
+    document.documentElement.style.setProperty('--resume-page-background', `url(${pageBackground.value})`)
+  }
+
+  const loadPageTheme = () => {
+    document.documentElement.style.setProperty('--resume-page-theme', pageThemeColor.value)
+  }
+
   watch(fontname, () => {
     loadFont()
   })
@@ -42,9 +52,19 @@ const useSettingsStore = defineStore('settings', () => {
     loadPagePadding()
   })
 
+  watch(pageBackground, () => {
+    loadPageBackground()
+  })
+
+  watch(pageThemeColor, () => {
+    loadPageTheme()
+  })
+
   onMounted(() => {
     loadFont()
     loadPagePadding()
+    loadPageBackground()
+    loadPageTheme()
   })
 
   return {
@@ -52,6 +72,8 @@ const useSettingsStore = defineStore('settings', () => {
     fontname: skipHydrate(fontname),
     editorMode: skipHydrate(editorMode),
     pagePadding: skipHydrate(pagePadding),
+    pageBackground: skipHydrate(pageBackground),
+    pageThemeColor: skipHydrate(pageThemeColor),
     fontMap,
     loadFont,
   }

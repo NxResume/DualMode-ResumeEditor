@@ -28,8 +28,9 @@
     "exportPdf": "导出 PDF"
   },
   "plugin": {
+    "resumeTemplate": "简历模板",
     "idPhoto": "证件照",
-    "theme": "主题",
+    "theme": "主题色",
     "followScroll": "跟随滚动",
     "fullscreen": "全屏",
     "screenshot": "截图",

@@ -28,6 +28,7 @@
     "exportPdf": "Export PDF"
   },
   "plugin": {
+    "resumeTemplate": "Resume Template",
     "idPhoto": "ID Photo",
     "theme": "Theme",
     "followScroll": "Follow Scroll",

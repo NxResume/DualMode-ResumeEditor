@@ -51,7 +51,7 @@ const { toggle } = useFullscreen(document.body)
       <Tooltip>
         <TooltipTrigger>
           <NuxtLink to="https://icon-sets.iconify.design/ri/" target="_blank" class="plugin-item">
-            <div class="i-ri-bear-smile-line icon-btn" />
+            <svg class="icon-btn" xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24"><path d="M12 22c5.514 0 10-4.486 10-10S17.514 2 12 2S2 6.486 2 12s4.486 10 10 10zm3.493-13a1.494 1.494 0 1 1-.001 2.987A1.494 1.494 0 0 1 15.493 9zm-4.301 6.919a4.108 4.108 0 0 0 1.616 0c.253-.052.505-.131.75-.233c.234-.1.464-.224.679-.368c.208-.142.407-.306.591-.489c.183-.182.347-.381.489-.592l1.658 1.117a6.027 6.027 0 0 1-1.619 1.621a6.003 6.003 0 0 1-2.149.904a6.116 6.116 0 0 1-2.414-.001a5.919 5.919 0 0 1-2.148-.903a6.078 6.078 0 0 1-1.621-1.622l1.658-1.117c.143.211.307.41.488.59a3.988 3.988 0 0 0 2.022 1.093zM8.5 9a1.5 1.5 0 1 1-.001 3.001A1.5 1.5 0 0 1 8.5 9z" fill="currentColor" /></svg>
             <Label for="icon-list" class="plugin-label">{{ t('plugin.iconList') }}</Label>
           </NuxtLink>
         </TooltipTrigger>
@@ -62,18 +62,25 @@ const { toggle } = useFullscreen(document.body)
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>
-    <PluginThemeListModal>
-      <div class="plugin-item cursor-pointer">
-        <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 1024 1024"><rect width="1024" height="1024" fill="none" /><path fill="currentColor" fill-opacity="0.15" d="M512 318c-79.2 0-148.5-48.8-176.7-120H182v196h119v432h422V394h119V198H688.7c-28.2 71.2-97.5 120-176.7 120" /><path fill="currentColor" d="M870 126H663.8c-17.4 0-32.9 11.9-37 29.3C614.3 208.1 567 246 512 246s-102.3-37.9-114.8-90.7a37.93 37.93 0 0 0-37-29.3H154a44 44 0 0 0-44 44v252a44 44 0 0 0 44 44h75v388a44 44 0 0 0 44 44h478a44 44 0 0 0 44-44V466h75a44 44 0 0 0 44-44V170a44 44 0 0 0-44-44m-28 268H723v432H301V394H182V198h153.3c28.2 71.2 97.5 120 176.7 120s148.5-48.8 176.7-120H842z" /></svg>
-        <Label class="plugin-label">{{ t('plugin.theme') }}</Label>
-      </div>
-    </PluginThemeListModal>
+
     <PluginIdPhoto>
       <div class="plugin-item">
         <div class="i-ri-id-card-line icon-btn" />
         <Label class="plugin-label">{{ t('plugin.idPhoto') }}</Label>
       </div>
     </PluginIdPhoto>
+    <PluginThemeColorAndBg>
+      <div class="plugin-item">
+        <svg class="icon-btn" xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24"><path fill="currentColor" d="M19.54 5.08A10.6 10.6 0 0 0 11.91 2a10 10 0 0 0-.05 20a2.58 2.58 0 0 0 2.53-1.89a2.52 2.52 0 0 0-.57-2.28a.5.5 0 0 1 .37-.83h1.65A6.15 6.15 0 0 0 22 11.33a8.48 8.48 0 0 0-2.46-6.25m-12.7 9.66a1.5 1.5 0 1 1 .4-2.08a1.49 1.49 0 0 1-.4 2.08M8.3 9.25a1.5 1.5 0 1 1-.55-2a1.5 1.5 0 0 1 .55 2M11 7a1.5 1.5 0 1 1 1.5-1.5A1.5 1.5 0 0 1 11 7m5.75.8a1.5 1.5 0 1 1 .55-2a1.5 1.5 0 0 1-.55 2" /></svg>
+        <Label class="plugin-label">{{ t('plugin.theme') }}</Label>
+      </div>
+    </PluginThemeColorAndBg>
+    <PluginThemeListModal>
+      <div class="plugin-item cursor-pointer">
+        <svg class="icon-btn" xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2M7 7h10M7 12h10M7 17h6" /></svg>
+        <Label class="plugin-label">{{ t('plugin.resumeTemplate') }}</Label>
+      </div>
+    </PluginThemeListModal>
     <div class="plugin-item" @click.stop="downloadImg">
       <div class="i-ri-image-line icon-btn" />
       <Label class="plugin-label">{{ t('plugin.screenshot') }}</Label>

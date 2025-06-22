@@ -1,10 +1,8 @@
 <script setup lang="ts">
 import type { ThemeName } from '~/utils'
 import { useI18n } from 'vue-i18n'
-import { Button } from '@/components/ui/button'
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
   DialogHeader,
@@ -37,13 +35,8 @@ function handleThemeSelect(theme: ThemeName) {
     <DialogTrigger as-child>
       <slot />
     </DialogTrigger>
-    <DialogContent class="dialogContent">
-      <DialogHeader class="dialogHeader">
-        <DialogClose as-child>
-          <Button variant="ghost" class="cursor-pointer right-4 top-4 absolute z-11">
-            <div class="i-ri-close-fill" />
-          </Button>
-        </DialogClose>
+    <DialogContent class="px-0; pt-0 max-h-[80vh] max-w-[80%] overflow-auto">
+      <DialogHeader class="p-6 pb-2 bg-white top-0 sticky z-10">
         <DialogTitle>{{ t('themeList.title') }}</DialogTitle>
         <DialogDescription>
           {{ t('themeList.description') }}
@@ -62,7 +55,6 @@ function handleThemeSelect(theme: ThemeName) {
             <img :src="theme.image" :alt="theme.label" srcset="">
           </div>
           <div class="theme-label">
-            <!-- {{ theme.label }} -->
             <div v-if="theme.isSelected" class="theme-selected-icon i-ri-checkbox-circle-line" />
           </div>
         </div>
@@ -71,7 +63,7 @@ function handleThemeSelect(theme: ThemeName) {
   </Dialog>
 </template>
 
-<style>
+<style scoped>
 .themeList {
   @apply grid grid-cols-2 md:grid-cols-4 gap-4 mx-6;
 }
@@ -94,17 +86,5 @@ function handleThemeSelect(theme: ThemeName) {
 
 .theme-image img {
   @apply w-full object-cover transition-transform duration-200 hover:scale-105;
-}
-
-/* .theme-label {
-  @apply p-3 text-center font-medium text-gray-700 flex items-center justify-center gap-2;
-} */
-
-.dialogContent {
-  @apply overflow-auto max-h-[80vh] max-w-[80%] pt-0 px-0;
-}
-
-.dialogHeader {
-  @apply sticky top-0 z-10 bg-white p-6 pb-2;
 }
 </style>
