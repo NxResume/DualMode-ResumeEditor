@@ -43,6 +43,21 @@
     "title": "主题列表",
     "description": "选择一个您喜欢的简历主题样式，点击即可应用"
   },
+  "themeColorAndBg": {
+    "title": "主题与背景设置",
+    "description": "自定义主题颜色和背景，打造专属的简历风格",
+    "currentColor": "当前颜色",
+    "presetColors": "预设颜色",
+    "customColor": "自定义颜色",
+    "openColorPicker": "打开颜色选择器",
+    "closeColorPicker": "关闭颜色选择器",
+    "close": "关闭",
+    "open": "打开",
+    "backgroundImages": "背景图片"
+  },
+  "pagePaddingSelect": {
+    "placeholder": "选择边距"
+  },
   "imageMoveable": {
     "dragTooltip": "拖拽移动图片",
     "scaleTooltip": "拖拽角落调整图片大小",

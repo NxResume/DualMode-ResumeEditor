@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ChromePicker, tinycolor } from 'vue-color'
+import { useI18n } from 'vue-i18n'
 import {
   Dialog,
   DialogContent,
@@ -14,6 +15,7 @@ import 'vue-color/style.css'
 
 const isColorPickerOpen = ref(false)
 const settingsStore = useSettingsStore()
+const { t } = useI18n()
 
 const color = defineModel<string>({
   default: 'rgb(0,0,0)',
@@ -76,10 +78,10 @@ onMounted(() => {
     >
       <DialogHeader class="dialogHeader">
         <DialogTitle class="text-lg font-semibold">
-          主题与背景设置
+          {{ t('themeColorAndBg.title') }}
         </DialogTitle>
         <DialogDescription class="text-sm text-gray-600">
-          自定义主题颜色和背景，打造专属的简历风格
+          {{ t('themeColorAndBg.description') }}
         </DialogDescription>
       </DialogHeader>
 
@@ -87,7 +89,7 @@ onMounted(() => {
         <!-- 当前颜色显示 -->
         <div class="space-y-2">
           <h3 class="text-sm text-gray-700 font-medium">
-            当前颜色
+            {{ t('themeColorAndBg.currentColor') }}
           </h3>
           <div class="flex items-center space-x-3">
             <div
@@ -102,7 +104,7 @@ onMounted(() => {
         <!-- 预设颜色 -->
         <div class="space-y-3">
           <h3 class="text-sm text-gray-700 font-medium">
-            预设颜色
+            {{ t('themeColorAndBg.presetColors') }}
           </h3>
           <div class="gap-2 grid grid-cols-6">
             <div
@@ -127,14 +129,14 @@ onMounted(() => {
         <!-- 自定义颜色选择器 -->
         <div class="space-y-3">
           <h3 class="text-sm text-gray-700 font-medium">
-            自定义颜色
+            {{ t('themeColorAndBg.customColor') }}
           </h3>
           <div class="flex items-center space-x-3">
             <button
               class="text-sm px-3 py-2 border border-gray-300 rounded-md transition-colors hover:bg-gray-50"
               @click="toggleColorPicker"
             >
-              {{ isColorPickerOpen ? '关闭' : '打开' }}颜色选择器
+              {{ isColorPickerOpen ? t('themeColorAndBg.closeColorPicker') : t('themeColorAndBg.openColorPicker') }}
             </button>
           </div>
           <ChromePicker v-if="isColorPickerOpen" v-model="color" />
@@ -143,7 +145,7 @@ onMounted(() => {
         <!-- 背景图片选择 -->
         <div class="bg-selected-wrapper pt-4 border-t border-gray-200 space-y-3">
           <h3 class="text-sm text-gray-700 font-medium">
-            背景图片
+            {{ t('themeColorAndBg.backgroundImages') }}
           </h3>
           <div class="themeList">
             <div

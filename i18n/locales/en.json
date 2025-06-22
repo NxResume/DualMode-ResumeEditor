@@ -43,6 +43,21 @@
     "title": "Theme List",
     "description": "Select a resume theme style you like, click to apply"
   },
+  "themeColorAndBg": {
+    "title": "Theme and Background Settings",
+    "description": "Customize theme colors and backgrounds to create your unique resume style",
+    "currentColor": "Current Color",
+    "presetColors": "Preset Colors",
+    "customColor": "Custom Color",
+    "openColorPicker": "Open Color Picker",
+    "closeColorPicker": "Close Color Picker",
+    "close": "Close",
+    "open": "Open",
+    "backgroundImages": "Background Images"
+  },
+  "pagePaddingSelect": {
+    "placeholder": "Select padding"
+  },
   "imageMoveable": {
     "dragTooltip": "Drag to move image",
     "scaleTooltip": "Drag corners to resize image",
