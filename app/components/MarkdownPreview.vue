@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { isClient } from '@vueuse/core'
-import { toPng } from 'html-to-image'
+import { exportToImage, exportToPDF } from '@/utils/download'
 import { useResumeStore } from '~/stores/resume'
 import useSettingsStore from '~/stores/settings'
 import { autoPaginate, DEFAULT_CONFIG } from '~/utils/pagination'
@@ -14,126 +14,12 @@ const md = computed(() => useMarkdown(props.content))
 const previewRef = ref<HTMLElement | null>(null)
 const isShowMoveabled = ref(false)
 
-async function exportToPDF() {
-  if (!previewRef.value)
-    return
-
-  const wrapper = previewRef.value.querySelector('.rs-page-item-wrapper')
-  if (!wrapper)
-    return
-
-  const pages = wrapper.querySelectorAll('.rs-page-item')
-  if (pages.length === 0)
-    return
-
-  // 动态导入 jsPDF
-  const { jsPDF: PDF } = await import('jspdf')
-
-  // 创建 PDF 文档
-  const pdf = new PDF({
-    orientation: 'portrait',
-    unit: 'pt',
-    format: 'a4',
-    compress: true,
-  })
-
-  // 遍历每一页
-  for (let i = 0; i < pages.length; i++) {
-    const page = pages[i] as HTMLElement
-
-    // 使用 html-to-image 转换页面
-    const dataUrl = await toPng(page, {
-      quality: 1.0,
-      pixelRatio: 2,
-      skipFonts: false,
-      filter: () => {
-        return true
-      },
-      style: {
-        transform: 'none',
-      },
-    })
-
-    // 计算尺寸
-    const imgWidth = 595.28
-    const imgHeight = 592.28 / page.offsetWidth * page.offsetHeight
-
-    // 如果不是第一页，添加新页面
-    if (i > 0) {
-      pdf.addPage()
-    }
-
-    // 添加图片到 PDF
-    pdf.addImage(dataUrl, 'PNG', 0, 0, imgWidth, imgHeight)
-  }
-
-  // 保存 PDF
-  pdf.save('resume.pdf')
+async function handleExportPDF() {
+  await exportToPDF(previewRef.value)
 }
 
-async function exportToImage() {
-  if (!previewRef.value)
-    return
-
-  const wrapper = previewRef.value.querySelector('.rs-page-item-wrapper')
-  if (!wrapper)
-    return
-
-  const pages = wrapper.querySelectorAll('.rs-page-item')
-  if (pages.length === 0)
-    return
-
-  // 如果只有一页，直接导出
-  if (pages.length === 1) {
-    const dataUrl = await toPng(pages[0] as HTMLElement, {
-      quality: 1.0,
-      pixelRatio: 2,
-      skipFonts: false,
-      filter: () => true,
-      style: {
-        transform: 'none',
-      },
-    })
-
-    // 创建下载链接
-    const link = document.createElement('a')
-    link.download = 'resume.png'
-    link.href = dataUrl
-    link.click()
-    return
-  }
-
-  // 如果有多页，创建 zip 文件
-  const JSZip = (await import('jszip')).default
-  const zip = new JSZip()
-
-  // 遍历每一页并添加到 zip
-  for (let i = 0; i < pages.length; i++) {
-    const page = pages[i] as HTMLElement
-    const dataUrl = await toPng(page, {
-      quality: 1.0,
-      pixelRatio: 2,
-      skipFonts: false,
-      filter: () => true,
-      style: {
-        transform: 'none',
-      },
-    })
-
-    // 将 base64 转换为 blob
-    const base64Data = dataUrl.split(',')[1]
-    const blob = await fetch(`data:image/png;base64,${base64Data}`).then(res => res.blob())
-
-    // 添加到 zip
-    zip.file(`resume-page-${i + 1}.png`, blob)
-  }
-
-  // 生成并下载 zip
-  const content = await zip.generateAsync({ type: 'blob' })
-  const link = document.createElement('a')
-  link.download = 'resume-pages.zip'
-  link.href = URL.createObjectURL(content)
-  link.click()
+function handleExportImage() {
+  exportToImage(previewRef.value)
 }
 
 // 监听内容变化
@@ -197,8 +83,8 @@ onMounted(() => {
 })
 
 defineExpose({
-  exportToPDF,
-  exportToImage,
+  exportToPDF: handleExportPDF,
+  exportToImage: handleExportImage,
 })
 </script>
 
@@ -244,6 +130,18 @@ defineExpose({
   background: var(--resume-page-background) no-repeat;
   background-size: contain;
   z-index: -1;
+}
+
+.rs-page-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 50%;
+  background: var(--resume-page-background) no-repeat;
+  background-size: contain;
+  z-index: -1;
+  pointer-events: none;
 }
 
 .rs-line-split {
