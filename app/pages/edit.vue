@@ -47,14 +47,14 @@ async function handleExport(type: 'pdf' | 'png') {
     <!-- 左侧编辑器 -->
     <div
       ref="leftRef"
-      class="p-2 rounded-lg bg-white flex-none h-full w-480px shadow-lg overflow-x-hidden overflow-y-auto dark:bg-gray-800"
+      class="p-2 pt-10 rounded-lg bg-white flex-none h-full w-480px shadow-lg overflow-x-hidden overflow-y-auto dark:bg-gray-800"
     >
       <ClientOnly>
         <CodeMirror v-model="resumeStore.content" :mode="settingStore.editorMode" />
       </ClientOnly>
     </div>
     <!-- 右侧预览 -->
-    <div ref="el" class="px-20 bg-[#606060] flex-shrink flex-grow flex-basis-0 relative overflow-auto">
+    <div ref="el" class="px-20 pt-2 bg-[#606060] flex-shrink flex-grow flex-basis-0 relative overflow-auto">
       <div
         class="w-full" :style="{
           scale: scalePre || 1,

@@ -143,7 +143,7 @@ onUnmounted(() => {
 
 <template>
   <div
-    class="mt-10 h-full"
+    class="h-full"
     :class="{
       'wysiwyg-mode': mode === 'wysiwyg',
     }"

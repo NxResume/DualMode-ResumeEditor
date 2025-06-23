@@ -1,38 +1,56 @@
-import { useScroll } from '@vueuse/core'
-import { watchEffect } from 'vue'
-
 export function useScrollSync(leftRef: Ref<any>, rightRef: Ref<any>) {
-  // 获取左边和右边元素的滚动位置
-  const { y: leftScrollY } = useScroll(leftRef)
-  const { y: rightScrollY } = useScroll(rightRef)
+  let isSyncing = false
 
-  // 监听左边编辑器的滚动，更新右边预览的滚动位置
-  const stopLeft = watchEffect(() => {
-    if (leftRef.value && rightRef.value) {
-      const leftHeight = leftRef.value.scrollHeight
-      const rightHeight = rightRef.value.scrollHeight
-      const scrollRatio = leftScrollY.value / leftHeight
+  const onLeftScroll = () => {
+    if (!leftRef.value || !rightRef.value)
+      return
+    if (isSyncing)
+      return
 
-      // 更新右边预览的滚动位置
-      rightRef.value.scrollTop = scrollRatio * rightHeight
-    }
-  })
+    const left = leftRef.value
+    const right = rightRef.value
 
-  // 监听右边预览的滚动，更新左边编辑器的滚动位置
-  const stopRight = watchEffect(() => {
-    if (leftRef.value && rightRef.value) {
-      const leftHeight = leftRef.value.scrollHeight
-      const rightHeight = rightRef.value.scrollHeight
-      const scrollRatio = rightScrollY.value / rightHeight
+    const leftMax = left.scrollHeight - left.clientHeight
+    const rightMax = right.scrollHeight - right.clientHeight
 
-      // 更新左边编辑器的滚动位置
-      leftRef.value.scrollTop = scrollRatio * leftHeight
-    }
-  })
+    const ratio = leftMax > 0 ? left.scrollTop / leftMax : 0
 
-  // 返回一个停止函数
-  return () => {
-    stopLeft()
-    stopRight()
+    isSyncing = true
+    right.scrollTop = ratio * rightMax
+    isSyncing = false
   }
+
+  const onRightScroll = () => {
+    if (!leftRef.value || !rightRef.value)
+      return
+    if (isSyncing)
+      return
+
+    const left = leftRef.value
+    const right = rightRef.value
+
+    const leftMax = left.scrollHeight - left.clientHeight
+    const rightMax = right.scrollHeight - right.clientHeight
+
+    const ratio = rightMax > 0 ? right.scrollTop / rightMax : 0
+
+    isSyncing = true
+    left.scrollTop = ratio * leftMax
+    isSyncing = false
+  }
+
+  // 添加监听器
+  onMounted(() => {
+    leftRef.value?.addEventListener('scroll', onLeftScroll)
+    rightRef.value?.addEventListener('scroll', onRightScroll)
+  })
+
+  const stop = () => {
+    leftRef.value?.removeEventListener('scroll', onLeftScroll)
+    rightRef.value?.removeEventListener('scroll', onRightScroll)
+  }
+
+  onUnmounted(stop)
+
+  return stop
 }
