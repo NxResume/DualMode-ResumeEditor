@@ -22,6 +22,10 @@ export const useResumeStore = defineStore('resume', () => {
     content.value = newContent
   }
 
+  function resetContent() {
+    content.value = tm1
+  }
+
   function setTheme(newTheme: ThemeName) {
     theme.value = newTheme
   }
@@ -68,5 +72,6 @@ export const useResumeStore = defineStore('resume', () => {
     addPlugin,
     removePlugin,
     applyTheme,
+    resetContent,
   }
 })

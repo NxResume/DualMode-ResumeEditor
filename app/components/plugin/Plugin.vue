@@ -77,7 +77,7 @@ const { toggle } = useFullscreen(document.body)
     </PluginThemeColorAndBg>
     <PluginThemeListModal>
       <div class="plugin-item cursor-pointer">
-        <svg class="icon-btn" xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2M7 7h10M7 12h10M7 17h6" /></svg>
+        <svg class="icon-btn" xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24"><path fill="currentColor" d="M8 13h8v-2H8zm0 3h8v-2H8zm0 3h5v-2H8zm-4 3V2h10l6 6v14zm9-13V4H6v16h12V9zM6 4v5zv16z" /></svg>
         <Label class="plugin-label">{{ t('plugin.resumeTemplate') }}</Label>
       </div>
     </PluginThemeListModal>
@@ -85,6 +85,12 @@ const { toggle } = useFullscreen(document.body)
       <div class="i-ri-image-line icon-btn" />
       <Label class="plugin-label">{{ t('plugin.screenshot') }}</Label>
     </div>
+    <PluginReset>
+      <div class="plugin-item">
+        <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24"><path fill="currentColor" d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89l.07.14L9 12H6a7 7 0 0 1 7-7a7 7 0 0 1 7 7a7 7 0 0 1-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.9 8.9 0 0 0 13 21a9 9 0 0 0 9-9a9 9 0 0 0-9-9" /></svg>
+        <Label class="plugin-label">重置</Label>
+      </div>
+    </PluginReset>
     <div class="plugin-item" @click.stop="toggle">
       <div class="i-ri-fullscreen-line icon-btn" />
       <Label class="plugin-label">{{ t('plugin.fullscreen') }}</Label>
@@ -97,8 +103,11 @@ const { toggle } = useFullscreen(document.body)
 .plugin-item {
   @apply flex items-center space-x-2;
 }
+.plugin-item svg {
+  @apply icon-btn hover:scale-105;
+}
 
 .plugin-label {
-  @apply text-white font-normal text-xs! cursor-pointer;
+  @apply text-white font-normal text-xs! cursor-pointer hover:scale-105;
 }
 </style>
