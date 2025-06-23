@@ -1,12 +1,15 @@
 {
   "app": {
     "title": "Markdown Resume Editor",
-    "description": "Create beautiful resumes with Markdown, featuring real-time preview and one-click PDF export"
+    "description": "Create beautiful resumes with Markdown, featuring real-time preview and one-click PDF export",
+    "startButton": "Get Started"
   },
   "nav": {
     "editor": "Editor",
     "guide": "Guide",
-    "templates": "Templates"
+    "templates": "Templates",
+    "resumeTemplates": "Resume Templates",
+    "faq": "FAQ"
   },
   "guide": {
     "title": "Quick Start",
@@ -75,5 +78,74 @@
     "resetPhoto": "Reset Photo",
     "confirmUpload": "Confirm Upload",
     "photoPreview": "ID Photo Preview"
+  },
+  "home": {
+    "templates": {
+      "title": "Featured Resume Templates",
+      "description": "Carefully selected unique resume templates to help you quickly create professional resumes and showcase your personal advantages."
+    },
+    "features": {
+      "title": "Key Features",
+      "items": [
+        {
+          "title": "Real-time Markdown Preview",
+          "description": "Write and see instantly, supporting rich syntax for efficient resume content editing."
+        },
+        {
+          "title": "Multiple Template Styles",
+          "description": "Diverse templates to meet different industry and personalization needs."
+        },
+        {
+          "title": "Multi-language Support",
+          "description": "Supports Chinese and English, easily switch between internationalized content."
+        },
+        {
+          "title": "One-click PDF Export",
+          "description": "Export high-quality PDFs for easy sharing and submission."
+        },
+        {
+          "title": "ID Photo Upload & Edit",
+          "description": "Upload ID photos with drag, zoom, and reset support, real-time preview."
+        },
+        {
+          "title": "PWA Offline Support",
+          "description": "Install as desktop or mobile app with offline editing and automatic caching."
+        }
+      ]
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "items": [
+        {
+          "question": "How to export PDF resume?",
+          "answer": "Click the 'Export PDF' button in the top right corner of the editor page to generate a high-definition PDF file with pagination and custom styling support."
+        },
+        {
+          "question": "What languages does the resume support?",
+          "answer": "Currently supports Chinese and English. You can switch via the language toggle button in the bottom right corner of the page, with content and UI updating synchronously."
+        },
+        {
+          "question": "Does it support offline use?",
+          "answer": "Yes. The project is configured with PWA and can be added to desktop for offline editing. Resources will be automatically cached after the first load."
+        },
+        {
+          "question": "Will resume content be lost?",
+          "answer": "No, all content is automatically saved to local cache. Your content will be preserved even after closing the page or refreshing."
+        }
+      ]
+    },
+    "footer": {
+      "projectName": "Nuxt Resume Editor",
+      "description": "A modern resume editor supporting Markdown editing, theme switching, export and other features.",
+      "links": {
+        "github": "GitHub",
+        "docs": "Documentation",
+        "faq": "FAQ",
+        "terms": "Terms of Service"
+      },
+      "copyright": "© 2025 RYANUO. MIT License.",
+      "contact": "Contact Me",
+      "github": "GitHub"
+    }
   }
 }

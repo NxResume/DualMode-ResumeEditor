@@ -1,12 +1,15 @@
 {
   "app": {
     "title": "Markdown 简历编辑器",
-    "description": "使用 Markdown 轻松创建精美的简历，支持实时预览，一键导出 PDF"
+    "description": "使用 Markdown 轻松创建精美的简历，支持实时预览，一键导出 PDF",
+    "startButton": "快速开始"
   },
   "nav": {
     "editor": "编辑器",
     "guide": "使用指南",
-    "templates": "模板"
+    "templates": "模板",
+    "resumeTemplates": "简历模板",
+    "faq": "常见问题"
   },
   "guide": {
     "title": "快速开始",
@@ -75,5 +78,74 @@
     "resetPhoto": "重置头像",
     "confirmUpload": "确认上传",
     "photoPreview": "证件照预览"
+  },
+  "home": {
+    "templates": {
+      "title": "精选简历模板",
+      "description": "精选多款风格独特的简历模板，助你快速制作专业简历，轻松展现个人优势。"
+    },
+    "features": {
+      "title": "主要功能",
+      "items": [
+        {
+          "title": "实时 Markdown 预览",
+          "description": "即写即看，支持丰富语法，高效编辑简历内容。"
+        },
+        {
+          "title": "多种模板风格",
+          "description": "多样模板，满足不同行业和个性化需求。"
+        },
+        {
+          "title": "多语言支持",
+          "description": "支持中英文，轻松切换国际化内容。"
+        },
+        {
+          "title": "一键导出 PDF",
+          "description": "导出高质量 PDF，方便分享与投递。"
+        },
+        {
+          "title": "证件照上传与编辑",
+          "description": "上传身份证照片，支持拖拽、缩放与重置，实时预览。"
+        },
+        {
+          "title": "PWA 离线支持",
+          "description": "安装为桌面或移动应用，支持离线编辑和自动缓存。"
+        }
+      ]
+    },
+    "faq": {
+      "title": "常见问题",
+      "items": [
+        {
+          "question": "如何导出 PDF 简历？",
+          "answer": "在编辑器页面右上角点击「导出 PDF」按钮，即可生成高清 PDF 文件，支持分页与自定义样式。"
+        },
+        {
+          "question": "简历支持哪些语言？",
+          "answer": "当前支持中英文，可通过页面右下角的语言切换按钮进行切换，内容与 UI 同步更新。"
+        },
+        {
+          "question": "是否支持离线使用？",
+          "answer": "支持。项目已配置 PWA，可添加到桌面并离线编辑，首次加载后资源将自动缓存。"
+        },
+        {
+          "question": "简历内容会丢失吗？",
+          "answer": "不会，所有内容会自动保存到本地缓存。你关闭页面或刷新后依然能保留上次编辑的内容。"
+        }
+      ]
+    },
+    "footer": {
+      "projectName": "Nuxt Resume Editor",
+      "description": "一个支持 Markdown 编辑、主题切换、导出等功能的现代简历编辑器。",
+      "links": {
+        "github": "GitHub",
+        "docs": "使用文档",
+        "faq": "常见问题",
+        "terms": "使用协议"
+      },
+      "copyright": "© 2025 RYANUO. MIT License.",
+      "contact": "联系我",
+      "github": "GitHub"
+    }
   }
 }
