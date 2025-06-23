@@ -147,5 +147,11 @@
       "contact": "联系我",
       "github": "GitHub"
     }
+  },
+  "resetResume": {
+    "title": "重置简历内容",
+    "description": "此操作无法撤销，将清空当前简历内容。你确定要继续吗？",
+    "cancel": "取消",
+    "action": "确定重置"
   }
 }

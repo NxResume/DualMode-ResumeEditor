@@ -9,6 +9,7 @@ const useSettingsStore = defineStore('settings', () => {
   const pageBackground = useStorage('nuxt-resume-page-background-image', 'default')
   const pageThemeColor = useStorage('nuxt-resume-page-theme-color', '0,0,0')
   const pagePadding = useStorage('nuxt-resume-editor-pagePadding', 36)
+  const pageLineHeight = useStorage('nuxt-resume-editor-pageLineHeight', 1.9)
 
   const fontMap = computed(() => {
     return fontList?.find(font => font.value === fontname.value)
@@ -44,6 +45,10 @@ const useSettingsStore = defineStore('settings', () => {
     document.documentElement.style.setProperty('--resume-page-theme', pageThemeColor.value)
   }
 
+  const loadPageLineHeight = () => {
+    document.documentElement.style.setProperty('--resume-line-height', `${pageLineHeight.value}`)
+  }
+
   watch(fontname, () => {
     loadFont()
   })
@@ -60,11 +65,16 @@ const useSettingsStore = defineStore('settings', () => {
     loadPageTheme()
   })
 
+  watch(pageLineHeight, () => {
+    loadPageLineHeight()
+  })
+
   onMounted(() => {
     loadFont()
     loadPagePadding()
     loadPageBackground()
     loadPageTheme()
+    loadPageLineHeight()
   })
 
   return {
@@ -74,6 +84,7 @@ const useSettingsStore = defineStore('settings', () => {
     pagePadding: skipHydrate(pagePadding),
     pageBackground: skipHydrate(pageBackground),
     pageThemeColor: skipHydrate(pageThemeColor),
+    pageLineHeight: skipHydrate(pageLineHeight),
     fontMap,
     loadFont,
   }

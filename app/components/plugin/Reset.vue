@@ -19,15 +19,15 @@ const resumeStore = useResumeStore()
     <AlertDialogTrigger><slot /></AlertDialogTrigger>
     <AlertDialogContent>
       <AlertDialogHeader>
-        <AlertDialogTitle>重置简历内容</AlertDialogTitle>
+        <AlertDialogTitle>{{ $t('resetResume.title') }}</AlertDialogTitle>
         <AlertDialogDescription>
-          此操作无法撤销，将清空当前简历内容。你确定要继续吗？
+          {{ $t('resetResume.description') }}
         </AlertDialogDescription>
       </AlertDialogHeader>
       <AlertDialogFooter>
-        <AlertDialogCancel>取消</AlertDialogCancel>
+        <AlertDialogCancel>{{ $t('resetResume.cancel') }}</AlertDialogCancel>
         <AlertDialogAction @click="resumeStore.resetContent">
-          确定重置
+          {{ $t('resetResume.action') }}
         </AlertDialogAction>
       </AlertDialogFooter>
     </AlertDialogContent>

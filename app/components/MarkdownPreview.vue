@@ -73,7 +73,13 @@ onMounted(() => {
   })
 })
 
-watch(() => [props.content, resumeStore.theme, settingsStore.pagePadding], () => {
+watch(() => [
+  props.content,
+  resumeStore.theme,
+  settingsStore.pagePadding,
+  settingsStore.pageLineHeight,
+  settingsStore.fontname,
+], () => {
   handleAutoPaginate()
 })
 

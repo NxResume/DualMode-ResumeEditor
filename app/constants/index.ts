@@ -82,6 +82,65 @@ export const pagePaddingList = [
   },
 ]
 
+export const pageLineHeightList = [
+  {
+    name: '1.0',
+    value: 1.0,
+  },
+  {
+    name: '1.2',
+    value: 1.2,
+  },
+  {
+    name: '1.5',
+    value: 1.5,
+  },
+  {
+    name: '1.6',
+    value: 1.6,
+  },
+  {
+    name: '1.7',
+    value: 1.7,
+  },
+  {
+    name: '1.8',
+    value: 1.8,
+  },
+  {
+    name: '1.9',
+    value: 1.9,
+  },
+  {
+    name: '2.0',
+    value: 2.0,
+  },
+  {
+    name: '2.1',
+    value: 2.1,
+  },
+  {
+    name: '2.2',
+    value: 2.2,
+  },
+  {
+    name: '2.3',
+    value: 2.3,
+  },
+  {
+    name: '2.4',
+    value: 2.4,
+  },
+  {
+    name: '3.0',
+    value: 3.0,
+  },
+  {
+    name: '4.0',
+    value: 4.0,
+  },
+]
+
 export const pageBgList = [
   { name: '背景0', value: 'default' },
   { name: '背景1', value: '/assets/preview-bg/9h7K594eFuRIDIL.png' },

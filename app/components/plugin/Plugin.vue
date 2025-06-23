@@ -30,6 +30,9 @@ const { toggle } = useFullscreen(document.body)
     <div>
       <PluginPagePaddingSelect />
     </div>
+    <div>
+      <PluginPageLineHeight />
+    </div>
     <div class="plugin-item">
       <Switch
         id="airplane-mode" :model-value="settingstore.isScrollable"

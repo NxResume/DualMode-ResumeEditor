@@ -17,7 +17,7 @@ const { t } = useI18n()
 
 <template>
   <Select v-model="settingStore.pagePadding">
-    <SelectTrigger class="text-xs bg-white h-6 w-[80px] cursor-pointer">
+    <SelectTrigger class="text-xs p-1 bg-white h-6 w-14 cursor-pointer">
       <SelectValue :placeholder="t('pagePaddingSelect.placeholder')" />
     </SelectTrigger>
     <SelectContent>

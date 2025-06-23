@@ -147,5 +147,11 @@
       "contact": "Contact Me",
       "github": "GitHub"
     }
+  },
+  "resetResume": {
+    "title": "Reset Resume Content",
+    "description": "This action cannot be undone. It will clear your current resume content. Are you sure you want to continue?",
+    "cancel": "Cancel",
+    "action": "Reset"
   }
 }
