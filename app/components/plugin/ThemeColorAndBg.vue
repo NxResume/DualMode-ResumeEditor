@@ -1,8 +1,10 @@
 <script setup lang="ts">
+import { X } from 'lucide-vue-next'
 import { ChromePicker, tinycolor } from 'vue-color'
 import { useI18n } from 'vue-i18n'
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogHeader,
@@ -83,6 +85,12 @@ onMounted(() => {
         <DialogDescription class="text-sm text-gray-600">
           {{ t('themeColorAndBg.description') }}
         </DialogDescription>
+        <DialogClose
+          class="rounded-sm opacity-70 cursor-pointer ring-offset-background transition-opacity right-4 top-8 absolute z-20 data-[state=open]:text-muted-foreground focus:outline-none data-[state=open]:bg-accent hover:opacity-100 disabled:pointer-events-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+        >
+          <X class="h-4 w-4" />
+          <span class="sr-only">Close</span>
+        </DialogClose>
       </DialogHeader>
 
       <div class="p-4 space-y-6" @click.self="closeColorPicker">

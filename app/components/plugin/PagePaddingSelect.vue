@@ -20,7 +20,7 @@ const { t } = useI18n()
     <SelectTrigger class="text-xs p-1 bg-white h-6 w-14 cursor-pointer">
       <SelectValue :placeholder="t('pagePaddingSelect.placeholder')" />
     </SelectTrigger>
-    <SelectContent>
+    <SelectContent class="min-w-4">
       <SelectGroup>
         <SelectItem v-for="item in pagePaddingList" :key="item.value" class="text-xs cursor-pointer" :value="item.value">
           {{ item.name }}
