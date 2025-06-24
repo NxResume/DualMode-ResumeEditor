@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { cn } from '~/lib/utils'
+
 const features = [
   {
     icon: 'i-ri-markdown-fill',
@@ -59,20 +61,23 @@ useAutoScrollBounce(scrollFeatRef, {
       <div
         v-for="(item, idx) in features"
         :key="idx"
-        class="p-6 rounded-xl bg-white/10 flex-shrink-0 w-64 cursor-pointer shadow-lg transform transition-transform duration-300 relative backdrop-blur-md hover:shadow-2xl hover:-translate-y-2"
+        :class="
+          cn('px-4 py-3 rounded-lg flex flex-shrink-0 gap-x-3 w-64 cursor-pointer shadow-md transition-colors duration-300 items-center hover:text-background hover:bg-primary',
+             'text-white bg-black hover:text-black hover:bg-white',
+          )"
       >
-        <div
-          class="text-3xl mb-6 rounded-xl inline-flex h-14 w-14 items-center justify-center drop-shadow-lg"
-          :class="[item.color]"
-        >
-          <i :class="item.icon" />
+        <!-- 图标 -->
+        <i :class="item.icon" class="text-xl" />
+
+        <!-- 文本 -->
+        <div class="flex flex-col">
+          <h4 class="text-sm font-semibold">
+            {{ $t(item.titleKey) }}
+          </h4>
+          <p class="text-xs leading-snug opacity-80">
+            {{ $t(item.descKey) }}
+          </p>
         </div>
-        <h4 class="text-xl text-black font-semibold mb-2">
-          {{ $t(item.titleKey) }}
-        </h4>
-        <p class="text-sm text-black/80 leading-relaxed">
-          {{ $t(item.descKey) }}
-        </p>
       </div>
     </div>
   </section>

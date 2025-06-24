@@ -21,7 +21,7 @@ useAutoScrollBounce(scrollRef, {
 
 <template>
   <section id="templates" class="mx-4 mb-12 lg:mx-8 sm:mx-6">
-    <div class="flex flex-col gap-8 items-start md:flex-row">
+    <div class="flex flex-col gap-8 pointer-events-none items-start md:flex-row">
       <!-- 左侧：标题与描述 -->
       <div class="w-full space-y-4 md:w-1/3">
         <h2 class="text-2xl font-bold">

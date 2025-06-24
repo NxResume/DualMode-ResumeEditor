@@ -28,7 +28,7 @@ const editPath = computed(() => {
 
           <NuxtLink :to="editPath">
             <div
-              class="text-lg text-white leading-[48px] font-semibold mx-auto mt-10 text-center rounded-4xl h-12 w-48 cursor-pointer select-none shadow-md transition-all duration-300 from-blue-500 to-indigo-500 bg-linear-to-r hover:shadow-lg active:scale-95 hover:scale-105"
+              class="text-lg text-white leading-[48px] font-semibold mx-auto mt-10 text-center rounded-4xl h-12 w-40 cursor-pointer select-none shadow-md transition-all duration-500 from-black to-gray-700 bg-linear-to-r hover:shadow-xl hover:scale-105"
             >
               {{ $t('app.startButton') }}
             </div>

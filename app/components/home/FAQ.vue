@@ -27,35 +27,34 @@ function toggle(index: number) {
 
 <template>
   <section id="faq" class="mx-auto mb-16 px-6 max-w-4xl">
-    <h3 class="text-2xl text-gray-900 font-bold mb-6 text-center">
+    <h3 class="text-3xl text-gray-900 font-bold mb-8 text-center">
       {{ $t('home.faq.title') }}
     </h3>
-    <div class="rounded-xl bg-white shadow divide-gray-200 divide-y">
+    <div class="rounded-2xl bg-white/70 shadow-lg overflow-hidden backdrop-blur divide-gray-200 divide-y">
       <div
         v-for="(faq, index) in faqs"
         :key="index"
-        class="px-6 py-4 cursor-pointer select-none"
+        class="group px-6 py-5 cursor-pointer transition-colors duration-300 hover:bg-gray-50"
         @click="toggle(index)"
       >
-        <!-- 问题 -->
+        <!-- 问题部分 -->
         <div class="flex items-center justify-between">
-          <h4 class="text-base text-gray-800 font-medium">
+          <h4
+            class="text-base text-gray-800 font-semibold transition-colors duration-300 md:text-lg group-hover:text-primary"
+          >
             {{ $t(faq.questionKey) }}
           </h4>
-          <span
-            class="transition-transform duration-300" :class="{
-              'rotate-180': activeIndex === index,
-            }"
-          >
-            <i class="i-ri-arrow-down-s-line text-xl text-gray-400" />
-          </span>
+          <i
+            class="i-ri-arrow-down-s-line text-xl text-gray-400 transition-transform duration-300"
+            :class="{ 'rotate-180 text-primary': activeIndex === index }"
+          />
         </div>
 
-        <!-- 答案 -->
+        <!-- 答案部分 -->
         <transition name="fade-slide">
           <p
             v-if="activeIndex === index"
-            class="text-sm text-gray-600 leading-relaxed mt-3"
+            class="text-sm text-gray-600 leading-relaxed mt-4 md:text-base"
           >
             {{ $t(faq.answerKey) }}
           </p>
@@ -68,14 +67,14 @@ function toggle(index: number) {
 <style scoped>
 .fade-slide-enter-active,
 .fade-slide-leave-active {
-  transition: all 0.4s ease-in-out;
+  transition: all 0.4s ease;
   overflow: hidden;
 }
 
 .fade-slide-enter-from,
 .fade-slide-leave-to {
   opacity: 0;
-  transform: translateY(-6px);
+  transform: translateY(-8px);
   max-height: 0;
 }
 
@@ -83,6 +82,6 @@ function toggle(index: number) {
 .fade-slide-leave-from {
   opacity: 1;
   transform: translateY(0);
-  max-height: 500px; /* 足够容纳单条答案即可 */
+  max-height: 500px;
 }
 </style>
