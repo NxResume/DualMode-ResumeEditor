@@ -77,7 +77,8 @@
     "fileSize": "大小:",
     "resetPhoto": "重置头像",
     "confirmUpload": "确认上传",
-    "photoPreview": "证件照预览"
+    "photoPreview": "证件照预览",
+    "uploading": "上传中..."
   },
   "home": {
     "templates": {

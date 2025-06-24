@@ -77,7 +77,8 @@
     "fileSize": "Size:",
     "resetPhoto": "Reset Photo",
     "confirmUpload": "Confirm Upload",
-    "photoPreview": "ID Photo Preview"
+    "photoPreview": "ID Photo Preview",
+    "uploading": "uploading..."
   },
   "home": {
     "templates": {

@@ -22,6 +22,7 @@ const { files, open, reset } = useFileDialog({
 const imagePreviewUrl = ref<string | null>(null)
 
 const dialogOpen = ref(false)
+const loading = ref(false)
 
 function getIdPhotoSrcFromContent(content: string) {
   const imgTagRegex = /<img\b[^>]*>/gi
@@ -91,6 +92,7 @@ function handleReset() {
 
 // 确认上传
 function handleConfirm() {
+  loading.value = true
   const uploadUrl = process.env.NODE_ENV === 'production'
     ? 'https://api.ryanuo.cc/api/meituan'
     : '/flask-upload'
@@ -103,6 +105,7 @@ function handleConfirm() {
         method: 'POST',
         body: formData,
       }).then(({ data, error }) => {
+        loading.value = false
         const result = data.value as {
           Jobs: string
         }
@@ -117,8 +120,17 @@ function handleConfirm() {
         else {
           console.error('图片上传失败:', error.value || '未知错误')
         }
+      }).catch((err) => {
+        loading.value = false
+        console.error('图片上传异常:', err)
       })
     }
+    else {
+      loading.value = false
+    }
+  }
+  else {
+    loading.value = false
   }
 }
 
@@ -197,8 +209,17 @@ onUnmounted(() => {
         <Button variant="outline" class="cursor-pointer" :disabled="!imagePreviewUrl" @click="handleReset">
           {{ t('idPhoto.resetPhoto') }}
         </Button>
-        <Button class="cursor-pointer" :disabled="!imagePreviewUrl" @click="handleConfirm">
-          {{ t('idPhoto.confirmUpload') }}
+        <Button class="cursor-pointer" :disabled="!imagePreviewUrl || loading" @click="handleConfirm">
+          <template v-if="loading">
+            <svg class="mr-2 h-4 w-4 inline-block animate-spin" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none" />
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+            </svg>
+            {{ t('idPhoto.uploading') }}
+          </template>
+          <template v-else>
+            {{ t('idPhoto.confirmUpload') }}
+          </template>
         </Button>
       </DialogFooter>
     </DialogContent>
