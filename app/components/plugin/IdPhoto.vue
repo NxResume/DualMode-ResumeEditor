@@ -47,6 +47,9 @@ watch(() => resumeStore.content, () => {
   if (src) {
     imagePreviewUrl.value = src
   }
+  else {
+    imagePreviewUrl.value = ''
+  }
 })
 
 onMounted(() => {

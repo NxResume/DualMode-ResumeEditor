@@ -1,5 +1,5 @@
-export const appName = 'Resume Editor'
-export const appDescription = 'Resume Editor'
+export const appName = 'MarkResume | Markdown-Based Resume Editor & PDF Exporter'
+export const appDescription = 'Markdown-Based Resume Editor & PDF Exporter'
 
 export const fontList = [
   {

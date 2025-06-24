@@ -83,9 +83,25 @@ watch(() => [
   handleAutoPaginate()
 })
 
+// Add keydown event for Delete key to remove ID photo
+function handleKeyDown(event: KeyboardEvent) {
+  if (isShowMoveabled.value && event.key === 'Backspace') {
+    // Remove <img id="id-photo" ...> from resumeStore.content
+    const imgTagRegex = /<img[^>]*id\s*=\s*['"]id-photo['"][^>]*>/gi
+    resumeStore.setContent(resumeStore.content.replace(imgTagRegex, ''))
+    isShowMoveabled.value = false
+  }
+}
+
 onMounted(() => {
   handleAutoPaginate()
   bindImageClickEvent()
+
+  document.addEventListener('keydown', handleKeyDown)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('keydown', handleKeyDown)
 })
 
 defineExpose({
