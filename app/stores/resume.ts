@@ -134,6 +134,7 @@ export const useResumeStore = defineStore('resume', () => {
       }
       resumes.value.push(duplicated)
       currentResumeId.value = duplicated.id
+      allSettings.value[duplicated.id] = allSettings.value[id] as any
       return duplicated
     }
   }

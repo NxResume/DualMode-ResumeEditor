@@ -55,7 +55,6 @@ export function useResumeStyleSync(
 
   onMounted(() => {
     applyAll()
-    updateFont(settings.value.fontname)
   })
 
   // 监听每个字段，按需更新
