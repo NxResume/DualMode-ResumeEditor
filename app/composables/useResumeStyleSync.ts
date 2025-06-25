@@ -44,6 +44,20 @@ export function useResumeStyleSync(
     }
   }
 
+  function applyAll() {
+    const s = settings.value
+    updateFont(s.fontname)
+    el.style.setProperty('--resume-line-height', `${s.pageLineHeight}`)
+    el.style.setProperty('--resume-page-padding-size', `${s.pagePadding}px`)
+    el.style.setProperty('--resume-page-background', `url(${s.pageBackground})`)
+    el.style.setProperty('--resume-page-theme', s.pageThemeColor)
+  }
+
+  onMounted(() => {
+    applyAll()
+    updateFont(settings.value.fontname)
+  })
+
   // 监听每个字段，按需更新
   watch(() => settings.value.fontname, updateFont, { immediate: true })
   watch(() => settings.value.pageLineHeight, (val) => {
@@ -59,12 +73,7 @@ export function useResumeStyleSync(
     el.style.setProperty('--resume-page-theme', val)
   }, { immediate: true })
 
-  // 初始挂载时应用一次
-  onMounted(() => {
-    updateFont(settings.value.fontname)
-  })
-
-  // 卸载时清理样式（可选）
+  // 清理
   onUnmounted(() => {
     const vars = [
       '--defaults-markdwon-family',

@@ -92,6 +92,7 @@ export const useResumeStore = defineStore('resume', () => {
     }
     resumes.value.push(newResume)
     currentResumeId.value = newResume.id
+    allSettings.value[newResume.id] = getDefaultSettings()
     return newResume
   }
 
