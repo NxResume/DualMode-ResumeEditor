@@ -7,21 +7,22 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
-import useSettingsStore from '~/stores/settings'
+import { useResumeSettingsStore } from '~/stores/resumeSettings'
 
 defineProps<{
   downloadImg: () => void
   downloadPdf: () => void
 }>()
 
-const settingstore = useSettingsStore()
+const resumeSettingsStore = useResumeSettingsStore()
 const { t } = useI18n()
 const { toggle } = useFullscreen(document.body)
+const localePath = useLocalePath()
 </script>
 
 <template>
   <div class="px-2 py-1 bg-[#606060] flex gap-4 h-10 w-full items-center left-0% top-0 fixed">
-    <NuxtLink to="/" class="item">
+    <NuxtLink :to="localePath('resumes')" class="item">
       <div class="i-ri-arrow-left-line text-white" />
     </NuxtLink>
     <div>
@@ -35,18 +36,20 @@ const { toggle } = useFullscreen(document.body)
     </div>
     <div class="plugin-item">
       <Switch
-        id="airplane-mode" :model-value="settingstore.isScrollable"
-        @update:model-value="settingstore.isScrollable = $event"
+        id="airplane-mode"
+        :model-value="resumeSettingsStore.currentSettings.isScrollable"
+        @update:model-value="resumeSettingsStore.updateCurrentSettings({ isScrollable: $event })"
       />
       <Label for="airplane-mode" class="plugin-label">{{ t('plugin.followScroll') }}</Label>
     </div>
     <div class="plugin-item">
       <Switch
-        id="editor-mode" :model-value="settingstore.editorMode === 'source'"
-        @update:model-value="settingstore.editorMode = $event ? 'source' : 'wysiwyg'"
+        id="editor-mode"
+        :model-value="resumeSettingsStore.currentSettings.editorMode === 'source'"
+        @update:model-value="resumeSettingsStore.updateCurrentSettings({ editorMode: $event ? 'source' : 'wysiwyg' })"
       />
       <Label for="editor-mode" class="plugin-label">
-        {{ settingstore.editorMode === 'source' ? t('plugin.source')
+        {{ resumeSettingsStore.currentSettings.editorMode === 'source' ? t('plugin.source')
           : t('plugin.wysiwyg')
         }}</Label>
     </div>

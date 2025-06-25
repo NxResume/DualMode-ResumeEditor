@@ -39,18 +39,14 @@ export function useScrollSync(leftRef: Ref<any>, rightRef: Ref<any>) {
     isSyncing = false
   }
 
-  // 添加监听器
-  onMounted(() => {
+  const start = () => {
     leftRef.value?.addEventListener('scroll', onLeftScroll)
     rightRef.value?.addEventListener('scroll', onRightScroll)
-  })
-
+  }
   const stop = () => {
     leftRef.value?.removeEventListener('scroll', onLeftScroll)
     rightRef.value?.removeEventListener('scroll', onRightScroll)
   }
 
-  onUnmounted(stop)
-
-  return stop
+  return { start, stop }
 }

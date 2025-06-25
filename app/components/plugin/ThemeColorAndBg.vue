@@ -12,11 +12,11 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { pageBgList, presetColors } from '~/constants'
-import useSettingsStore from '~/stores/settings'
+import { useResumeSettingsStore } from '~/stores/resumeSettings'
 import 'vue-color/style.css'
 
 const isColorPickerOpen = ref(false)
-const settingsStore = useSettingsStore()
+const resumeSettingsStore = useResumeSettingsStore()
 const { t } = useI18n()
 
 const color = defineModel<string>({
@@ -26,26 +26,26 @@ const color = defineModel<string>({
 const backgroundList = computed(() => {
   return pageBgList?.map(item => ({
     ...item,
-    isSelected: item.value === settingsStore.pageBackground,
+    isSelected: item.value === resumeSettingsStore.currentSettings.pageBackground,
   })) ?? []
 })
 
 const currentColorValue = computed(() => {
-  return settingsStore.pageThemeColor === 'default'
+  return resumeSettingsStore.currentSettings.pageThemeColor === 'default'
     ? 'rgb(0,0,0)'
-    : `rgb(${settingsStore.pageThemeColor})`
+    : `rgb(${resumeSettingsStore.currentSettings.pageThemeColor})`
 })
 
 function selectPresetColor(colorValue: string) {
   const rgb = tinycolor(colorValue).toRgb()
   const rgbString = `${rgb.r},${rgb.g},${rgb.b}`
 
-  settingsStore.pageThemeColor = rgbString
+  resumeSettingsStore.currentSettings.pageThemeColor = rgbString
   color.value = colorValue
 }
 
 function handleBackgroundSelect(backgroundValue: string) {
-  settingsStore.pageBackground = backgroundValue
+  resumeSettingsStore.currentSettings.pageBackground = backgroundValue
 }
 
 function toggleColorPicker() {
@@ -59,7 +59,7 @@ function closeColorPicker() {
 watch(color, (newColor) => {
   if (newColor && newColor !== currentColorValue.value) {
     const rgb = tinycolor(newColor).toRgb()
-    settingsStore.pageThemeColor = `${rgb.r},${rgb.g},${rgb.b}`
+    resumeSettingsStore.currentSettings.pageThemeColor = `${rgb.r},${rgb.g},${rgb.b}`
   }
 }, { immediate: false })
 

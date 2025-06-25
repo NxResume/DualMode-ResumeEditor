@@ -1,5 +1,8 @@
 <script setup lang="ts">
+const localePath = useLocalePath()
+
 const navLinks = [
+  { label: 'nav.resumes', href: localePath('resumes'), type: 'nuxt-link' },
   { label: 'nav.resumeTemplates', href: '#templates' },
   { label: 'nav.faq', href: '#faq' },
 ]
@@ -19,7 +22,11 @@ const navLinks = [
       <!-- 右侧导航链接 -->
       <ul class="text-sm font-medium gap-6 hidden items-center md:flex">
         <li v-for="(item, idx) in navLinks" :key="idx">
+          <NuxtLink v-if="item.type === 'nuxt-link'" :to="item.href">
+            {{ $t(item.label) }}
+          </NuxtLink>
           <a
+            v-else
             :href="item.href"
             class="text-gray-600 transition-colors duration-200 relative hover:text-black"
           >

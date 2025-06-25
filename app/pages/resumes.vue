@@ -1,0 +1,163 @@
+<script setup lang="ts">
+import { Copy, Download, Edit, Plus, Trash2 } from 'lucide-vue-next'
+import { useResumeStore } from '@/stores/resume'
+
+const resumeStore = useResumeStore()
+const router = useRouter()
+const localePath = useLocalePath()
+
+const showCreateDialog = ref(false)
+const newResumeName = ref('')
+
+function handleCreateResume() {
+  if (newResumeName.value.trim()) {
+    const newResume = resumeStore.createResume(newResumeName.value.trim())
+    showCreateDialog.value = false
+    newResumeName.value = ''
+    router.push(localePath({
+      name: 'edit-id',
+      params: { id: newResume.id },
+    }))
+  }
+}
+
+function handleEditResume(id: string) {
+  resumeStore.switchResume(id)
+  router.push(localePath({
+    name: 'edit-id',
+    params: { id },
+  }))
+}
+
+function handleDuplicateResume(id: string) {
+  resumeStore.duplicateResume(id)
+}
+
+function handleDeleteResume(id: string) {
+  if (resumeStore.resumes.length > 1) {
+    resumeStore.deleteResume(id)
+  }
+}
+
+function formatDate(date: Date) {
+  return new Date(date).toLocaleDateString()
+}
+</script>
+
+<template>
+  <div class="bg-gray-50 min-h-screen">
+    <div class="mx-auto px-4 py-8 max-w-6xl">
+      <!-- Header -->
+      <div class="mb-8 flex items-center justify-between">
+        <div>
+          <h1 class="text-3xl text-gray-900 font-bold">
+            {{ $t('resumes.title') }}
+          </h1>
+          <p class="text-gray-600 mt-2">
+            {{ $t('resumes.description') }}
+          </p>
+        </div>
+        <button
+          class="text-white px-4 py-2 rounded-lg bg-blue-600 flex gap-2 items-center hover:bg-blue-700"
+          @click="showCreateDialog = true"
+        >
+          <Plus class="h-4 w-4" />
+          {{ $t('resumes.createNew') }}
+        </button>
+      </div>
+
+      <ClientOnly>
+        <!-- Resume Grid -->
+        <div class="gap-6 grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2">
+          <div
+            v-for="resume in resumeStore.resumes"
+            :key="resume.id"
+            class="p-6 rounded-lg bg-white shadow-md transition-shadow hover:shadow-lg"
+          >
+            <div class="mb-4 flex items-start justify-between">
+              <h3 class="text-lg text-gray-900 font-semibold">
+                {{ resume.name }}
+              </h3>
+              <div class="flex gap-2">
+                <button
+                  class="text-gray-600 p-2 rounded hover:text-blue-600 hover:bg-blue-50"
+                  :title="$t('resumes.edit')"
+                  @click="handleEditResume(resume.id)"
+                >
+                  <Edit class="h-4 w-4" />
+                </button>
+                <button
+                  class="text-gray-600 p-2 rounded hover:text-green-600 hover:bg-green-50"
+                  :title="$t('resumes.duplicate')"
+                  @click="handleDuplicateResume(resume.id)"
+                >
+                  <Copy class="h-4 w-4" />
+                </button>
+                <button
+                  v-if="resumeStore.resumes.length > 1"
+                  class="text-gray-600 p-2 rounded hover:text-red-600 hover:bg-red-50"
+                  :title="$t('resumes.delete')"
+                  @click="handleDeleteResume(resume.id)"
+                >
+                  <Trash2 class="h-4 w-4" />
+                </button>
+              </div>
+            </div>
+
+            <div class="text-sm text-gray-500 mb-4">
+              <div>{{ $t('resumes.lastModified') }}: {{ formatDate(resume.updatedAt) }}</div>
+              <div>{{ $t('resumes.created') }}: {{ formatDate(resume.createdAt) }}</div>
+            </div>
+
+            <div class="flex gap-2">
+              <button
+                class="text-white px-4 py-2 rounded-lg bg-blue-600 flex flex-1 gap-2 items-center justify-center hover:bg-blue-700"
+                @click="handleEditResume(resume.id)"
+              >
+                <Edit class="h-4 w-4" />
+                {{ $t('resumes.edit') }}
+              </button>
+              <button
+                class="text-gray-600 p-2 rounded hover:text-gray-800 hover:bg-gray-100"
+                :title="$t('resumes.download')"
+              >
+                <Download class="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+      </ClientOnly>
+    </div>
+
+    <!-- Create Resume Dialog -->
+    <Dialog v-model:open="showCreateDialog">
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>{{ $t('resumes.createNew') }}</DialogTitle>
+          <DialogDescription>
+            {{ $t('resumes.createDescription') }}
+          </DialogDescription>
+        </DialogHeader>
+        <div class="space-y-4">
+          <div>
+            <Label for="resume-name">{{ $t('resumes.name') }}</Label>
+            <input
+              id="resume-name"
+              v-model="newResumeName"
+              :placeholder="$t('resumes.namePlaceholder')"
+              @keyup.enter="handleCreateResume"
+            >
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" @click="showCreateDialog = false">
+            {{ $t('common.cancel') }}
+          </Button>
+          <Button :disabled="!newResumeName.trim()" @click="handleCreateResume">
+            {{ $t('common.create') }}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  </div>
+</template>

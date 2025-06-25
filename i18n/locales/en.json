@@ -6,10 +6,32 @@
   },
   "nav": {
     "editor": "Editor",
+    "resumes": "My Resumes",
     "guide": "Guide",
     "templates": "Templates",
     "resumeTemplates": "Resume Templates",
     "faq": "FAQ"
+  },
+  "resumes": {
+    "title": "My Resumes",
+    "description": "Manage all your resumes",
+    "createNew": "Create New Resume",
+    "createDescription": "Give your new resume a name",
+    "name": "Resume Name",
+    "namePlaceholder": "Enter resume name",
+    "edit": "Edit",
+    "duplicate": "Duplicate",
+    "delete": "Delete",
+    "download": "Download",
+    "lastModified": "Last Modified",
+    "created": "Created"
+  },
+  "common": {
+    "cancel": "Cancel",
+    "create": "Create",
+    "save": "Save",
+    "delete": "Delete",
+    "confirm": "Confirm"
   },
   "guide": {
     "title": "Quick Start",

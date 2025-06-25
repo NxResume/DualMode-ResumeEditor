@@ -1,13 +1,9 @@
 <script setup lang="ts">
-const { locale } = useI18n<{ locale: 'en' | 'zh' }>()
-
 definePageMeta({
   layout: 'default',
 })
 
-const editPath = computed(() => {
-  return locale.value === 'en' ? '/en/edit' : '/edit'
-})
+const localePath = useLocalePath()
 </script>
 
 <template>
@@ -26,7 +22,7 @@ const editPath = computed(() => {
             {{ $t('app.description') }}
           </p>
 
-          <NuxtLink :to="editPath">
+          <NuxtLink :to="localePath('resumes')">
             <div
               class="text-lg text-white leading-[48px] font-semibold mx-auto mt-10 text-center rounded-4xl h-12 w-40 cursor-pointer select-none shadow-md transition-all duration-500 from-black to-gray-700 bg-linear-to-r hover:shadow-xl hover:scale-105"
             >
@@ -51,9 +47,3 @@ const editPath = computed(() => {
     <HomeFooterSection />
   </div>
 </template>
-
-<style scoped>
-.card-wrapper {
-  @apply p-6 border-b border-gray-200 flex items-center justify-between;
-}
-</style>

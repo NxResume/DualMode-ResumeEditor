@@ -2,7 +2,7 @@
 import { isClient } from '@vueuse/core'
 import { exportToImage, exportToPDF } from '@/utils/download'
 import { useResumeStore } from '~/stores/resume'
-import useSettingsStore from '~/stores/settings'
+import { useResumeSettingsStore } from '~/stores/resumeSettings'
 import { autoPaginate, DEFAULT_CONFIG } from '~/utils/pagination'
 
 const props = defineProps<{
@@ -24,7 +24,7 @@ function handleExportImage() {
 
 // 监听内容变化
 const resumeStore = useResumeStore()
-const settingsStore = useSettingsStore()
+const resumeSettingsStore = useResumeSettingsStore()
 // 提取重复逻辑为独立函数
 function handleAutoPaginate() {
   nextTick(() => {
@@ -36,7 +36,7 @@ function handleAutoPaginate() {
             ...DEFAULT_CONFIG,
             themeClass: theme,
             themeName: resumeStore.theme,
-            padding: settingsStore.pagePadding,
+            padding: resumeSettingsStore.currentSettings.pagePadding,
           })
         }
       }
@@ -60,25 +60,31 @@ function bindImageClickEvent() {
   })
 }
 
-const imagePositionStore = useImagePositionStore()
+function updatePostion() {
+  if (isClient) {
+    nextTick(() => {
+      const pot = resumeSettingsStore.currentSettings.imagePosition
+      document.documentElement.style.setProperty('--id-photo-top', `${pot.top}px`)
+      document.documentElement.style.setProperty('--id-photo-left', `${pot.left}px`)
+      document.documentElement.style.setProperty('--id-photo-scale', pot.scale.toString())
+    })
+  }
+}
+
+watch(() => resumeSettingsStore.currentSettings.imagePosition, () => {
+  updatePostion()
+}, { immediate: true, deep: true })
 
 onMounted(() => {
-  nextTick(() => {
-    if (isClient) {
-    // 设置全局 CSS 变量
-      document.documentElement.style.setProperty('--id-photo-top', `${imagePositionStore.position.top}px`)
-      document.documentElement.style.setProperty('--id-photo-left', `${imagePositionStore.position.left}px`)
-      document.documentElement.style.setProperty('--id-photo-scale', imagePositionStore.position.scale.toString())
-    }
-  })
+  updatePostion()
 })
 
 watch(() => [
   props.content,
   resumeStore.theme,
-  settingsStore.pagePadding,
-  settingsStore.pageLineHeight,
-  settingsStore.fontname,
+  resumeSettingsStore.currentSettings.pagePadding,
+  resumeSettingsStore.currentSettings.pageLineHeight,
+  resumeSettingsStore.currentSettings.fontname,
 ], () => {
   handleAutoPaginate()
 })

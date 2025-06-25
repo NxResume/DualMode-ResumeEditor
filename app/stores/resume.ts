@@ -1,23 +1,143 @@
 import { isClient, useStorage } from '@vueuse/core'
+import { nanoid } from 'nanoid'
 import { defineStore, skipHydrate } from 'pinia'
-import { ref } from 'vue'
 
 import tm1 from '~/templates/tm1.md?raw'
 import { reTheme, ThemeName } from '~/utils'
 
 export interface ResumeData {
+  id: string
+  name: string
   content: string
   theme: string
   plugins: string[]
+  createdAt: Date
+  updatedAt: Date
+  isDefault?: boolean
 }
 
 export const useResumeStore = defineStore('resume', () => {
   // state
-  const content = useStorage('nuxt-resume-editor-resume', tm1)
-  const theme = useStorage<ThemeName>('nuxt-resume-editor-theme', ThemeName.Default)
-  const plugins = ref<string[]>([])
+  const resumes = useStorage<ResumeData[]>('nuxt-resume-editor-resumes', [])
+  const currentResumeId = useStorage<string | null>('nuxt-resume-editor-current', null)
+  const allSettings = useStorage<Record<string, ResumeSettings>>(
+    'nuxt-resume-editor-all-settings',
+    {},
+  )
+
+  // 初始化默认简历
+  const initializeDefaultResume = () => {
+    if (resumes.value.length === 0) {
+      const defaultResume: ResumeData = {
+        id: nanoid(),
+        name: '我的简历',
+        content: tm1,
+        theme: ThemeName.Default,
+        plugins: [],
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        isDefault: true,
+      }
+      resumes.value.push(defaultResume)
+      currentResumeId.value = defaultResume.id
+      allSettings.value[defaultResume.id] = getDefaultSettings()
+    }
+  }
+
+  // 计算属性
+  const currentResume = computed(() => {
+    return resumes.value.find(r => r.id === currentResumeId.value) || resumes.value[0]
+  })
+
+  const content = computed({
+    get: () => currentResume.value?.content || tm1,
+    set: (value: string) => {
+      if (currentResume.value) {
+        currentResume.value.content = value
+        currentResume.value.updatedAt = new Date()
+      }
+    },
+  })
+
+  const theme = computed({
+    get: () => currentResume.value?.theme || ThemeName.Default,
+    set: (value: ThemeName) => {
+      if (currentResume.value) {
+        currentResume.value.theme = value
+        currentResume.value.updatedAt = new Date()
+      }
+    },
+  })
+
+  const plugins = computed({
+    get: () => currentResume.value?.plugins || [],
+    set: (value: string[]) => {
+      if (currentResume.value) {
+        currentResume.value.plugins = value
+        currentResume.value.updatedAt = new Date()
+      }
+    },
+  })
 
   // actions
+  function createResume(name: string = '新简历') {
+    const newResume: ResumeData = {
+      id: nanoid(),
+      name,
+      content: tm1,
+      theme: ThemeName.Default,
+      plugins: [],
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    }
+    resumes.value.push(newResume)
+    currentResumeId.value = newResume.id
+    return newResume
+  }
+
+  function deleteResume(id: string) {
+    const index = resumes.value.findIndex(r => r.id === id)
+    if (index > -1) {
+      resumes.value.splice(index, 1)
+      // 如果删除的是当前简历，切换到第一个简历
+      if (currentResumeId.value === id) {
+        currentResumeId.value = resumes.value[0]?.id || null
+      }
+    }
+  }
+
+  function switchResume(id: string) {
+    if (resumes.value.find(r => r.id === id)) {
+      currentResumeId.value = id
+    }
+  }
+
+  function renameResume(id: string, name: string) {
+    const resume = resumes.value.find(r => r.id === id)
+    if (resume) {
+      resume.name = name
+      resume.updatedAt = new Date()
+    }
+  }
+
+  function duplicateResume(id: string) {
+    const original = resumes.value.find(r => r.id === id)
+    if (original) {
+      const duplicated: ResumeData = {
+        ...original,
+        id: nanoid(),
+        name: `${original.name} (副本)`,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        isDefault: false,
+      }
+      resumes.value.push(duplicated)
+      currentResumeId.value = duplicated.id
+      return duplicated
+    }
+  }
+
+  // 原有的方法保持不变，但内部逻辑需要适配
   function setContent(newContent: string) {
     content.value = newContent
   }
@@ -32,7 +152,7 @@ export const useResumeStore = defineStore('resume', () => {
 
   function addPlugin(plugin: string) {
     if (!plugins.value.includes(plugin)) {
-      plugins.value.push(plugin)
+      plugins.value = [...plugins.value, plugin]
     }
   }
 
@@ -42,13 +162,13 @@ export const useResumeStore = defineStore('resume', () => {
 
   const applyTheme = () => {
     nextTick(() => {
-      reTheme.setTheme(theme.value)
+      reTheme.setTheme(theme.value as ThemeName)
     })
   }
 
   onMounted(() => {
     if (isClient) {
-      // 确保先应用当前主题
+      initializeDefaultResume()
       applyTheme()
     }
   })
@@ -63,10 +183,18 @@ export const useResumeStore = defineStore('resume', () => {
 
   return {
     // state
+    resumes: skipHydrate(resumes),
+    currentResumeId: skipHydrate(currentResumeId),
+    currentResume,
     content: skipHydrate(content),
     theme: skipHydrate(theme),
     plugins,
     // actions
+    createResume,
+    deleteResume,
+    switchResume,
+    renameResume,
+    duplicateResume,
     setContent,
     setTheme,
     addPlugin,

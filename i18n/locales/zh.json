@@ -6,10 +6,32 @@
   },
   "nav": {
     "editor": "编辑器",
+    "resumes": "我的简历",
     "guide": "使用指南",
     "templates": "模板",
     "resumeTemplates": "简历模板",
     "faq": "常见问题"
+  },
+  "resumes": {
+    "title": "我的简历",
+    "description": "管理你的所有简历",
+    "createNew": "创建新简历",
+    "createDescription": "为你的新简历起一个名字",
+    "name": "简历名称",
+    "namePlaceholder": "输入简历名称",
+    "edit": "编辑",
+    "duplicate": "复制",
+    "delete": "删除",
+    "download": "下载",
+    "lastModified": "最后修改",
+    "created": "创建时间"
+  },
+  "common": {
+    "cancel": "取消",
+    "create": "创建",
+    "save": "保存",
+    "delete": "删除",
+    "confirm": "确认"
   },
   "guide": {
     "title": "快速开始",

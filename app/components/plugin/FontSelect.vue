@@ -8,13 +8,13 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { fontList } from '~/constants'
-import useSettingStore from '~/stores/settings'
+import { useResumeSettingsStore } from '~/stores/resumeSettings'
 
-const settingStore = useSettingStore()
+const resumeSettingsStore = useResumeSettingsStore()
 </script>
 
 <template>
-  <Select v-model="settingStore.fontname">
+  <Select v-model="resumeSettingsStore.currentSettings.fontname">
     <SelectTrigger class="text-xs bg-white h-6 w-[100px] cursor-pointer">
       <SelectValue placeholder="Select a font" />
     </SelectTrigger>

@@ -9,14 +9,14 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { pagePaddingList } from '~/constants'
-import useSettingStore from '~/stores/settings'
+import { useResumeSettingsStore } from '~/stores/resumeSettings'
 
-const settingStore = useSettingStore()
+const resumeSettingsStore = useResumeSettingsStore()
 const { t } = useI18n()
 </script>
 
 <template>
-  <Select v-model="settingStore.pagePadding">
+  <Select v-model="resumeSettingsStore.currentSettings.pagePadding">
     <SelectTrigger class="text-xs p-1 bg-white h-6 w-14 cursor-pointer">
       <SelectValue :placeholder="t('pagePaddingSelect.placeholder')" />
     </SelectTrigger>
