@@ -102,10 +102,10 @@ onMounted(() => {
           <div class="flex items-center space-x-3">
             <div
               class="border-2 border-gray-200 rounded-lg h-10 w-10 cursor-pointer shadow-sm transition-all hover:scale-105"
-              :style="{ backgroundColor: color }"
+              :style="{ backgroundColor: `rgb(${resumeSettingsStore.currentSettings.pageThemeColor})` }"
               @click.stop="toggleColorPicker"
             />
-            <span class="text-sm text-gray-600 font-mono">{{ color }}</span>
+            <span class="text-sm text-gray-600 font-mono">{{ resumeSettingsStore.currentSettings.pageThemeColor }}</span>
           </div>
         </div>
 

@@ -2,7 +2,6 @@
 import { isClient, useStorage } from '@vueuse/core'
 import { defineStore, skipHydrate } from 'pinia'
 import { computed } from 'vue'
-import { fontList } from '~/constants'
 
 export const useResumeSettingsStore = defineStore('resumeSettings', () => {
   // 所有简历的设置对象
@@ -30,14 +29,8 @@ export const useResumeSettingsStore = defineStore('resumeSettings', () => {
       allSettings.value[reId.value] = val
     },
   })
-
-  // 获取当前字体对象
-  const fontMap = computed(() => {
-    return fontList?.find(font => font.value === currentSettings.value.fontname)
-  })
-
   if (isClient) {
-    useResumeStyleSync(currentSettings, fontMap)
+    useResumeStyleSync(currentSettings)
   }
 
   // 更新当前简历的部分设置
@@ -58,7 +51,6 @@ export const useResumeSettingsStore = defineStore('resumeSettings', () => {
   return {
     allSettings: skipHydrate(allSettings),
     currentSettings: skipHydrate(currentSettings),
-    fontMap,
     updateCurrentSettings,
     updateImagePosition,
     resetCurrentSettings,

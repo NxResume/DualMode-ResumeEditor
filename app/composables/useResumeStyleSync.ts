@@ -1,6 +1,7 @@
 import type { Ref } from 'vue'
 // composables/useResumeStyleSync.ts
 import { onMounted, onUnmounted, watch } from 'vue'
+import { fontList } from '~/constants'
 
 interface ResumeSettings {
   fontname: string
@@ -15,12 +16,11 @@ const loadedFonts = new Set<string>()
 
 export function useResumeStyleSync(
   settings: Ref<ResumeSettings>,
-  fontMap: ComputedRef<any>,
   el: HTMLElement = document.documentElement,
 ) {
   // 字体处理
   function updateFont(font: string) {
-    const fontInfo = fontMap.value
+    const fontInfo = fontList?.find(font => font.value === settings.value.fontname)
     if (!fontInfo) {
       el.style.setProperty('--defaults-markdwon-family', font)
       return

@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { Copy, Download, Edit, Plus, Trash2 } from 'lucide-vue-next'
+import { Copy, Edit, Plus, Trash2 } from 'lucide-vue-next'
+import { Button } from '@/components/ui/button'
 import { useResumeStore } from '@/stores/resume'
 
 const resumeStore = useResumeStore()
@@ -40,7 +41,8 @@ function handleDeleteResume(id: string) {
 }
 
 function formatDate(date: Date) {
-  return new Date(date).toLocaleDateString()
+  const d = new Date(date)
+  return `${d.toLocaleDateString()} ${d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
 }
 </script>
 
@@ -49,21 +51,27 @@ function formatDate(date: Date) {
     <div class="mx-auto px-4 py-8 max-w-6xl">
       <!-- Header -->
       <div class="mb-8 flex items-center justify-between">
-        <div>
-          <h1 class="text-3xl text-gray-900 font-bold">
-            {{ $t('resumes.title') }}
-          </h1>
-          <p class="text-gray-600 mt-2">
-            {{ $t('resumes.description') }}
-          </p>
+        <div class="flex gap-4 items-center">
+          <NuxtLink :to="localePath('index')" class="-translate-y-4">
+            <div class="i-ri-arrow-left-line" />
+          </NuxtLink>
+          <div>
+            <h1 class="text-3xl text-gray-900 font-bold">
+              {{ $t('resumes.title') }}
+            </h1>
+            <p class="text-gray-600 mt-2">
+              {{ $t('resumes.description') }}
+            </p>
+          </div>
         </div>
-        <button
-          class="text-white px-4 py-2 rounded-lg bg-blue-600 flex gap-2 items-center hover:bg-blue-700"
+        <Button
+          class="text-white px-4 py-2 bg-black cursor-pointer hover:bg-gray-900"
+          variant="default"
           @click="showCreateDialog = true"
         >
           <Plus class="h-4 w-4" />
           {{ $t('resumes.createNew') }}
-        </button>
+        </Button>
       </div>
 
       <ClientOnly>
@@ -80,14 +88,14 @@ function formatDate(date: Date) {
               </h3>
               <div class="flex gap-2">
                 <button
-                  class="text-gray-600 p-2 rounded hover:text-blue-600 hover:bg-blue-50"
+                  class="text-gray-600 p-2 rounded cursor-pointer hover:text-blue-600 hover:bg-blue-50"
                   :title="$t('resumes.edit')"
                   @click="handleEditResume(resume.id)"
                 >
                   <Edit class="h-4 w-4" />
                 </button>
                 <button
-                  class="text-gray-600 p-2 rounded hover:text-green-600 hover:bg-green-50"
+                  class="text-gray-600 p-2 rounded cursor-pointer hover:text-green-600 hover:bg-green-50"
                   :title="$t('resumes.duplicate')"
                   @click="handleDuplicateResume(resume.id)"
                 >
@@ -95,7 +103,7 @@ function formatDate(date: Date) {
                 </button>
                 <button
                   v-if="resumeStore.resumes.length > 1"
-                  class="text-gray-600 p-2 rounded hover:text-red-600 hover:bg-red-50"
+                  class="text-gray-600 p-2 rounded cursor-pointer hover:text-red-600 hover:bg-red-50"
                   :title="$t('resumes.delete')"
                   @click="handleDeleteResume(resume.id)"
                 >
@@ -110,19 +118,20 @@ function formatDate(date: Date) {
             </div>
 
             <div class="flex gap-2">
-              <button
-                class="text-white px-4 py-2 rounded-lg bg-blue-600 flex flex-1 gap-2 items-center justify-center hover:bg-blue-700"
+              <Button
+                class="text-white px-4 py-2 bg-black flex flex-1 gap-2 cursor-pointer items-center justify-center hover:bg-gray-900"
+                variant="default"
                 @click="handleEditResume(resume.id)"
               >
                 <Edit class="h-4 w-4" />
                 {{ $t('resumes.edit') }}
-              </button>
-              <button
+              </Button>
+              <!-- <button
                 class="text-gray-600 p-2 rounded hover:text-gray-800 hover:bg-gray-100"
                 :title="$t('resumes.download')"
               >
                 <Download class="h-4 w-4" />
-              </button>
+              </button> -->
             </div>
           </div>
         </div>
@@ -153,7 +162,7 @@ function formatDate(date: Date) {
           <Button variant="outline" @click="showCreateDialog = false">
             {{ $t('common.cancel') }}
           </Button>
-          <Button :disabled="!newResumeName.trim()" @click="handleCreateResume">
+          <Button :disabled="!newResumeName.trim()" class="text-white bg-black hover:bg-gray-900" variant="default" @click="handleCreateResume">
             {{ $t('common.create') }}
           </Button>
         </DialogFooter>
