@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Copy, Edit, Plus, Trash2 } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { useResumeStore } from '@/stores/resume'
 
 const resumeStore = useResumeStore()
@@ -9,6 +10,8 @@ const localePath = useLocalePath()
 
 const showCreateDialog = ref(false)
 const newResumeName = ref('')
+const editingResumeId = ref<string | null>(null)
+const editingResumeName = ref('')
 
 function handleCreateResume() {
   if (newResumeName.value.trim()) {
@@ -43,6 +46,27 @@ function handleDeleteResume(id: string) {
 function formatDate(date: Date) {
   const d = new Date(date)
   return `${d.toLocaleDateString()} ${d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+}
+
+function startEditResumeName(resume: any) {
+  editingResumeId.value = resume.id
+  editingResumeName.value = resume.name
+  nextTick(() => {
+    const input = document.getElementById(`resume-name-input-${resume.id}`) as HTMLInputElement
+    input?.focus()
+    input?.select()
+  })
+}
+
+function saveEditResumeName(resume: any) {
+  if (
+    editingResumeId.value === resume.id
+    && editingResumeName.value.trim()
+    && editingResumeName.value !== resume.name
+  ) {
+    resumeStore.renameResume(resume.id, editingResumeName.value.trim())
+  }
+  editingResumeId.value = null
 }
 </script>
 
@@ -84,16 +108,23 @@ function formatDate(date: Date) {
           >
             <div class="mb-4 flex items-start justify-between">
               <h3 class="text-lg text-gray-900 font-semibold">
-                {{ resume.name }}
+                <template v-if="editingResumeId === resume.id">
+                  <Input
+                    :id="`resume-name-input-${resume.id}`"
+                    v-model="editingResumeName"
+                    class="text-lg text-gray-900 font-semibold px-1 py-0.5 outline-none border-b border-gray-300 bg-transparent min-w-24 w-auto focus:border-black"
+                    @blur="() => saveEditResumeName(resume)"
+                    @keyup.enter="() => saveEditResumeName(resume)"
+                  />
+                </template>
+                <template v-else>
+                  <span class="cursor-pointer select-text" @click="startEditResumeName(resume)">{{ resume.name }}</span>
+                  <button class="text-gray-500 ml-1 hover:text-black" :title="$t('resumes.edit')" @click="startEditResumeName(resume)">
+                    <Edit class="h-4 w-4" />
+                  </button>
+                </template>
               </h3>
               <div class="flex gap-2">
-                <button
-                  class="text-gray-600 p-2 rounded cursor-pointer hover:text-blue-600 hover:bg-blue-50"
-                  :title="$t('resumes.edit')"
-                  @click="handleEditResume(resume.id)"
-                >
-                  <Edit class="h-4 w-4" />
-                </button>
                 <button
                   class="text-gray-600 p-2 rounded cursor-pointer hover:text-green-600 hover:bg-green-50"
                   :title="$t('resumes.duplicate')"
@@ -126,12 +157,6 @@ function formatDate(date: Date) {
                 <Edit class="h-4 w-4" />
                 {{ $t('resumes.edit') }}
               </Button>
-              <!-- <button
-                class="text-gray-600 p-2 rounded hover:text-gray-800 hover:bg-gray-100"
-                :title="$t('resumes.download')"
-              >
-                <Download class="h-4 w-4" />
-              </button> -->
             </div>
           </div>
         </div>
@@ -149,13 +174,12 @@ function formatDate(date: Date) {
         </DialogHeader>
         <div class="space-y-4">
           <div>
-            <Label for="resume-name">{{ $t('resumes.name') }}</Label>
-            <input
+            <Input
               id="resume-name"
               v-model="newResumeName"
               :placeholder="$t('resumes.namePlaceholder')"
               @keyup.enter="handleCreateResume"
-            >
+            />
           </div>
         </div>
         <DialogFooter>
