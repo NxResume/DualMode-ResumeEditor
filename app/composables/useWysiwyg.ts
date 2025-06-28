@@ -4,7 +4,7 @@ import TurndownService from 'turndown'
 import { nextTick, onMounted, ref, watch } from 'vue'
 import { WysiwygTags } from '~/constants'
 
-export function useWysiwyg(props: { modelValue: string }, emit: (event: 'update:modelValue', value: string) => void) {
+export function useWysiwyg(props: { modelValue: string | undefined }, emit: (event: 'update:modelValue', value: string) => void) {
   const previewRef = ref<HTMLElement | null>(null)
   let isUpdating = false
 
@@ -166,7 +166,7 @@ export function useWysiwyg(props: { modelValue: string }, emit: (event: 'update:
       return
 
     isUpdating = true
-    previewRef.value.innerHTML = md.render(props.modelValue)
+    previewRef.value.innerHTML = md.render(props.modelValue as string)
     nextTick(() => {
       isUpdating = false
     })
@@ -174,14 +174,14 @@ export function useWysiwyg(props: { modelValue: string }, emit: (event: 'update:
 
   // 监听内容变化
   watch(() => props.modelValue, (_newValue) => {
-    if (previewRef.value) {
+    if (previewRef.value && props.modelValue) {
       updatePreview()
     }
   })
 
   // 组件挂载时初始化内容
   onMounted(() => {
-    if (previewRef.value) {
+    if (previewRef.value && props.modelValue) {
       previewRef.value.innerHTML = md.render(props.modelValue)
     }
   })

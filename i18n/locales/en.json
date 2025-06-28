@@ -53,6 +53,7 @@
     "exportPdf": "Export PDF"
   },
   "plugin": {
+    "save": "Save",
     "resumeTemplate": "Resume Template",
     "idPhoto": "ID Photo",
     "theme": "Theme",

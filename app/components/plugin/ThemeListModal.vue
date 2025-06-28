@@ -28,6 +28,7 @@ const themeList = computed(() => {
 
 function handleThemeSelect(theme: ThemeName) {
   resumeStore.theme = theme
+  reTheme.setTheme(theme)
 }
 </script>
 

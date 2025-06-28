@@ -5,19 +5,24 @@ import { useResumeStore } from '@/stores/resume'
 import { useResumeSettingsStore } from '~/stores/resumeSettings'
 
 const route = useRoute()
-const router = useRouter()
 const resumeStore = useResumeStore()
 
 // 根据路由参数切换简历
 const resumeId = (route.params as Record<string, any>)?.id as string | undefined
-if (resumeId && resumeStore.currentResumeId !== resumeId) {
-  resumeStore.switchResume(resumeId)
-}
 
-// 如果简历不存在，重定向到简历列表
-if (!resumeStore.currentResume) {
-  router.push('/resumes')
-}
+watch(() => resumeId, () => {
+  if (!resumeId)
+    return
+
+  resumeStore.fetchResumesById(resumeId)
+})
+
+onMounted(() => {
+  if (!resumeId)
+    return
+
+  resumeStore.fetchResumesById(resumeId)
+})
 
 const resumeSettingsStore = useResumeSettingsStore()
 const el = useTemplateRef('el')
@@ -31,13 +36,6 @@ const scalePre = computed(() => {
 
 definePageMeta({
   layout: 'default',
-})
-
-// 监听路由变化，切换简历
-watch(() => (route.params as Record<string, any>)?.id, (newId) => {
-  if (typeof newId === 'string') {
-    resumeStore.switchResume(newId)
-  }
 })
 
 const { stop, start } = useScrollSync(leftRef, el)
@@ -75,7 +73,7 @@ async function handleExport(type: 'pdf' | 'png') {
       class="p-2 pt-10 rounded-lg bg-white flex-none h-full w-480px shadow-lg overflow-x-hidden overflow-y-auto dark:bg-gray-800"
     >
       <ClientOnly>
-        <CodeMirror v-model="resumeStore.content" :mode="resumeSettingsStore.currentSettings.editorMode" />
+        <CodeMirror v-model="resumeStore.resumeContent" :mode="resumeSettingsStore.currentSettings.editorMode" />
       </ClientOnly>
     </div>
     <!-- 右侧预览 -->
@@ -86,7 +84,7 @@ async function handleExport(type: 'pdf' | 'png') {
           transformOrigin: 'top left',
         }"
       >
-        <MarkdownPreview ref="preRef" :content="resumeStore.content" />
+        <MarkdownPreview ref="preRef" :content="resumeStore.resumeContent" />
       </div>
       <ClientOnly>
         <Plugin :download-img="() => handleExport('png')" :download-pdf="() => handleExport('pdf')" />

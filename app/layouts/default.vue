@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { useI18n } from 'vue-i18n'
+import Toaster from '~/components/ui/toast/Toaster.vue'
 
 const routes = useRoute()
 const { t, locale } = useI18n()
@@ -37,6 +38,7 @@ onMounted(() => {
 
 <template>
   <div class="h-100vh relative">
+    <Toaster />
     <main class="h-full">
       <slot />
     </main>

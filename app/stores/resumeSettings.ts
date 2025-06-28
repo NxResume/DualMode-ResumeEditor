@@ -1,56 +1,73 @@
+import type { ResumeSettings } from '../../types/resume'
+import { isClient } from '@vueuse/core'
 // app/stores/resumeSettings.ts
-import { isClient, useStorage } from '@vueuse/core'
 import { defineStore, skipHydrate } from 'pinia'
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
+import { useStorageManager } from '../composables/useStorageManager'
+import { getDefaultSettings } from '../utils'
 
 export const useResumeSettingsStore = defineStore('resumeSettings', () => {
-  // 所有简历的设置对象
-  const allSettings = useStorage<Record<string, ResumeSettings>>(
-    'nuxt-resume-editor-all-settings',
-    {},
-  )
-
-  const route = useRoute() // 新增
-
-  const reId = computed(() => {
-    return (route.params as {
-      id: string
-    }).id as string
-  })
+  const storageManager = useStorageManager()
+  const route = useRoute()
+  const reId = computed(() => (route.params as { id: string }).id as string)
 
   // 当前简历的设置
-  const currentSettings = computed<ResumeSettings>({
-    get: () => {
-      if (!isClient)
-        return getDefaultSettings()
-      return allSettings.value[reId.value] ?? getDefaultSettings() as ResumeSettings
-    },
-    set: (val) => {
-      allSettings.value[reId.value] = val
-    },
-  })
+  const currentSettings = ref<ResumeSettings>(getDefaultSettings())
+  const loading = ref(false)
+
   if (isClient) {
     useResumeStyleSync(currentSettings)
   }
 
+  // 加载当前简历设置
+  async function fetchCurrentSettings() {
+    loading.value = true
+    try {
+      if (!reId.value)
+        return
+
+      const provider = storageManager.getCurrentProvider()
+      const settings = await provider.getSettings(reId.value)
+      currentSettings.value = settings
+    }
+    catch {
+      currentSettings.value = getDefaultSettings()
+    }
+    finally {
+      loading.value = false
+    }
+  }
+
   // 更新当前简历的部分设置
-  function updateCurrentSettings(partial: Partial<ResumeSettings>) {
-    currentSettings.value = { ...currentSettings.value, ...partial }
+  async function updateCurrentSettings(partial: Partial<ResumeSettings>) {
+    const provider = storageManager.getCurrentProvider()
+    const updated = await provider.updateSettings(reId.value, partial)
+    currentSettings.value = updated
   }
 
   // 单独更新图片位置
-  function updateImagePosition(newPosition: Partial<ResumeSettings['imagePosition']>) {
-    currentSettings.value.imagePosition = { ...currentSettings.value.imagePosition, ...newPosition }
+  async function updateImagePosition(newPosition: Partial<ResumeSettings['imagePosition']>) {
+    await updateCurrentSettings({ imagePosition: { ...currentSettings.value.imagePosition, ...newPosition } })
   }
 
   // 重置当前简历设置为默认
-  function resetCurrentSettings() {
-    currentSettings.value = getDefaultSettings()
+  async function resetCurrentSettings() {
+    await updateCurrentSettings(getDefaultSettings())
   }
 
+  async function saveCurrentSettings() {
+    await updateCurrentSettings(currentSettings.value)
+  }
+
+  // 监听路由变化或存储模式变化时自动加载
+  watch([reId, () => storageManager.currentMode.value], fetchCurrentSettings, { immediate: true })
+
   return {
-    allSettings: skipHydrate(allSettings),
     currentSettings: skipHydrate(currentSettings),
+    loading,
+    saveCurrentSettings,
+    fetchCurrentSettings,
     updateCurrentSettings,
     updateImagePosition,
     resetCurrentSettings,

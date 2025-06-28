@@ -1,0 +1,46 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Resume {
+  id        String   @id @default(cuid())
+  name      String
+  content   String
+  theme     String   @default("default")
+  plugins   String   // JSON string
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isDefault Boolean  @default(false)
+  
+  // 关联设置
+  settings ResumeSettings?
+}
+
+model ResumeSettings {
+  id              String  @id @default(cuid())
+  resumeId        String  @unique
+  resume          Resume  @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+  
+  fontname        String  @default("default")
+  pagePadding     Int     @default(36)
+  pageLineHeight  Float   @default(1.9)
+  pageBackground  String  @default("default")
+  pageThemeColor  String  @default("0,0,0")
+  imagePosition   String  // JSON string: {top, left, scale}
+  isScrollable    Boolean @default(false)
+  editorMode      String  @default("source")
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

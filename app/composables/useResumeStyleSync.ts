@@ -1,6 +1,6 @@
 import type { Ref } from 'vue'
 // composables/useResumeStyleSync.ts
-import { onMounted, onUnmounted, watch } from 'vue'
+import { onMounted, watch } from 'vue'
 import { fontList } from '~/constants'
 
 interface ResumeSettings {
@@ -63,6 +63,7 @@ export function useResumeStyleSync(
     el.style.setProperty('--resume-line-height', `${val}`)
   }, { immediate: true })
   watch(() => settings.value.pagePadding, (val) => {
+    console.log(val)
     el.style.setProperty('--resume-page-padding-size', `${val}px`)
   }, { immediate: true })
   watch(() => settings.value.pageBackground, (val) => {
@@ -71,17 +72,4 @@ export function useResumeStyleSync(
   watch(() => settings.value.pageThemeColor, (val) => {
     el.style.setProperty('--resume-page-theme', val)
   }, { immediate: true })
-
-  // 清理
-  onUnmounted(() => {
-    const vars = [
-      '--defaults-markdwon-family',
-      '--resume-line-height',
-      '--resume-page-padding-size',
-      '--resume-page-background',
-      '--resume-page-theme',
-    ]
-    for (const v of vars)
-      el.style.removeProperty(v)
-  })
 }

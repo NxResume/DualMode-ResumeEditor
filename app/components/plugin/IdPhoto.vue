@@ -43,8 +43,8 @@ function getIdPhotoSrcFromContent(content: string) {
   return null
 }
 
-watch(() => resumeStore.content, () => {
-  const src = getIdPhotoSrcFromContent(resumeStore.content)
+watch(() => resumeStore.resumeContent, () => {
+  const src = getIdPhotoSrcFromContent(resumeStore.resumeContent)
   if (src) {
     imagePreviewUrl.value = src
   }
@@ -54,7 +54,7 @@ watch(() => resumeStore.content, () => {
 })
 
 onMounted(() => {
-  const src = getIdPhotoSrcFromContent(resumeStore.content)
+  const src = getIdPhotoSrcFromContent(resumeStore.resumeContent)
   if (src) {
     imagePreviewUrl.value = src
   }
@@ -84,9 +84,9 @@ function handleReset() {
     URL.revokeObjectURL(imagePreviewUrl.value)
     imagePreviewUrl.value = null
   }
-  // 移除resumeStore.content中的id-photo图片
-  const imgTagRegex = /<img[^>]*id\s*=\s*['"]id-photo['"][^>]*>/gi
-  resumeStore.setContent(resumeStore.content.replace(imgTagRegex, ''))
+  // 移除resumeStore.resumeContent中的id-photo图片
+  // const imgTagRegex = /<img[^>]*id\s*=\s*['"]id-photo['"][^>]*>/gi
+  // resumeStore.updateResume()
   dialogOpen.value = false // 关闭 Dialog
 }
 
@@ -112,9 +112,9 @@ function handleConfirm() {
         if (result && result.Jobs) {
           const imgTag = `<img src="${result.Jobs}" id="id-photo" data-id-photo alt="" srcset="">`
           const imgTagRegex = /<img[^>]*id\s*=\s*['"]id-photo['"][^>]*>/gi
-          let newContent = resumeStore.content.replace(imgTagRegex, '')
+          let newContent = resumeStore.resumeContent.replace(imgTagRegex, '')
           newContent = `${imgTag}\n\n${newContent.trim()}`
-          resumeStore.setContent(newContent)
+          // resumeStore.setContent(newContent)
           dialogOpen.value = false // 上传成功后关闭 Dialog
         }
         else {

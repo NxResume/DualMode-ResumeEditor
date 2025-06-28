@@ -2,7 +2,13 @@ import MarkdownIt from 'markdown-it'
 import remarkContainer from 'markdown-it-container'
 import iconPlugin from '~/utils/markdown-it-icon'
 
-export function useMarkdown(content: string) {
+export function useMarkdown(content?: string) {
+  if (!content) {
+    return {
+      html: '',
+    }
+  }
+
   const md = new MarkdownIt({
     html: true,
     linkify: true,

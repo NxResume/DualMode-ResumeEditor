@@ -6,7 +6,7 @@ import { useResumeSettingsStore } from '~/stores/resumeSettings'
 import { autoPaginate, DEFAULT_CONFIG } from '~/utils/pagination'
 
 const props = defineProps<{
-  content: string
+  content: string | undefined
 }>()
 
 const theme = 'markdown-body'
@@ -91,12 +91,12 @@ watch(() => [
 
 // Add keydown event for Delete key to remove ID photo
 function handleKeyDown(event: KeyboardEvent) {
-  if (isShowMoveabled.value && event.key === 'Backspace') {
-    // Remove <img id="id-photo" ...> from resumeStore.content
-    const imgTagRegex = /<img[^>]*id\s*=\s*['"]id-photo['"][^>]*>/gi
-    resumeStore.setContent(resumeStore.content.replace(imgTagRegex, ''))
-    isShowMoveabled.value = false
-  }
+  // if (isShowMoveabled.value && event.key === 'Backspace') {
+  //   // Remove <img id="id-photo" ...> from resumeStore.resumeContent
+  //   const imgTagRegex = /<img[^>]*id\s*=\s*['"]id-photo['"][^>]*>/gi
+  //   resumeStore.setContent(resumeStore.resumeContent.replace(imgTagRegex, ''))
+  //   isShowMoveabled.value = false
+  // }
 }
 
 onMounted(() => {

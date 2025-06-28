@@ -38,7 +38,7 @@ const localePath = useLocalePath()
       <Switch
         id="airplane-mode"
         :model-value="resumeSettingsStore.currentSettings.isScrollable"
-        @update:model-value="resumeSettingsStore.updateCurrentSettings({ isScrollable: $event })"
+        @update:model-value="resumeSettingsStore.currentSettings.isScrollable = $event"
       />
       <Label for="airplane-mode" class="plugin-label">{{ t('plugin.followScroll') }}</Label>
     </div>
@@ -46,7 +46,7 @@ const localePath = useLocalePath()
       <Switch
         id="editor-mode"
         :model-value="resumeSettingsStore.currentSettings.editorMode === 'source'"
-        @update:model-value="resumeSettingsStore.updateCurrentSettings({ editorMode: $event ? 'source' : 'wysiwyg' })"
+        @update:model-value="resumeSettingsStore.currentSettings.editorMode = $event ? 'source' : 'wysiwyg'"
       />
       <Label for="editor-mode" class="plugin-label">
         {{ resumeSettingsStore.currentSettings.editorMode === 'source' ? t('plugin.source')
@@ -102,6 +102,7 @@ const localePath = useLocalePath()
       <Label class="plugin-label">{{ t('plugin.fullscreen') }}</Label>
     </div>
     <PluginExportButton :on-export="downloadPdf" />
+    <PluginSaveInfo />
   </div>
 </template>
 

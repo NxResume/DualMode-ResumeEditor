@@ -7,7 +7,7 @@ import { useWysiwyg } from '~/composables/useWysiwyg'
 import { WysiwygTags } from '~/constants'
 
 const props = defineProps<{
-  modelValue: string
+  modelValue: string | undefined
   mode: 'source' | 'wysiwyg'
 }>()
 

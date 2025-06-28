@@ -53,6 +53,7 @@
     "exportPdf": "导出 PDF"
   },
   "plugin": {
+    "save": "保存",
     "resumeTemplate": "简历模板",
     "idPhoto": "证件照",
     "theme": "主题色",

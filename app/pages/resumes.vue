@@ -13,9 +13,9 @@ const newResumeName = ref('')
 const editingResumeId = ref<string | null>(null)
 const editingResumeName = ref('')
 
-function handleCreateResume() {
+async function handleCreateResume() {
   if (newResumeName.value.trim()) {
-    const newResume = resumeStore.createResume(newResumeName.value.trim())
+    const newResume = await resumeStore.createResume(newResumeName.value.trim())
     showCreateDialog.value = false
     newResumeName.value = ''
     router.push(localePath({
@@ -26,8 +26,7 @@ function handleCreateResume() {
 }
 
 function handleEditResume(id: string) {
-  resumeStore.switchResume(id)
-  router.push(localePath({
+  router?.push(localePath({
     name: 'edit-id',
     params: { id },
   }))
@@ -68,6 +67,10 @@ function saveEditResumeName(resume: any) {
   }
   editingResumeId.value = null
 }
+
+onMounted(async () => {
+  await resumeStore.fetchResumes()
+})
 </script>
 
 <template>
