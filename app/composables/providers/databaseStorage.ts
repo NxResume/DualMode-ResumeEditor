@@ -2,6 +2,33 @@ import type { ResumeData, ResumeSettings } from '../../../types/resume'
 import type { IStorageProvider, StorageMode } from '../../../types/storage'
 import { getDefaultSettings } from '../../utils'
 
+// 定义API响应的类型
+interface ApiResponse<T> {
+  data: T
+}
+
+interface ResumeApiData {
+  id: string
+  name: string
+  content: string
+  theme: string
+  plugins: string
+  createdAt: string
+  updatedAt: string
+  isDefault?: boolean
+}
+
+interface SettingsApiData {
+  fontname: string
+  pagePadding: number
+  pageLineHeight: number
+  pageBackground: string
+  pageThemeColor: string
+  imagePosition: string
+  isScrollable: boolean
+  editorMode: 'source' | 'wysiwyg'
+}
+
 export class DatabaseStorageProvider implements IStorageProvider {
   getCurrentMode(): StorageMode {
     return 'database'
@@ -9,8 +36,12 @@ export class DatabaseStorageProvider implements IStorageProvider {
 
   async getResumes(): Promise<ResumeData[]> {
     try {
-      const { data } = await $fetch('/api/resumes')
-      return data.map((resume: any) => ({
+      const response = await $fetch<ApiResponse<ResumeApiData[]>>('/api/resumes')
+      if (!response.data) {
+        return []
+      }
+
+      return response.data.map(resume => ({
         ...resume,
         plugins: JSON.parse(resume.plugins || '[]'),
         createdAt: new Date(resume.createdAt),
@@ -25,14 +56,16 @@ export class DatabaseStorageProvider implements IStorageProvider {
 
   async getResumeById(id: string): Promise<ResumeData | undefined> {
     try {
-      const { data } = await $fetch(`/api/resumes/${id}`)
-      if (!data)
+      const response = await $fetch<ApiResponse<ResumeApiData>>(`/api/resumes/${id}`)
+      if (!response.data) {
         return undefined
+      }
+
       return {
-        ...data,
-        plugins: JSON.parse(data.plugins || '[]'),
-        createdAt: new Date(data.createdAt),
-        updatedAt: new Date(data.updatedAt),
+        ...response.data,
+        plugins: JSON.parse(response.data.plugins || '[]'),
+        createdAt: new Date(response.data.createdAt),
+        updatedAt: new Date(response.data.updatedAt),
       }
     }
     catch (error) {
@@ -43,7 +76,7 @@ export class DatabaseStorageProvider implements IStorageProvider {
 
   async createResume(resumeData: Omit<ResumeData, 'id' | 'createdAt' | 'updatedAt'>): Promise<ResumeData> {
     try {
-      const { data } = await $fetch('/api/resumes', {
+      const response = await $fetch<ApiResponse<ResumeApiData>>('/api/resumes', {
         method: 'POST',
         body: {
           ...resumeData,
@@ -51,11 +84,15 @@ export class DatabaseStorageProvider implements IStorageProvider {
         },
       })
 
+      if (!response.data) {
+        throw new Error('创建简历失败: 服务器返回空数据')
+      }
+
       return {
-        ...data,
-        plugins: JSON.parse(data.plugins || '[]'),
-        createdAt: new Date(data.createdAt),
-        updatedAt: new Date(data.updatedAt),
+        ...response.data,
+        plugins: JSON.parse(response.data.plugins || '[]'),
+        createdAt: new Date(response.data.createdAt),
+        updatedAt: new Date(response.data.updatedAt),
       }
     }
     catch (error) {
@@ -66,18 +103,22 @@ export class DatabaseStorageProvider implements IStorageProvider {
 
   async updateResume(id: string, updates: Partial<ResumeData>): Promise<ResumeData> {
     try {
-      const { data } = await $fetch(`/api/resumes/${id}`, {
+      const response = await $fetch<ApiResponse<ResumeApiData>>(`/api/resumes/${id}`, {
         method: 'PUT',
         body: {
           ...updates,
         },
       })
 
+      if (!response.data) {
+        throw new Error('更新简历失败: 服务器返回空数据')
+      }
+
       return {
-        ...data,
-        plugins: JSON.parse(data.plugins || '[]'),
-        createdAt: new Date(data.createdAt),
-        updatedAt: new Date(data.updatedAt),
+        ...response.data,
+        plugins: JSON.parse(response.data.plugins || '[]'),
+        createdAt: new Date(response.data.createdAt),
+        updatedAt: new Date(response.data.updatedAt),
       }
     }
     catch (error) {
@@ -100,10 +141,14 @@ export class DatabaseStorageProvider implements IStorageProvider {
 
   async getSettings(resumeId: string): Promise<ResumeSettings> {
     try {
-      const { data } = await $fetch(`/api/resumes/${resumeId}/settings`)
+      const response = await $fetch<ApiResponse<SettingsApiData>>(`/api/resumes/${resumeId}/settings`)
+      if (!response.data) {
+        return getDefaultSettings()
+      }
+
       return {
-        ...data,
-        imagePosition: JSON.parse(data.imagePosition || '{}'),
+        ...response.data,
+        imagePosition: JSON.parse(response.data.imagePosition || '{}'),
       } as ResumeSettings
     }
     catch (error) {
@@ -114,16 +159,20 @@ export class DatabaseStorageProvider implements IStorageProvider {
 
   async updateSettings(resumeId: string, settings: Partial<ResumeSettings>): Promise<ResumeSettings> {
     try {
-      const { data } = await $fetch(`/api/resumes/${resumeId}/settings`, {
+      const response = await $fetch<ApiResponse<SettingsApiData>>(`/api/resumes/${resumeId}/settings`, {
         method: 'PUT',
         body: {
           ...settings,
         },
       })
 
+      if (!response.data) {
+        throw new Error('更新设置失败: 服务器返回空数据')
+      }
+
       return {
-        ...data,
-        imagePosition: JSON.parse(data.imagePosition || '{}'),
+        ...response.data,
+        imagePosition: JSON.parse(response.data.imagePosition || '{}'),
       } as ResumeSettings
     }
     catch (error) {
