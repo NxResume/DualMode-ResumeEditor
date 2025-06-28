@@ -38,7 +38,7 @@ jobs:
 
       - name: Install
         run: pnpm install
-      
+
       - name: prisma generate
         run: npx prisma generate
 
