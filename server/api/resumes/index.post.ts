@@ -34,10 +34,10 @@ export default defineEventHandler(async (event) => {
       data: resume,
     }
   }
-  catch (error) {
+  catch (error: any) {
     throw createError({
       statusCode: 500,
-      statusMessage: '创建简历失败',
+      statusMessage: error || '创建简历失败',
     })
   }
 })

@@ -13,10 +13,10 @@ export default defineEventHandler(async (event) => {
       message: '删除成功',
     }
   }
-  catch (error) {
+  catch (error: any) {
     throw createError({
       statusCode: 500,
-      statusMessage: '删除简历失败',
+      statusMessage: error || '删除简历失败',
     })
   }
 })

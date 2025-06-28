@@ -1,6 +1,6 @@
 import type { ResumeData } from '../../types/resume'
 import { defineStore, skipHydrate } from 'pinia'
-import { computed, ref } from 'vue'
+import { ref } from 'vue'
 import tm1 from '~/templates/tm1.md?raw'
 import { reTheme, ThemeName } from '~/utils'
 import { useStorageManager } from '../composables/useStorageManager'
@@ -28,18 +28,9 @@ export const useResumeStore = defineStore('resume', () => {
   }
 
   // 主题相关
-  const theme = computed({
-    get: () => currentResume.value?.theme || ThemeName.Default,
-    set: (value: ThemeName) => {
-      if (currentResume.value && currentResume.value.id) {
-        updateResume(currentResume.value.id, { theme: value })
-      }
-    },
-  })
-
   const applyTheme = () => {
-    if (theme.value) {
-      reTheme.setTheme(theme.value as ThemeName)
+    if (currentResume.value?.theme) {
+      reTheme.setTheme(currentResume.value?.theme as ThemeName)
     }
   }
 
@@ -126,7 +117,6 @@ export const useResumeStore = defineStore('resume', () => {
     resumes: skipHydrate(resumes),
     currentResumeId: skipHydrate(currentResumeId),
     loading,
-    theme,
     currentResume: skipHydrate(currentResume),
     resumeContent,
     saveCurrentResume,

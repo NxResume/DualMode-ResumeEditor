@@ -9,7 +9,7 @@ export default defineEventHandler(async (_event) => {
   catch (error: any) {
     throw createError({
       statusCode: 503,
-      statusMessage: 'Database connection failed',
+      statusMessage: error || 'Database connection failed',
     })
   }
 })

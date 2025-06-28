@@ -85,8 +85,9 @@ function handleReset() {
     imagePreviewUrl.value = null
   }
   // 移除resumeStore.resumeContent中的id-photo图片
-  // const imgTagRegex = /<img[^>]*id\s*=\s*['"]id-photo['"][^>]*>/gi
-  // resumeStore.updateResume()
+  const imgTagRegex = /<img[^>]*id\s*=\s*['"]id-photo['"][^>]*>/gi
+
+  resumeStore.resumeContent = resumeStore.resumeContent.replace(imgTagRegex, '')
   dialogOpen.value = false // 关闭 Dialog
 }
 
@@ -114,7 +115,9 @@ function handleConfirm() {
           const imgTagRegex = /<img[^>]*id\s*=\s*['"]id-photo['"][^>]*>/gi
           let newContent = resumeStore.resumeContent.replace(imgTagRegex, '')
           newContent = `${imgTag}\n\n${newContent.trim()}`
-          // resumeStore.setContent(newContent)
+          if (resumeStore.currentResume && resumeStore.currentResume?.content !== newContent)
+            resumeStore.resumeContent = newContent
+
           dialogOpen.value = false // 上传成功后关闭 Dialog
         }
         else {

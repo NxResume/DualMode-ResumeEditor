@@ -35,7 +35,7 @@ function handleAutoPaginate() {
           autoPaginate(wrapper as HTMLElement, md.value.html, {
             ...DEFAULT_CONFIG,
             themeClass: theme,
-            themeName: resumeStore.theme,
+            themeName: resumeStore.currentResume?.theme,
             padding: resumeSettingsStore.currentSettings.pagePadding,
           })
         }
@@ -81,7 +81,7 @@ onMounted(() => {
 
 watch(() => [
   props.content,
-  resumeStore.theme,
+  resumeStore.currentResume?.theme,
   resumeSettingsStore.currentSettings.pagePadding,
   resumeSettingsStore.currentSettings.pageLineHeight,
   resumeSettingsStore.currentSettings.fontname,
@@ -91,12 +91,12 @@ watch(() => [
 
 // Add keydown event for Delete key to remove ID photo
 function handleKeyDown(event: KeyboardEvent) {
-  // if (isShowMoveabled.value && event.key === 'Backspace') {
-  //   // Remove <img id="id-photo" ...> from resumeStore.resumeContent
-  //   const imgTagRegex = /<img[^>]*id\s*=\s*['"]id-photo['"][^>]*>/gi
-  //   resumeStore.setContent(resumeStore.resumeContent.replace(imgTagRegex, ''))
-  //   isShowMoveabled.value = false
-  // }
+  if (isShowMoveabled.value && event.key === 'Backspace') {
+    // Remove <img id="id-photo" ...> from resumeStore.resumeContent
+    const imgTagRegex = /<img[^>]*id\s*=\s*['"]id-photo['"][^>]*>/gi
+    resumeStore.resumeContent = resumeStore.resumeContent.replace(imgTagRegex, '')
+    isShowMoveabled.value = false
+  }
 }
 
 onMounted(() => {

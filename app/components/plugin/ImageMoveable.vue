@@ -16,18 +16,14 @@ interface DragEvent {
 }
 
 function onDrag({ left, top }: DragEvent) {
-  resumeSettingsStore.updateImagePosition({
-    left,
-    top,
-  })
+  resumeSettingsStore.currentSettings.imagePosition.left = left
+  resumeSettingsStore.currentSettings.imagePosition.top = top
 }
 
 function onScale(event: any) {
   const scaleMatch = event.transform.match(/scale\(([^)]+)\)/)
   const scale = scaleMatch ? scaleMatch[1] : '1'
-  resumeSettingsStore.updateImagePosition({
-    scale,
-  })
+  resumeSettingsStore.currentSettings.imagePosition.scale = scale
 }
 </script>
 

@@ -21,13 +21,15 @@ const themeList = computed(() => {
       value: theme,
       label: theme,
       image: `/assets/themes/${theme}.png`,
-      isSelected: theme === resumeStore.theme,
+      isSelected: theme === resumeStore.currentResume?.theme,
     }
   })
 })
 
 function handleThemeSelect(theme: ThemeName) {
-  resumeStore.theme = theme
+  if (resumeStore.currentResume && theme)
+    resumeStore.currentResume.theme = theme
+
   reTheme.setTheme(theme)
 }
 </script>

@@ -63,7 +63,6 @@ export function useResumeStyleSync(
     el.style.setProperty('--resume-line-height', `${val}`)
   }, { immediate: true })
   watch(() => settings.value.pagePadding, (val) => {
-    console.log(val)
     el.style.setProperty('--resume-page-padding-size', `${val}px`)
   }, { immediate: true })
   watch(() => settings.value.pageBackground, (val) => {

@@ -29,10 +29,10 @@ export default defineEventHandler(async (event) => {
 
     return { success: true, message: '数据迁移成功' }
   }
-  catch (error) {
+  catch (error: any) {
     throw createError({
       statusCode: 500,
-      statusMessage: '数据迁移失败',
+      statusMessage: error || '数据迁移失败',
     })
   }
 })
