@@ -4,7 +4,7 @@ export default defineEventHandler(async (_event) => {
   try {
     const resumes = await prisma.resume.findMany({
       include: {
-        settings: true,
+        settings: false,
       },
       orderBy: { createdAt: 'desc' },
     })

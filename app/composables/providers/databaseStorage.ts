@@ -70,7 +70,6 @@ export class DatabaseStorageProvider implements IStorageProvider {
         method: 'PUT',
         body: {
           ...updates,
-          plugins: JSON.stringify(updates.plugins || []),
         },
       })
 
