@@ -113,6 +113,12 @@ export const useResumeStore = defineStore('resume', () => {
     }
   }
 
+  async function resetCurrentResume() {
+    if (currentResume.value) {
+      await fetchResumesById(currentResume.value.id)
+    }
+  }
+
   return {
     resumes: skipHydrate(resumes),
     currentResumeId: skipHydrate(currentResumeId),
@@ -128,5 +134,6 @@ export const useResumeStore = defineStore('resume', () => {
     renameResume,
     duplicateResume,
     applyTheme,
+    resetCurrentResume,
   }
 })

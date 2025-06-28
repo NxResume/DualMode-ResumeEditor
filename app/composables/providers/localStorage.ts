@@ -64,11 +64,11 @@ export class LocalStorageProvider implements IStorageProvider {
     if (index === -1)
       throw new Error('Resume not found')
 
-    const updatedResume: ResumeData = {
+    const updatedResume = {
       ...resumes[index],
       ...updates,
       updatedAt: new Date(),
-    }
+    } as ResumeData
 
     resumes[index] = updatedResume
     localStorage.setItem(this.RESUMES_KEY, JSON.stringify(resumes))

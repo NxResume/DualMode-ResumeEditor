@@ -16,7 +16,9 @@ const resumeStore = useResumeStore()
 
 <template>
   <AlertDialog>
-    <AlertDialogTrigger><slot /></AlertDialogTrigger>
+    <AlertDialogTrigger>
+      <slot />
+    </AlertDialogTrigger>
     <AlertDialogContent>
       <AlertDialogHeader>
         <AlertDialogTitle>{{ $t('resetResume.title') }}</AlertDialogTitle>
@@ -26,7 +28,7 @@ const resumeStore = useResumeStore()
       </AlertDialogHeader>
       <AlertDialogFooter>
         <AlertDialogCancel>{{ $t('resetResume.cancel') }}</AlertDialogCancel>
-        <AlertDialogAction @click="resumeStore.resetContent">
+        <AlertDialogAction @click="resumeStore.resetCurrentResume">
           {{ $t('resetResume.action') }}
         </AlertDialogAction>
       </AlertDialogFooter>

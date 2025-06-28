@@ -1,15 +1,13 @@
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue'
-
 const storageManager = useStorageManager()
 const selectedMode = ref<'local' | 'database'>('local')
 const isDatabaseConnected = ref(false)
 
 const { currentMode, isLoading, error } = storageManager
 
-function handleModeChange(newMode: 'local' | 'database' | null) {
-  if (newMode) {
-    storageManager.switchMode(newMode)
+function handleModeChange(value: any) {
+  if (value === 'local' || value === 'database') {
+    storageManager.switchMode(value)
   }
 }
 
