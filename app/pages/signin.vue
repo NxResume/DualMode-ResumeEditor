@@ -1,9 +1,19 @@
 <script setup lang="ts">
-const { signIn } = useAuth()
+const { signIn, status } = useAuth()
 
 definePageMeta({
   layout: false,
 })
+
+watchEffect(() => {
+  if (status.value === 'authenticated') {
+    navigateTo('/')
+  }
+})
+
+if (status.value === 'authenticated') {
+  await navigateTo('/')
+}
 </script>
 
 <template>

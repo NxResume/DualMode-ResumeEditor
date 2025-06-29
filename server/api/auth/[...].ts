@@ -29,5 +29,4 @@ export default NuxtAuthHandler({
       return session
     },
   },
-  debug: true,
 })

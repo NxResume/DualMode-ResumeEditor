@@ -1,16 +1,5 @@
 <script setup lang="ts">
 const { signIn, signOut, status, data } = useAuth()
-
-async function handleSignOut() {
-  try {
-    console.warn('Attempting to sign out...')
-    await signOut({ callbackUrl: '/' })
-    console.warn('Sign out successful')
-  }
-  catch (error) {
-    console.error('Sign out error:', error)
-  }
-}
 </script>
 
 <template>
@@ -32,7 +21,7 @@ async function handleSignOut() {
           variant="outline"
           size="sm"
           class="hidden md:inline-flex"
-          @click="handleSignOut"
+          @click="signOut"
         >
           {{ $t('auth.signOut') }}
         </Button>
