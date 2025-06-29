@@ -13,10 +13,13 @@
     "start": "node .output/server/index.mjs",
     "start:generate": "npx serve .output/public",
     "lint": "eslint .",
-    "typecheck": "nuxt typecheck"
+    "typecheck": "nuxt typecheck",
+    "db-ui": "npx prisma studio --port 5556"
   },
   "devDependencies": {
     "@antfu/eslint-config": "catalog:dev",
+    "@auth/core": "catalog:frontend",
+    "@auth/prisma-adapter": "catalog:frontend",
     "@codemirror/commands": "catalog:frontend",
     "@codemirror/lang-markdown": "catalog:frontend",
     "@codemirror/state": "catalog:frontend",
@@ -29,6 +32,7 @@
     "@nuxtjs/i18n": "catalog:build",
     "@pinia/nuxt": "catalog:build",
     "@prisma/client": "catalog:frontend",
+    "@sidebase/nuxt-auth": "catalog:frontend",
     "@types/codemirror": "catalog:dev",
     "@types/markdown-it": "catalog:dev",
     "@types/markdown-it-container": "catalog:dev",
@@ -52,6 +56,7 @@
     "markdown-it": "catalog:frontend",
     "markdown-it-container": "catalog:frontend",
     "markdown-it-regex": "catalog:frontend",
+    "next-auth": "catalog:frontend",
     "nuxt": "catalog:build",
     "pinia": "catalog:frontend",
     "prisma": "catalog:frontend",

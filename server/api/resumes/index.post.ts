@@ -1,32 +1,42 @@
+import { getServerSession } from '#auth'
 import { prisma } from '../../utils/db'
 
 export default defineEventHandler(async (event) => {
   try {
+    const session = await getServerSession(event)
+    const userEmail = session?.user?.email
+
+    if (!userEmail) {
+      throw createError({
+        statusCode: 401,
+        statusMessage: '未登录',
+      })
+    }
+
+    // 根据邮箱查找用户
+    const user = await prisma.user.findUnique({
+      where: { email: userEmail },
+    })
+
+    if (!user) {
+      throw createError({
+        statusCode: 401,
+        statusMessage: '用户不存在',
+      })
+    }
+
     const body = await readBody(event)
+    const { name, content, theme, plugins, isDefault } = body
 
     const resume = await prisma.resume.create({
       data: {
-        name: body.name,
-        content: body.content,
-        theme: body.theme,
-        plugins: JSON.stringify(body.plugins || []),
-        isDefault: body.isDefault || false,
-        settings: {
-          create: {
-            fontname: body.settings?.fontname || 'default',
-            pagePadding: body.settings?.pagePadding || 36,
-            pageLineHeight: body.settings?.pageLineHeight || 1.9,
-            pageBackground: body.settings?.pageBackground || 'default',
-            pageThemeColor: body.settings?.pageThemeColor || '0,0,0',
-            imagePosition: JSON.stringify(body.settings?.imagePosition || { top: 66, left: 391, scale: '0.8 0.8' }),
-            isScrollable: body.settings?.isScrollable || false,
-            editorMode: body.settings?.editorMode || 'source',
-          },
-        },
-      },
-      include: {
-        settings: true,
-      },
+        name,
+        content,
+        theme,
+        plugins: JSON.stringify(plugins || []),
+        isDefault: isDefault || false,
+        userId: user.id,
+      } as any,
     })
 
     return {
@@ -35,9 +45,10 @@ export default defineEventHandler(async (event) => {
     }
   }
   catch (error: any) {
+    console.error('Error creating resume:', error)
     throw createError({
       statusCode: 500,
-      statusMessage: error || '创建简历失败',
+      statusMessage: error.message || '创建简历失败',
     })
   }
 })

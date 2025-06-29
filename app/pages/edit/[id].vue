@@ -36,6 +36,7 @@ const scalePre = computed(() => {
 
 definePageMeta({
   layout: 'default',
+  middleware: 'sidebase-auth',
 })
 
 const { stop, start } = useScrollSync(leftRef, el)

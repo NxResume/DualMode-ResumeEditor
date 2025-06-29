@@ -10,7 +10,24 @@
     "guide": "Guide",
     "templates": "Templates",
     "resumeTemplates": "Resume Templates",
-    "faq": "FAQ"
+    "faq": "FAQ",
+    "signIn": "Sign In",
+    "signOut": "Sign Out",
+    "profile": "Profile"
+  },
+  "auth": {
+    "signIn": "Sign In",
+    "signInDescription": "Sign in with your GitHub account to save and manage your resumes",
+    "signInWithGithub": "Sign in with GitHub",
+    "signOut": "Sign Out",
+    "profile": "Profile",
+    "bySigningIn": "By signing in, you agree to our",
+    "termsOfService": "Terms of Service",
+    "and": "and",
+    "privacyPolicy": "Privacy Policy",
+    "welcome": "Welcome back",
+    "notSignedIn": "Please sign in first",
+    "signInRequired": "Sign in required to access this feature"
   },
   "resumes": {
     "title": "My Resumes",

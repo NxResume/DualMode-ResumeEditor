@@ -40,9 +40,12 @@ const navLinks = [
           <LanguageSwitcher />
         </li>
         <li class="nuxt-btn-link">
-          <NuxtLink to="https://github.com/NxResume/nuxt-resume-editor" target="_blank">
+          <NuxtLink to="https://github.com/NxResume/DualMode-ResumeEditor" target="_blank">
             <div class="i-ri-github-line" />
           </NuxtLink>
+        </li>
+        <li>
+          <HomeAuthButton />
         </li>
       </ul>
     </nav>

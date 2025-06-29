@@ -12,6 +12,7 @@ export default defineNuxtConfig({
     '@nuxt/eslint',
     '@nuxtjs/i18n',
     'shadcn-nuxt',
+    '@sidebase/nuxt-auth',
   ],
   devtools: { enabled: true },
   app: {
@@ -77,6 +78,23 @@ export default defineNuxtConfig({
       format: 'es',
     },
   },
+
+  auth: {
+    isEnabled: true,
+    disableServerSideAuth: false,
+    originEnvKey: 'AUTH_ORIGIN',
+    provider: {
+      type: 'authjs',
+      trustHost: false,
+      defaultProvider: 'github',
+      addDefaultCallbackUrl: true,
+    },
+    sessionRefresh: {
+      enablePeriodically: 1000 * 60 * 5, // 5 分钟刷新一次
+      enableOnWindowFocus: true,
+    },
+  },
+
   eslint: {
     config: {
       standalone: false,

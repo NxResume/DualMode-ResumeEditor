@@ -10,7 +10,24 @@
     "guide": "使用指南",
     "templates": "模板",
     "resumeTemplates": "简历模板",
-    "faq": "常见问题"
+    "faq": "常见问题",
+    "signIn": "登录",
+    "signOut": "退出登录",
+    "profile": "个人资料"
+  },
+  "auth": {
+    "signIn": "登录",
+    "signInDescription": "使用 GitHub 账号登录以保存和管理你的简历",
+    "signInWithGithub": "使用 GitHub 登录",
+    "signOut": "退出登录",
+    "profile": "个人资料",
+    "bySigningIn": "登录即表示您同意我们的",
+    "termsOfService": "服务条款",
+    "and": "和",
+    "privacyPolicy": "隐私政策",
+    "welcome": "欢迎回来",
+    "notSignedIn": "请先登录",
+    "signInRequired": "需要登录才能访问此功能"
   },
   "resumes": {
     "title": "我的简历",
