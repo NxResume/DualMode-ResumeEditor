@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { isClient, useCssVar } from '@vueuse/core'
+import { Button } from '@/components/ui/button'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { exportToImage, exportToPDF } from '@/utils/download'
 import { useResumeStore } from '~/stores/resume'
 import { useResumeSettingsStore } from '~/stores/resumeSettings'
@@ -8,6 +10,33 @@ import { autoPaginate, DEFAULT_CONFIG } from '~/utils/pagination'
 const props = defineProps<{
   content: string | undefined
 }>()
+
+const preventLeave = ref(true)
+const showLeaveConfirm = ref(false)
+const pendingNavigation = ref<any>(null)
+
+// 1. 页面刷新 / 关闭 拦截
+useBeforeUnload({
+  enabled: preventLeave.value,
+  message: '你有未保存的更改，确定要离开页面吗？',
+})
+
+// 2. 页面内部跳转拦截
+onBeforeRouteLeave((to, from, next) => {
+  if (!preventLeave.value)
+    return next()
+
+  showLeaveConfirm.value = true
+  pendingNavigation.value = next
+})
+
+function handleLeaveConfirm(confirmed: boolean) {
+  showLeaveConfirm.value = false
+  if (pendingNavigation.value) {
+    pendingNavigation.value(confirmed)
+    pendingNavigation.value = null
+  }
+}
 
 const theme = 'markdown-body'
 const md = computed(() => useMarkdown(props.content))
@@ -127,6 +156,26 @@ defineExpose({
       <PluginImageMoveable v-if="isShowMoveabled" />
       <div class="rs-page-item-wrapper" :class="theme" />
     </div>
+
+    <!-- 离开确认对话框 -->
+    <Dialog v-model:open="showLeaveConfirm">
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>确认离开</DialogTitle>
+          <DialogDescription>
+            你有未保存的更改，确定要离开页面吗？
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <Button variant="outline" @click="handleLeaveConfirm(false)">
+            取消
+          </Button>
+          <Button @click="handleLeaveConfirm(true)">
+            确定离开
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   </div>
 </template>
 
