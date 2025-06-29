@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { isClient } from '@vueuse/core'
+import { isClient, useCssVar } from '@vueuse/core'
 import { exportToImage, exportToPDF } from '@/utils/download'
 import { useResumeStore } from '~/stores/resume'
 import { useResumeSettingsStore } from '~/stores/resumeSettings'
@@ -13,6 +13,11 @@ const theme = 'markdown-body'
 const md = computed(() => useMarkdown(props.content))
 const previewRef = ref<HTMLElement | null>(null)
 const isShowMoveabled = ref(false)
+
+// 使用 useCssVar 创建响应式的 CSS 变量
+const idPhotoTop = useCssVar('--id-photo-top', document.documentElement)
+const idPhotoLeft = useCssVar('--id-photo-left', document.documentElement)
+const idPhotoScale = useCssVar('--id-photo-scale', document.documentElement)
 
 async function handleExportPDF() {
   await exportToPDF(previewRef.value)
@@ -64,9 +69,9 @@ function updatePostion() {
   if (isClient) {
     nextTick(() => {
       const pot = resumeSettingsStore.currentSettings.imagePosition
-      document.documentElement.style.setProperty('--id-photo-top', `${pot.top}px`)
-      document.documentElement.style.setProperty('--id-photo-left', `${pot.left}px`)
-      document.documentElement.style.setProperty('--id-photo-scale', pot.scale.toString())
+      idPhotoTop.value = `${pot.top}px`
+      idPhotoLeft.value = `${pot.left}px`
+      idPhotoScale.value = pot.scale.toString()
     })
   }
 }

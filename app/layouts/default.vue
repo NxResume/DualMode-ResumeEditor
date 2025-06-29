@@ -1,8 +1,6 @@
 <script lang="ts" setup>
-import { useI18n } from 'vue-i18n'
 import Toaster from '~/components/ui/toast/Toaster.vue'
 
-const routes = useRoute()
 const { t, locale } = useI18n()
 
 useSeoMeta({
@@ -24,15 +22,6 @@ useHead({
   link: [
     { rel: 'icon', href: '/favicon.ico', sizes: 'any' },
   ],
-})
-
-onMounted(() => {
-  watchEffect(() => {
-    if (import.meta.client) {
-      const isEdit = routes.path.includes('/edit')
-      document.documentElement.style.setProperty('--nuxt-btn-link', isEdit ? '#fff' : '#000')
-    }
-  })
 })
 </script>
 

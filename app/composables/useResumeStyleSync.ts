@@ -1,4 +1,5 @@
 import type { Ref } from 'vue'
+import { useCssVar } from '@vueuse/core'
 // composables/useResumeStyleSync.ts
 import { onMounted, watch } from 'vue'
 import { fontList } from '~/constants'
@@ -18,11 +19,17 @@ export function useResumeStyleSync(
   settings: Ref<ResumeSettings>,
   el: HTMLElement = document.documentElement,
 ) {
+  const fontFamily = useCssVar('--defaults-markdwon-family', el)
+  const lineHeight = useCssVar('--resume-line-height', el)
+  const pagePadding = useCssVar('--resume-page-padding-size', el)
+  const pageBackground = useCssVar('--resume-page-background', el)
+  const pageTheme = useCssVar('--resume-page-theme', el)
+
   // 字体处理
   function updateFont(font: string) {
     const fontInfo = fontList?.find(font => font.value === settings.value.fontname)
     if (!fontInfo) {
-      el.style.setProperty('--defaults-markdwon-family', font)
+      fontFamily.value = font
       return
     }
 
@@ -31,26 +38,26 @@ export function useResumeStyleSync(
       fontFace.load().then(() => {
         document.fonts.add(fontFace)
         loadedFonts.add(fontInfo.value)
-        el.style.setProperty('--defaults-markdwon-family', fontInfo.value)
+        fontFamily.value = fontInfo.value
       }).catch((err) => {
         console.warn('Font load failed:', err)
       })
     }
     else if (fontInfo.fontFamily) {
-      el.style.setProperty('--defaults-markdwon-family', fontInfo.fontFamily)
+      fontFamily.value = fontInfo.fontFamily
     }
     else {
-      el.style.setProperty('--defaults-markdwon-family', fontInfo.value)
+      fontFamily.value = fontInfo.value
     }
   }
 
   function applyAll() {
     const s = settings.value
     updateFont(s.fontname)
-    el.style.setProperty('--resume-line-height', `${s.pageLineHeight}`)
-    el.style.setProperty('--resume-page-padding-size', `${s.pagePadding}px`)
-    el.style.setProperty('--resume-page-background', `url(${s.pageBackground})`)
-    el.style.setProperty('--resume-page-theme', s.pageThemeColor)
+    lineHeight.value = `${s.pageLineHeight}`
+    pagePadding.value = `${s.pagePadding}px`
+    pageBackground.value = `url(${s.pageBackground})`
+    pageTheme.value = s.pageThemeColor
   }
 
   onMounted(() => {
@@ -60,15 +67,15 @@ export function useResumeStyleSync(
   // 监听每个字段，按需更新
   watch(() => settings.value.fontname, updateFont, { immediate: true })
   watch(() => settings.value.pageLineHeight, (val) => {
-    el.style.setProperty('--resume-line-height', `${val}`)
+    lineHeight.value = `${val}`
   }, { immediate: true })
   watch(() => settings.value.pagePadding, (val) => {
-    el.style.setProperty('--resume-page-padding-size', `${val}px`)
+    pagePadding.value = `${val}px`
   }, { immediate: true })
   watch(() => settings.value.pageBackground, (val) => {
-    el.style.setProperty('--resume-page-background', `url(${val})`)
+    pageBackground.value = `url(${val})`
   }, { immediate: true })
   watch(() => settings.value.pageThemeColor, (val) => {
-    el.style.setProperty('--resume-page-theme', val)
+    pageTheme.value = val
   }, { immediate: true })
 }
