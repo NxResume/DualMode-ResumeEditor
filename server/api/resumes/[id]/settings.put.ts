@@ -3,11 +3,18 @@ import { prisma } from '../../../utils/db'
 export default defineEventHandler(async (event) => {
   try {
     const id = getRouterParam(event, 'id')
-    const body = await readBody(event)
 
-    const settings = await prisma.resumeSettings.update({
+    if (!id) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: '简历ID不能为空',
+      })
+    }
+
+    const body = await readBody(event)
+    const settings = await prisma.resumeSettings.upsert({
       where: { resumeId: id },
-      data: {
+      update: {
         fontname: body.fontname,
         pagePadding: body.pagePadding,
         pageLineHeight: body.pageLineHeight,
@@ -17,6 +24,17 @@ export default defineEventHandler(async (event) => {
         isScrollable: body.isScrollable,
         editorMode: body.editorMode,
         updatedAt: new Date(),
+      },
+      create: {
+        resumeId: id,
+        fontname: body.fontname || 'default',
+        pagePadding: body.pagePadding || 36,
+        pageLineHeight: body.pageLineHeight || 1.9,
+        pageBackground: body.pageBackground || 'default',
+        pageThemeColor: body.pageThemeColor || '0,0,0',
+        imagePosition: JSON.stringify(body.imagePosition || { top: 66, left: 391, scale: '0.8 0.8' }),
+        isScrollable: body.isScrollable || false,
+        editorMode: body.editorMode || 'source',
       },
     })
 
@@ -28,7 +46,7 @@ export default defineEventHandler(async (event) => {
   catch (error: any) {
     throw createError({
       statusCode: 500,
-      statusMessage: error || '更新设置失败',
+      statusMessage: error.message || '更新设置失败',
     })
   }
 })
