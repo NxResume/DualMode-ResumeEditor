@@ -4,7 +4,7 @@
   "private": true,
   "packageManager": "pnpm@10.11.1",
   "scripts": {
-    "build": "nuxt build",
+    "build": "pnpm run db:build && nuxt build",
     "dev:pwa": "VITE_PLUGIN_PWA=true nuxt dev",
     "dev": "nuxt dev & pnpm run db:ui",
     "generate": "nuxt generate",
@@ -14,7 +14,8 @@
     "start:generate": "npx serve .output/public",
     "lint": "eslint .",
     "typecheck": "nuxt typecheck",
-    "db:ui": "npx prisma studio --port 5556"
+    "db:ui": "npx prisma studio --port 5556",
+    "db:build": "prisma generate && prisma migrate dev"
   },
   "devDependencies": {
     "@antfu/eslint-config": "catalog:dev",
