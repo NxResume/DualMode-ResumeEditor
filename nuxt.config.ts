@@ -61,11 +61,6 @@ export default defineNuxtConfig({
         target: 'esnext',
       },
     },
-    prerender: {
-      crawlLinks: false,
-      routes: ['/', '/edit'],
-      ignore: ['/assets/**'],
-    },
     devProxy: {
       '/flask-upload': {
         target: devApi,
