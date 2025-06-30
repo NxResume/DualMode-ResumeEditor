@@ -2,7 +2,7 @@ import process from 'node:process'
 import { NuxtAuthHandler } from '#auth'
 import GithubProvider from '@auth/core/providers/github'
 import { PrismaAdapter } from '@auth/prisma-adapter'
-import { prisma } from '../../utils/db'
+import { prisma } from '../../../utils/db'
 
 export default NuxtAuthHandler({
   secret: process.env.AUTH_SECRET,
