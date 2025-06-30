@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const storageManager = useStorageManager()
-const selectedMode = ref<'local' | 'database'>('local')
+const selectedMode = ref<'local' | 'database'>('database')
 const isDatabaseConnected = ref(false)
 
 const { currentMode, isLoading, error } = storageManager
