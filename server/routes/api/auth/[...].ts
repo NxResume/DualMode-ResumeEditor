@@ -3,7 +3,8 @@ import { NuxtAuthHandler } from '#auth'
 import GithubProvider from '@auth/core/providers/github'
 import GoogleProvider from '@auth/core/providers/google'
 import { PrismaAdapter } from '@auth/prisma-adapter'
-import { prisma } from '../../../utils/db'
+import { prisma } from '~/utils/db'
+import { GiteeProvider } from '~/utils/providers'
 
 export default NuxtAuthHandler({
   secret: process.env.AUTH_SECRET,
@@ -23,6 +24,11 @@ export default NuxtAuthHandler({
           prompt: 'consent',
         },
       },
+    }),
+    // @ts-expect-error Use .default here for it to work during SSR.
+    GiteeProvider({
+      clientId: process.env.GITEE_CLIENT_ID,
+      clientSecret: process.env.GITEE_CLIENT_SECRET,
     }),
   ],
   session: {
