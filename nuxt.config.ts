@@ -80,9 +80,6 @@ export default defineNuxtConfig({
     originEnvKey: 'AUTH_ORIGIN',
     provider: {
       type: 'authjs',
-      trustHost: false,
-      defaultProvider: 'github',
-      addDefaultCallbackUrl: true,
     },
     sessionRefresh: {
       enablePeriodically: 1000 * 60 * 5, // 5 分钟刷新一次

@@ -11,6 +11,11 @@ function handleSignIn() {
   showDialog.value = false
   signIn('github')
 }
+
+function handleGoogle() {
+  showDialog.value = false
+  signIn('google')
+}
 </script>
 
 <template>
@@ -34,6 +39,15 @@ function handleSignIn() {
           </svg>
         </span>
         {{ $t('auth.signInWithGithub') }}
+      </button>
+      <button
+        class="group text-sm text-white font-medium px-4 py-2 border border-transparent rounded-md bg-gray-800 flex w-full justify-center relative focus:outline-none hover:bg-gray-700 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+        @click="handleGoogle"
+      >
+        <span class="pl-3 flex items-center inset-y-0 left-0 absolute">
+          <svg class="text-gray-400 h-5 w-5 group-hover:text-gray-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M6 12a6 6 0 0 0 11.659 2H12v-4h9.805v4H21.8c-.927 4.564-4.962 8-9.8 8c-5.523 0-10-4.477-10-10S6.477 2 12 2a9.99 9.99 0 0 1 8.282 4.393l-3.278 2.295A6 6 0 0 0 6 12" /></svg>
+        </span>
+        {{ $t('auth.signInWithGoogle') }}
       </button>
       <div class="text-center">
         <p class="text-sm text-gray-600">

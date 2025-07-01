@@ -19,6 +19,7 @@
     "signIn": "登录",
     "signInDescription": "使用 GitHub 账号登录以保存和管理你的简历",
     "signInWithGithub": "使用 GitHub 登录",
+    "signInWithGoogle": "使用 Google 登录",
     "signOut": "退出登录",
     "profile": "个人资料",
     "bySigningIn": "登录即表示您同意我们的",

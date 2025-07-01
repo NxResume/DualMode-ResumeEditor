@@ -1,6 +1,7 @@
 import process from 'node:process'
 import { NuxtAuthHandler } from '#auth'
 import GithubProvider from '@auth/core/providers/github'
+import GoogleProvider from '@auth/core/providers/google'
 import { PrismaAdapter } from '@auth/prisma-adapter'
 import { prisma } from '../../../utils/db'
 
@@ -12,6 +13,11 @@ export default NuxtAuthHandler({
     GithubProvider({
       clientId: process.env.GITHUB_CLIENT_ID,
       clientSecret: process.env.GITHUB_CLIENT_SECRET,
+    }),
+    // @ts-expect-error Use .default here for it to work during SSR.
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     }),
   ],
   session: {
@@ -29,4 +35,5 @@ export default NuxtAuthHandler({
       return session
     },
   },
+  debug: true,
 })
