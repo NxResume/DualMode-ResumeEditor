@@ -1,8 +1,7 @@
-import type { ResumeData, ResumeSettings } from '../../../types/resume'
-
-import type { IStorageProvider, StorageMode } from '../../../types/storage'
+import type { ResumeData, ResumeSettings } from '~~/types/resume'
+import type { IStorageProvider, StorageMode } from '~~/types/storage'
 import { nanoid } from 'nanoid'
-import { getDefaultSettings } from '../../utils'
+import { getDefaultSettings } from '~/utils'
 
 export class LocalStorageProvider implements IStorageProvider {
   private readonly RESUMES_KEY = 'nuxt-resume-editor-resumes'
@@ -111,27 +110,6 @@ export class LocalStorageProvider implements IStorageProvider {
     return updatedSettings
   }
 
-  async switchMode(mode: StorageMode): Promise<void> {
-    if (!import.meta.client)
-      return
-
-    localStorage.setItem(this.MODE_KEY, mode)
-  }
-
-  async migrateData(from: StorageMode, to: StorageMode): Promise<void> {
-    // 本地存储迁移逻辑
-    if (from === 'local' && to === 'database') {
-      const resumes = await this.getResumes()
-      const allSettings = this.getAllSettings()
-
-      // 调用数据库迁移 API
-      await $fetch('/api/migrate/local-to-database', {
-        method: 'POST',
-        body: { resumes, allSettings },
-      })
-    }
-  }
-
   private getAllSettings(): Record<string, ResumeSettings> {
     if (!import.meta.client)
       return {}
@@ -145,5 +123,10 @@ export class LocalStorageProvider implements IStorageProvider {
       return undefined
     const resumes = await this.getResumes()
     return resumes.find(r => r.id === id)
+  }
+
+  async copySettings(originId: string, resumeId: string): Promise<ResumeSettings> {
+    const originSettings = await this.getSettings(originId)
+    return await this.updateSettings(resumeId, originSettings)
   }
 }

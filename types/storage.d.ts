@@ -16,6 +16,7 @@ export interface IStorageProvider {
   // 设置相关
   getSettings: (resumeId: string) => Promise<ResumeSettings>
   updateSettings: (resumeId: string, settings: Partial<ResumeSettings>) => Promise<ResumeSettings>
+  copySettings: (originId: string, resumeId: string) => Promise<ResumeSettings>
 
   // 模式相关
   getCurrentMode: () => StorageMode

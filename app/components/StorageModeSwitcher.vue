@@ -6,9 +6,7 @@ const isDatabaseConnected = ref(false)
 const { currentMode, isLoading, error } = storageManager
 
 function handleModeChange(value: any) {
-  if (value === 'local' || value === 'database') {
-    storageManager.switchMode(value)
-  }
+  storageManager.switchMode(value)
 }
 
 async function checkDatabaseConnection() {

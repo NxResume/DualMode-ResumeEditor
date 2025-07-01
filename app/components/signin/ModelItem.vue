@@ -3,13 +3,7 @@ import Dialog from '@/components/ui/dialog/Dialog.vue'
 import DialogContent from '@/components/ui/dialog/DialogContent.vue'
 import DialogTrigger from '@/components/ui/dialog/DialogTrigger.vue'
 
-const { signIn } = useAuth()
 const showDialog = ref(false)
-
-function handleSignIn(type: 'github' | 'google' | 'gitee') {
-  showDialog.value = false
-  signIn(type)
-}
 </script>
 
 <template>
@@ -18,7 +12,7 @@ function handleSignIn(type: 'github' | 'google' | 'gitee') {
       <slot />
     </DialogTrigger>
     <DialogContent>
-      <SigninSocialSignInButtons @sign-in="handleSignIn" />
+      <SigninSocialSignInButtons />
     </DialogContent>
   </Dialog>
 </template>

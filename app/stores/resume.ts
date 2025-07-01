@@ -1,4 +1,5 @@
 import type { ResumeData } from '../../types/resume'
+import { nanoid } from 'nanoid'
 import { defineStore, skipHydrate } from 'pinia'
 import { ref } from 'vue'
 import tm1 from '~/templates/tm1.md?raw'
@@ -97,6 +98,8 @@ export const useResumeStore = defineStore('resume', () => {
       })
       resumes.value.push(duplicated)
       currentResumeId.value = duplicated.id
+
+      await provider.copySettings(id, nanoid())
       return duplicated
     }
   }

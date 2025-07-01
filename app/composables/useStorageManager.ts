@@ -24,26 +24,8 @@ export function useStorageManager() {
     }
   }
 
-  // 切换存储模式
-  const switchMode = async (newMode: StorageMode) => {
-    if (currentMode.value === newMode)
-      return
-
-    isLoading.value = true
-    error.value = null
-
-    try {
-      // 更新模式
-      currentMode.value = newMode
-      await localProvider.switchMode(newMode)
-    }
-    catch (err) {
-      error.value = `切换存储模式失败: ${err}`
-      console.error('切换存储模式失败:', err)
-    }
-    finally {
-      isLoading.value = false
-    }
+  const switchMode = async (mode: StorageMode) => {
+    currentMode.value = mode
   }
 
   // 检查数据库连接
@@ -61,8 +43,8 @@ export function useStorageManager() {
     currentMode: readonly(currentMode),
     isLoading: readonly(isLoading),
     error: readonly(error),
-    initializeMode,
     switchMode,
+    initializeMode,
     getCurrentProvider,
     checkDatabaseConnection,
   }

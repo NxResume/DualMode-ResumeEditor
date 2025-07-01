@@ -1,6 +1,6 @@
-import type { ResumeData, ResumeSettings } from '../../../types/resume'
-import type { IStorageProvider, StorageMode } from '../../../types/storage'
-import { getDefaultSettings } from '../../utils'
+import type { ResumeData, ResumeSettings } from '~~/types/resume'
+import type { IStorageProvider, StorageMode } from '~~/types/storage'
+import { getDefaultSettings } from '~/utils'
 
 // 定义API响应的类型
 interface ApiResponse<T> {
@@ -80,7 +80,6 @@ export class DatabaseStorageProvider implements IStorageProvider {
         method: 'POST',
         body: {
           ...resumeData,
-          plugins: JSON.stringify(resumeData.plugins || []),
         },
       })
 
@@ -179,5 +178,10 @@ export class DatabaseStorageProvider implements IStorageProvider {
       console.error('更新设置失败:', error)
       throw error
     }
+  }
+
+  async copySettings(originId: string, resumeId: string): Promise<ResumeSettings> {
+    const originSettings = await this.getSettings(originId)
+    return await this.updateSettings(resumeId, originSettings)
   }
 }
