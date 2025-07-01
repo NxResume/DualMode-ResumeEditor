@@ -1,25 +1,9 @@
-import type { AdapterAccount } from '@auth/core/adapters'
 import process from 'node:process'
 import { NuxtAuthHandler } from '#auth'
 import GithubProvider from '@auth/core/providers/github'
 import GoogleProvider from '@auth/core/providers/google'
-import { PrismaAdapter } from '@auth/prisma-adapter'
-import { prisma } from '~/utils/db'
+import { getAdapter } from '~/utils/providers'
 import GiteeProvider from '~/utils/providers/gitee'
-
-function getAdapter() {
-  const adapter = PrismaAdapter(prisma)
-
-  adapter.linkAccount = async (data) => {
-    if (data.provider === 'gitee') {
-      const { created_at, ...rest } = data
-      return prisma.account.create({ data: rest }) as unknown as AdapterAccount
-    }
-    return prisma.account.create({ data }) as unknown as AdapterAccount
-  }
-
-  return adapter as any
-}
 
 export default NuxtAuthHandler({
   secret: process.env.AUTH_SECRET,
@@ -28,10 +12,12 @@ export default NuxtAuthHandler({
     GithubProvider({
       clientId: process.env.GITHUB_CLIENT_ID,
       clientSecret: process.env.GITHUB_CLIENT_SECRET,
+      allowDangerousEmailAccountLinking: true,
     }),
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      allowDangerousEmailAccountLinking: true,
       authorization: {
         params: {
           prompt: 'consent',
@@ -41,6 +27,7 @@ export default NuxtAuthHandler({
     GiteeProvider({
       clientId: process.env.GITEE_CLIENT_ID,
       clientSecret: process.env.GITEE_CLIENT_SECRET,
+      allowDangerousEmailAccountLinking: true,
     }),
   ],
   session: {
