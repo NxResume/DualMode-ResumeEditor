@@ -4,7 +4,7 @@ import { DatabaseStorageProvider } from './providers/databaseStorage'
 import { LocalStorageProvider } from './providers/localStorage'
 
 export function useStorageManager() {
-  const currentMode = useStorage<StorageMode>('local', 'local')
+  const currentMode = useStorage<StorageMode>('nuxt-resume-editor-storage-mode', 'database')
   const isLoading = ref(false)
   const error = ref<string | null>(null)
 

@@ -11,9 +11,9 @@ export class LocalStorageProvider implements IStorageProvider {
 
   getCurrentMode(): StorageMode {
     if (import.meta.client) {
-      return localStorage.getItem(this.MODE_KEY) as StorageMode || 'local'
+      return localStorage.getItem(this.MODE_KEY) as StorageMode || 'database'
     }
-    return 'local'
+    return 'database'
   }
 
   async getResumes(): Promise<ResumeData[]> {

@@ -29,7 +29,10 @@
     "privacyPolicy": "隐私政策",
     "welcome": "欢迎回来",
     "notSignedIn": "请先登录",
-    "signInRequired": "需要登录才能访问此功能"
+    "signInRequired": "需要登录才能访问此功能",
+    "emailPlaceholder": "请输入邮箱",
+    "signInWithEmail": "邮箱登录",
+    "or": "或"
   },
   "resumes": {
     "title": "我的简历",

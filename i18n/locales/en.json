@@ -29,7 +29,10 @@
     "privacyPolicy": "Privacy Policy",
     "welcome": "Welcome back",
     "notSignedIn": "Please sign in first",
-    "signInRequired": "Sign in required to access this feature"
+    "signInRequired": "Sign in required to access this feature",
+    "emailPlaceholder": "Enter your email",
+    "signInWithEmail": "Sign in with Email",
+    "or": "or"
   },
   "resumes": {
     "title": "My Resumes",
