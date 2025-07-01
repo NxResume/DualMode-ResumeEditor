@@ -2,8 +2,7 @@ import process from 'node:process'
 import { NuxtAuthHandler } from '#auth'
 import GithubProvider from '@auth/core/providers/github'
 import GoogleProvider from '@auth/core/providers/google'
-import { getAdapter } from '~/utils/providers'
-import GiteeProvider from '~/utils/providers/gitee'
+import { getAdapter, GiteeProvider } from '~/utils/providers'
 
 export default NuxtAuthHandler({
   secret: process.env.AUTH_SECRET,

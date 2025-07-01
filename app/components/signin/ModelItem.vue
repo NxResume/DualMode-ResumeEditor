@@ -7,14 +7,9 @@ import DialogTrigger from '../ui/dialog/DialogTrigger.vue'
 const { signIn } = useAuth()
 const showDialog = ref(false)
 
-function handleSignIn() {
+function handleSignIn(type: 'github' | 'google' | 'gitee') {
   showDialog.value = false
-  signIn('github')
-}
-
-function handleGoogle() {
-  showDialog.value = false
-  signIn('google')
+  signIn(type)
 }
 </script>
 
@@ -31,7 +26,7 @@ function handleGoogle() {
       </div>
       <button
         class="group text-sm text-white font-medium px-4 py-2 border border-transparent rounded-md bg-gray-800 flex w-full justify-center relative focus:outline-none hover:bg-gray-700 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
-        @click="handleSignIn"
+        @click="handleSignIn('github')"
       >
         <span class="pl-3 flex items-center inset-y-0 left-0 absolute">
           <svg class="text-gray-400 h-5 w-5 group-hover:text-gray-300" fill="currentColor" viewBox="0 0 20 20">
@@ -42,7 +37,7 @@ function handleGoogle() {
       </button>
       <button
         class="group text-sm text-white font-medium px-4 py-2 border border-transparent rounded-md bg-gray-800 flex w-full justify-center relative focus:outline-none hover:bg-gray-700 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
-        @click="handleGoogle"
+        @click="handleSignIn('google')"
       >
         <span class="pl-3 flex items-center inset-y-0 left-0 absolute">
           <svg class="text-gray-400 h-5 w-5 group-hover:text-gray-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M6 12a6 6 0 0 0 11.659 2H12v-4h9.805v4H21.8c-.927 4.564-4.962 8-9.8 8c-5.523 0-10-4.477-10-10S6.477 2 12 2a9.99 9.99 0 0 1 8.282 4.393l-3.278 2.295A6 6 0 0 0 6 12" /></svg>
@@ -50,8 +45,8 @@ function handleGoogle() {
         {{ $t('auth.signInWithGoogle') }}
       </button>
       <button
-        class="group text-sm text-white font-medium mt-2 px-4 py-2 border border-transparent rounded-md bg-gray-800 flex w-full justify-center relative focus:outline-none hover:bg-gray-700 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
-        @click="signIn('gitee')"
+        class="group text-sm text-white font-medium px-4 py-2 border border-transparent rounded-md bg-gray-800 flex w-full justify-center relative focus:outline-none hover:bg-gray-700 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+        @click="handleSignIn('gitee')"
       >
         <span class="pl-3 flex items-center inset-y-0 left-0 absolute">
           <svg class="text-gray-400 h-5 w-5 group-hover:text-gray-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M11.984 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12a12 12 0 0 0 12-12A12 12 0 0 0 12 0zm6.09 5.333c.328 0 .593.266.592.593v1.482a.594.594 0 0 1-.593.592H9.777c-.982 0-1.778.796-1.778 1.778v5.63c0 .327.266.592.593.592h5.63c.982 0 1.778-.796 1.778-1.778v-.296a.593.593 0 0 0-.592-.593h-4.15a.59.59 0 0 1-.592-.592v-1.482a.593.593 0 0 1 .593-.592h6.815c.327 0 .593.265.593.592v3.408a4 4 0 0 1-4 4H5.926a.593.593 0 0 1-.593-.593V9.778a4.444 4.444 0 0 1 4.445-4.444h8.296Z" /></svg>
