@@ -19,11 +19,11 @@ export default defineConfig({
   ],
   theme: {
     colors: {
-      success: '#22c55e',
+      'success': '#22c55e',
       'success-foreground': '#fff',
-      info: '#3b82f6',
+      'info': '#3b82f6',
       'info-foreground': '#fff',
-      warning: '#f59e42',
+      'warning': '#f59e42',
       'warning-foreground': '#fff',
     },
   },
