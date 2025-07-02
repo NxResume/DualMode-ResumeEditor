@@ -1,4 +1,4 @@
-import type { Ref } from 'vue'
+import type { Reactive } from 'vue'
 import { useCssVar } from '@vueuse/core'
 // composables/useResumeStyleSync.ts
 import { onMounted, watch } from 'vue'
@@ -16,7 +16,7 @@ interface ResumeSettings {
 const loadedFonts = new Set<string>()
 
 export function useResumeStyleSync(
-  settings: Ref<ResumeSettings>,
+  settings: Reactive<ResumeSettings>,
   el: HTMLElement = document.documentElement,
 ) {
   const fontFamily = useCssVar('--defaults-markdwon-family', el)
@@ -27,7 +27,7 @@ export function useResumeStyleSync(
 
   // 字体处理
   function updateFont(font: string) {
-    const fontInfo = fontList?.find(font => font.value === settings.value.fontname)
+    const fontInfo = fontList?.find(font => font.value === settings.fontname)
     if (!fontInfo) {
       fontFamily.value = font
       return
@@ -52,7 +52,7 @@ export function useResumeStyleSync(
   }
 
   function applyAll() {
-    const s = settings.value
+    const s = settings
     updateFont(s.fontname)
     lineHeight.value = `${s.pageLineHeight}`
     pagePadding.value = `${s.pagePadding}px`
@@ -65,17 +65,17 @@ export function useResumeStyleSync(
   })
 
   // 监听每个字段，按需更新
-  watch(() => settings.value.fontname, updateFont, { immediate: true })
-  watch(() => settings.value.pageLineHeight, (val) => {
+  watch(() => settings.fontname, updateFont, { immediate: true })
+  watch(() => settings.pageLineHeight, (val) => {
     lineHeight.value = `${val}`
   }, { immediate: true })
-  watch(() => settings.value.pagePadding, (val) => {
+  watch(() => settings.pagePadding, (val) => {
     pagePadding.value = `${val}px`
   }, { immediate: true })
-  watch(() => settings.value.pageBackground, (val) => {
+  watch(() => settings.pageBackground, (val) => {
     pageBackground.value = `url(${val})`
   }, { immediate: true })
-  watch(() => settings.value.pageThemeColor, (val) => {
+  watch(() => settings.pageThemeColor, (val) => {
     pageTheme.value = val
   }, { immediate: true })
 }
