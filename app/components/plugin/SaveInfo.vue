@@ -15,6 +15,7 @@ async function save() {
     toast({
       title: 'Saved',
       description: 'Your changes have been saved.',
+      variant: "success"
     })
   }
   catch (error) {
