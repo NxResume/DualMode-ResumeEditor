@@ -66,6 +66,7 @@ export const useResumeSettingsStore = defineStore('resumeSettings', () => {
   return {
     currentSettings: skipHydrate(currentSettings),
     loading,
+    reId: readonly(reId),
     saveCurrentSettings,
     fetchCurrentSettings,
     updateCurrentSettings,

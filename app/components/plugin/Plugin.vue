@@ -102,6 +102,17 @@ const localePath = useLocalePath()
       <Label class="plugin-label">{{ t('plugin.fullscreen') }}</Label>
     </div>
     <PluginExportButton :on-export="downloadPdf" />
+    <NuxtLink
+      :to="localePath({
+        name: 'preview-id',
+        params: {
+          id: resumeSettingsStore.reId,
+        },
+      })" class="plugin-item"
+    >
+      <div class="i-ri-eye-line icon-btn" />
+      <Label class="plugin-label">{{ t('plugin.preview') }}</Label>
+    </NuxtLink>
     <PluginSaveInfo />
   </div>
 </template>

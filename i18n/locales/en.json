@@ -72,10 +72,12 @@
   },
   "export": {
     "exporting": "Exporting...",
-    "exportPdf": "Export PDF"
+    "exportPdf": "Export PDF",
+    "exportImage": "Export Image"
   },
   "plugin": {
     "save": "Save",
+    "preview": "Preview",
     "resumeTemplate": "Resume Template",
     "idPhoto": "ID Photo",
     "theme": "Theme",

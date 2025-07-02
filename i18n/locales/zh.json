@@ -72,10 +72,12 @@
   },
   "export": {
     "exporting": "导出中...",
-    "exportPdf": "导出 PDF"
+    "exportPdf": "导出 PDF",
+    "exportImage": "导出图片"
   },
   "plugin": {
     "save": "保存",
+    "preview": "预览",
     "resumeTemplate": "简历模板",
     "idPhoto": "证件照",
     "theme": "主题色",
