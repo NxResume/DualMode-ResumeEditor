@@ -4,6 +4,10 @@ import DialogContent from '@/components/ui/dialog/DialogContent.vue'
 import DialogTrigger from '@/components/ui/dialog/DialogTrigger.vue'
 
 const showDialog = ref(false)
+
+function callback() {
+  showDialog.value = false
+}
 </script>
 
 <template>
@@ -12,7 +16,7 @@ const showDialog = ref(false)
       <slot />
     </DialogTrigger>
     <DialogContent>
-      <SigninSocialSignInButtons />
+      <SigninSocialSignInButtons :callback="callback" />
     </DialogContent>
   </Dialog>
 </template>

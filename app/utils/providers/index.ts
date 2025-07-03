@@ -31,7 +31,7 @@ function getAdapter() {
       }
     }
 
-    return prisma.user.create({ data: stripUndefined(data) }) as unknown as AdapterUser
+    return prisma.user.create(stripUndefined(data)) as unknown as AdapterUser
   }
 
   return adapter as any

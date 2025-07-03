@@ -201,5 +201,27 @@
     "description": "此操作无法撤销，将清空当前简历内容。你确定要继续吗？",
     "cancel": "取消",
     "action": "确定重置"
-  }
+  },
+  "notFound": "未找到页面",
+  "back": "返回",
+  "devTools": "开发工具",
+  "settingsPage": "设置页面",
+  "login.emailPlaceholder": "请输入邮箱",
+  "login.passwordPlaceholder": "请输入密码",
+  "login.confirmPasswordPlaceholder": "请再次输入密码",
+  "login.or": "或",
+  "login.terms": "服务条款",
+  "login.login": "登录",
+  "login.register": "注册",
+  "login.resend": "重新发送{count}秒",
+  "login.privacy": "隐私政策",
+  "login.codeSent": "验证码已发送到邮箱",
+  "login.fillAllInfo": "请填写完整信息",
+  "login.registerSuccess": "注册成功，请登录",
+  "login.fillEmailAndPasswords": "请填写邮箱和两次密码",
+  "login.passwordsNotMatch": "两次密码不一致",
+  "login.fillEmailAndPassword": "请输入邮箱和密码",
+  "login.loginSuccess": "登录成功",
+  "login.bySigningIn": "登录即代表同意",
+  "login.and": "和"
 }

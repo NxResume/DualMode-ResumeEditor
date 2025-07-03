@@ -51,14 +51,14 @@ const isDev = import.meta.dev
     <div v-if="isDev" class="bottom-4 right-4 fixed z-50">
       <div class="text-white p-4 rounded-lg bg-blue-500 shadow-lg">
         <h3 class="font-semibold mb-2">
-          开发工具
+          {{ $t('devTools') }}
         </h3>
         <div class="space-y-2">
           <NuxtLink
             to="/settings"
             class="text-sm block hover:underline"
           >
-            ⚙️ 设置页面
+            ⚙️ {{ $t('settingsPage') }}
           </NuxtLink>
         </div>
       </div>
