@@ -10,4 +10,3 @@ public/assets/fonts
 flask-upload.py
 /app/generated/prisma
 prisma/prisma/
-migrations/
