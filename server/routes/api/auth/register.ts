@@ -1,9 +1,7 @@
 import process from 'node:process'
-import { PrismaClient } from '@prisma/client'
 import bcrypt from 'bcrypt'
 import nodemailer from 'nodemailer'
-
-const prisma = new PrismaClient()
+import { prisma } from '~/utils/db'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
