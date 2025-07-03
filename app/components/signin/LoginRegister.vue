@@ -14,6 +14,7 @@ const props = defineProps<{
 
 const { t } = useI18n()
 
+const { signIn } = useAuth()
 const email = ref('')
 const password = ref('')
 const confirmPassword = ref('')
@@ -89,19 +90,18 @@ async function handleLogin() {
     return
   }
   loading.value = true
-  const res = await $fetch('/api/auth/login', {
-    method: 'POST',
-    body: { email: email.value, password: password.value },
+  const res = await signIn('credentials', {
+    email: email.value,
+    password: password.value,
   })
   loading.value = false
-  if (res.success) {
+  if (res.ok && !res.error) {
     message.value = t('login.loginSuccess')
-    // 登录成功后的逻辑
     props.callback?.()
     navigateTo('/')
   }
   else {
-    message.value = res.message
+    message.value = res?.error || '登录失败'
   }
 }
 
