@@ -223,5 +223,6 @@
   "login.fillEmailAndPassword": "请输入邮箱和密码",
   "login.loginSuccess": "登录成功",
   "login.bySigningIn": "登录即代表同意",
-  "login.and": "和"
+  "login.and": "和",
+  "login.sendCode": "发送验证码"
 }
