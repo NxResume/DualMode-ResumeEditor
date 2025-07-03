@@ -93,12 +93,13 @@ async function handleLogin() {
   const res = await signIn('credentials', {
     email: email.value,
     password: password.value,
+    redirect: false,
   })
   loading.value = false
   if (res.ok && !res.error) {
     message.value = t('login.loginSuccess')
     props.callback?.()
-    navigateTo('/')
+    // navigateTo('/')
   }
   else {
     message.value = res?.error || '登录失败'

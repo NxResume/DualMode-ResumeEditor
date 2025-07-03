@@ -25,12 +25,21 @@ export default defineEventHandler(async (event) => {
   const passwordHash = await bcrypt.hash(password, 10)
 
   // 创建用户
-  await prisma.user.create({
+  const user = await prisma.user.create({
     data: {
       email,
       passwordHash,
       emailVerificationCode: code,
       emailVerificationExpires: expires,
+    },
+  })
+
+  await prisma.account.create({
+    data: {
+      userId: user.id,
+      type: 'credentials',
+      provider: 'credentials',
+      providerAccountId: user.email!,
     },
   })
 

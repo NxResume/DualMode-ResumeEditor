@@ -1,6 +1,7 @@
 import type { AdapterAccount, AdapterUser } from '@auth/core/adapters'
 import { PrismaAdapter } from '@auth/prisma-adapter'
 import { prisma } from '~/utils/db'
+import CredentialsProvider from '~/utils/providers/credentials'
 import GiteeProvider from '~/utils/providers/gitee'
 
 function stripUndefined<T>(obj: T) {
@@ -37,4 +38,4 @@ function getAdapter() {
   return adapter as any
 }
 
-export { getAdapter, GiteeProvider }
+export { CredentialsProvider, getAdapter, GiteeProvider }
