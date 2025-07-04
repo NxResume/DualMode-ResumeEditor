@@ -82,7 +82,9 @@ async function handleExport(type: 'pdf' | 'png') {
           transformOrigin: 'top left',
         }"
       >
-        <EditMarkdownPreview ref="preRef" :content="resumeStore.resumeContent" />
+        <ClientOnly>
+          <EditMarkdownPreview ref="preRef" :content="resumeStore.resumeContent" />
+        </ClientOnly>
       </div>
       <ClientOnly>
         <Plugin :download-img="() => handleExport('png')" :download-pdf="() => handleExport('pdf')" />

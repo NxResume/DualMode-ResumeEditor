@@ -47,7 +47,7 @@ export default defineNuxtConfig({
     renderJsonPayloads: true,
     typedPages: true,
   },
-  compatibilityDate: '2024-08-14',
+  compatibilityDate: '2025-03-25',
   nitro: {
     routeRules: {
       '/flask-upload': {

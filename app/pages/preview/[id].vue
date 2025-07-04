@@ -60,7 +60,9 @@ async function handleExportImage() {
 
 <template>
   <div class="flex h-full justify-center relative">
-    <EditMarkdownPreview ref="preRef" :content="resumeStore.resumeContent" />
+    <ClientOnly>
+      <EditMarkdownPreview ref="preRef" :content="resumeStore.resumeContent" />
+    </ClientOnly>
 
     <!-- 导出按钮 -->
     <div class="flex gap-3 bottom-6 right-6 fixed z-50">
