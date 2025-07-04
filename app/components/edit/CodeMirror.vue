@@ -159,7 +159,7 @@ onUnmounted(() => {
       @mousemove="onMouseMove"
       @mouseleave="onMouseLeave"
     />
-    <HoverToolbar
+    <EditHoverToolbar
       :visible="showToolbar"
       :current-type="hoverType"
       :types="WysiwygTags"

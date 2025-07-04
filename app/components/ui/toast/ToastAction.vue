@@ -3,7 +3,7 @@ import type { ToastActionProps } from 'reka-ui'
 import type { HTMLAttributes } from 'vue'
 import { reactiveOmit } from '@vueuse/core'
 import { ToastAction } from 'reka-ui'
-import { cn } from '@/lib/utils'
+import { cn } from '@/utils/ui'
 
 const props = defineProps<ToastActionProps & { class?: HTMLAttributes['class'] }>()
 

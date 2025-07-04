@@ -9,7 +9,6 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { pagePaddingList } from '~/constants'
-import { useResumeSettingsStore } from '~/stores/resumeSettings'
 
 const resumeSettingsStore = useResumeSettingsStore()
 const { t } = useI18n()

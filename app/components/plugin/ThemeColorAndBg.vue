@@ -12,7 +12,6 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { pageBgList, presetColors } from '~/constants'
-import { useResumeSettingsStore } from '~/stores/resumeSettings'
 import 'vue-color/style.css'
 
 const isColorPickerOpen = ref(false)

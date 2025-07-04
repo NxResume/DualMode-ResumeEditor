@@ -4,8 +4,6 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { exportToImage, exportToPDF } from '@/utils/download'
 import { useBeforeLeaveConfirm } from '~/composables/useBeforeLeaveConfirm'
-import { useResumeStore } from '~/stores/resume'
-import { useResumeSettingsStore } from '~/stores/resumeSettings'
 import { autoPaginate, DEFAULT_CONFIG } from '~/utils/pagination'
 
 const props = defineProps<{

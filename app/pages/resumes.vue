@@ -2,7 +2,6 @@
 import { Copy, Edit, Plus, Trash2 } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { useResumeStore } from '@/stores/resume'
 
 const resumeStore = useResumeStore()
 const router = useRouter()

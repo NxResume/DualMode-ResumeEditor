@@ -1,11 +1,10 @@
-import type { ResumeSettings } from '../../types/resume'
+import type { ResumeSettings } from '~~/types/resume'
 import { isClient } from '@vueuse/core'
-// app/stores/resumeSettings.ts
+// app/composables/stores/resumeSettings.ts
 import { defineStore, skipHydrate } from 'pinia'
 import { computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { useStorageManager } from '../composables/useStorageManager'
-import { getDefaultSettings } from '../utils'
+import { getDefaultSettings } from '~/utils'
 
 export const useResumeSettingsStore = defineStore('resumeSettings', () => {
   const storageManager = useStorageManager()
@@ -74,3 +73,6 @@ export const useResumeSettingsStore = defineStore('resumeSettings', () => {
     resetCurrentSettings,
   }
 })
+
+if (import.meta.hot)
+  import.meta.hot.accept(acceptHMRUpdate(useResumeSettingsStore, import.meta.hot))

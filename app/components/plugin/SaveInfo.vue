@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { LabelLoading } from '../ui/label'
-import { useToast } from '../ui/toast'
+import { LabelLoading } from '@/components/ui/label'
+import { useToast } from '@/components/ui/toast'
 
 const { toast } = useToast()
 const resumeStore = useResumeStore()

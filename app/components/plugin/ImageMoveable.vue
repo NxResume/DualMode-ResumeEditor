@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Moveable from 'vue3-moveable'
 import { useI18n } from 'vue-i18n'
-import { useResumeSettingsStore } from '~/stores/resumeSettings'
+import { useResumeSettingsStore } from '~/composables/stores/settings'
 
 const resumeSettingsStore = useResumeSettingsStore()
 

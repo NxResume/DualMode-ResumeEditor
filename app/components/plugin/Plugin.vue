@@ -7,7 +7,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
-import { useResumeSettingsStore } from '~/stores/resumeSettings'
 
 defineProps<{
   downloadImg: () => void

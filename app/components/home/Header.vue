@@ -37,7 +37,7 @@ const navLinks = [
           </a>
         </li>
         <li class="nuxt-btn-link">
-          <LanguageSwitcher />
+          <HomeLanguageSwitcher />
         </li>
         <li class="nuxt-btn-link">
           <NuxtLink to="https://github.com/NxResume/DualMode-ResumeEditor" target="_blank">

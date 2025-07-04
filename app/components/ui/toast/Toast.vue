@@ -3,7 +3,7 @@ import type { ToastRootEmits } from 'reka-ui'
 import type { ToastProps } from '.'
 import { reactiveOmit } from '@vueuse/core'
 import { ToastRoot, useForwardPropsEmits } from 'reka-ui'
-import { cn } from '@/lib/utils'
+import { cn } from '@/utils/ui'
 import { toastVariants } from '.'
 
 const props = defineProps<ToastProps>()

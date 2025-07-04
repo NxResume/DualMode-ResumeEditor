@@ -1,8 +1,5 @@
 <script setup lang="ts">
-import type { MarkdownPreview } from '#components'
-import CodeMirror from '@/components/CodeMirror.vue'
-import { useResumeStore } from '@/stores/resume'
-import { useResumeSettingsStore } from '~/stores/resumeSettings'
+import type { EditCodeMirror, EditMarkdownPreview } from '#components'
 
 const route = useRoute()
 const resumeStore = useResumeStore()
@@ -26,8 +23,8 @@ onMounted(() => {
 
 const resumeSettingsStore = useResumeSettingsStore()
 const el = useTemplateRef('el')
-const leftRef = ref<InstanceType<typeof CodeMirror>>()
-const preRef = ref<InstanceType<typeof MarkdownPreview>>()
+const leftRef = ref<InstanceType<typeof EditCodeMirror>>()
+const preRef = ref<InstanceType<typeof EditMarkdownPreview>>()
 const { width } = useElementSize(el)
 
 const scalePre = computed(() => {
@@ -74,7 +71,7 @@ async function handleExport(type: 'pdf' | 'png') {
       class="p-2 pt-10 rounded-lg bg-white flex-none h-full w-480px shadow-lg overflow-x-hidden overflow-y-auto dark:bg-gray-800"
     >
       <ClientOnly>
-        <CodeMirror v-model="resumeStore.resumeContent" :mode="resumeSettingsStore.currentSettings.editorMode" />
+        <EditCodeMirror v-model="resumeStore.resumeContent" :mode="resumeSettingsStore.currentSettings.editorMode" />
       </ClientOnly>
     </div>
     <!-- 右侧预览 -->
@@ -85,7 +82,7 @@ async function handleExport(type: 'pdf' | 'png') {
           transformOrigin: 'top left',
         }"
       >
-        <MarkdownPreview ref="preRef" :content="resumeStore.resumeContent" />
+        <EditMarkdownPreview ref="preRef" :content="resumeStore.resumeContent" />
       </div>
       <ClientOnly>
         <Plugin :download-img="() => handleExport('png')" :download-pdf="() => handleExport('pdf')" />

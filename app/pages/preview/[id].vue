@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import type { MarkdownPreview } from '#components'
+import type { EditMarkdownPreview } from '#components'
 import { Download, FileImage } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
-import { useResumeStore } from '@/stores/resume'
 
 const route = useRoute()
 const resumeStore = useResumeStore()
@@ -25,7 +24,7 @@ onMounted(() => {
   resumeStore.fetchResumesById(resumeId)
 })
 
-const preRef = ref<InstanceType<typeof MarkdownPreview>>()
+const preRef = ref<InstanceType<typeof EditMarkdownPreview>>()
 const pdfLoading = ref(false)
 const imageLoading = ref(false)
 
@@ -61,7 +60,7 @@ async function handleExportImage() {
 
 <template>
   <div class="flex h-full justify-center relative">
-    <MarkdownPreview ref="preRef" :content="resumeStore.resumeContent" />
+    <EditMarkdownPreview ref="preRef" :content="resumeStore.resumeContent" />
 
     <!-- 导出按钮 -->
     <div class="flex gap-3 bottom-6 right-6 fixed z-50">

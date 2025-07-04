@@ -8,7 +8,6 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { fontList } from '~/constants'
-import { useResumeSettingsStore } from '~/stores/resumeSettings'
 
 const resumeSettingsStore = useResumeSettingsStore()
 </script>

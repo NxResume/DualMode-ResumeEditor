@@ -3,7 +3,7 @@ import type { ToastTitleProps } from 'reka-ui'
 import type { HTMLAttributes } from 'vue'
 import { reactiveOmit } from '@vueuse/core'
 import { ToastTitle } from 'reka-ui'
-import { cn } from '@/lib/utils'
+import { cn } from '@/utils/ui'
 
 const props = defineProps<ToastTitleProps & { class?: HTMLAttributes['class'] }>()
 

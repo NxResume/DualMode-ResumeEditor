@@ -7,7 +7,6 @@ import {
   SelectTrigger,
 } from '@/components/ui/select'
 import { pageLineHeightList } from '~/constants'
-import { useResumeSettingsStore } from '~/stores/resumeSettings'
 
 const resumeSettingsStore = useResumeSettingsStore()
 </script>

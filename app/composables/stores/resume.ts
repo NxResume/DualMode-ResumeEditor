@@ -1,10 +1,9 @@
-import type { ResumeData } from '../../types/resume'
+import type { ResumeData } from '~~/types/resume'
 import { nanoid } from 'nanoid'
 import { defineStore, skipHydrate } from 'pinia'
 import { ref } from 'vue'
-import tm1 from '~/templates/tm1.md?raw'
+import tm1 from '~/constants/templates/tm1.md?raw'
 import { reTheme, ThemeName } from '~/utils'
-import { useStorageManager } from '../composables/useStorageManager'
 
 export const useResumeStore = defineStore('resume', () => {
   // state
@@ -140,3 +139,6 @@ export const useResumeStore = defineStore('resume', () => {
     resetCurrentResume,
   }
 })
+
+if (import.meta.hot)
+  import.meta.hot.accept(acceptHMRUpdate(useResumeStore, import.meta.hot))
