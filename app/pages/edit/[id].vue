@@ -1,38 +1,8 @@
 <script setup lang="ts">
 import type { EditCodeMirror, EditMarkdownPreview } from '#components'
-import type { ResumeData } from '~~/types/resume'
-import { isClient } from '@vueuse/core'
-import resumeController from '~/composables/action/resume'
+import { useResumeData } from '~/composables/useResumeData'
 
-const route = useRoute()
-const currentResume = ref<ResumeData>({
-  content: '',
-  id: '',
-  name: '',
-  theme: '',
-  plugins: [],
-  createdAt: new Date(),
-  updatedAt: new Date(),
-  settings: getDefaultSettings(),
-})
-
-// 根据路由参数切换简历
-const resumeId = (route.params as Record<string, any>)?.id as string | undefined
-
-async function fetchCurrentResume() {
-  if (!resumeId)
-    return
-
-  currentResume.value = await resumeController.fetchResumeById(resumeId) as ResumeData
-}
-
-watch(() => resumeId, () => {
-  fetchCurrentResume()
-})
-
-onMounted(() => {
-  fetchCurrentResume()
-})
+const { currentResume, updateResumeData } = useResumeData()
 
 const el = useTemplateRef('el')
 const leftRef = ref<InstanceType<typeof EditCodeMirror>>()
@@ -71,20 +41,6 @@ async function handleExport(type: 'pdf' | 'png') {
 
   return preRef.value?.exportToPDF()
 }
-
-async function updateData(data: ResumeData) {
-  currentResume.value = data
-}
-
-watch(
-  () => currentResume.value.settings,
-  (settings) => {
-    if (settings && isClient) {
-      useResumeStyleSync(settings)
-    }
-  },
-  { immediate: true, deep: true },
-)
 </script>
 
 <template>
@@ -118,7 +74,7 @@ watch(
         </ClientOnly>
       </div>
       <ClientOnly>
-        <Plugin :data="currentResume" :download-img="() => handleExport('png')" :download-pdf="() => handleExport('pdf')" @update:data="updateData" />
+        <Plugin :data="currentResume" :download-img="() => handleExport('png')" :download-pdf="() => handleExport('pdf')" @update:data="updateResumeData" />
       </ClientOnly>
     </div>
   </div>
