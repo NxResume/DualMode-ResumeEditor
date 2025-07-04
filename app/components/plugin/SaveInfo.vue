@@ -1,16 +1,22 @@
 <script setup lang="ts">
+import type { ResumeData } from '~~/types/resume'
 import { LabelLoading } from '@/components/ui/label'
 import { useToast } from '@/components/ui/toast'
+import resumeController from '~/composables/action/resume'
 
+const props = defineProps<{
+  data: ResumeData
+}>()
 const { toast } = useToast()
-const resumeStore = useResumeStore()
-const resumeSettingsStore = useResumeSettingsStore()
 
 async function save() {
   try {
+    if (!props.data.settings)
+      return
+
     await Promise.all([
-      resumeStore.saveCurrentResume(),
-      resumeSettingsStore.saveCurrentSettings(),
+      resumeController.saveCurrentResume(props.data),
+      resumeController.updateCurrentSettings(props.data.id, props.data.settings),
     ])
 
     toast({

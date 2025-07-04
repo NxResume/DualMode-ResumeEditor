@@ -16,6 +16,7 @@ interface ResumeApiData {
   createdAt: string
   updatedAt: string
   isDefault?: boolean
+  settings?: ResumeSettings
 }
 
 interface SettingsApiData {
@@ -60,6 +61,9 @@ export class DatabaseStorageProvider implements IStorageProvider {
       if (!response.data) {
         return undefined
       }
+
+      if (response.data.settings)
+        response.data.settings.imagePosition = JSON.parse(response.data.settings?.imagePosition as unknown as string)
 
       return {
         ...response.data,
@@ -126,11 +130,15 @@ export class DatabaseStorageProvider implements IStorageProvider {
     }
   }
 
-  async deleteResume(id: string): Promise<void> {
+  async deleteResume(id: string): Promise<{
+    success: boolean
+    message: string
+  }> {
     try {
-      await $fetch(`/api/resumes/${id}`, {
+      const data = await $fetch(`/api/resumes/${id}`, {
         method: 'DELETE',
       })
+      return data
     }
     catch (error) {
       console.error('删除简历失败:', error)

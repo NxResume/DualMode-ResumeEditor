@@ -7,7 +7,7 @@ export default defineEventHandler(async (event) => {
     if (!id) {
       throw createError({
         statusCode: 400,
-        statusMessage: '简历ID不能为空',
+        message: '简历ID不能为空',
       })
     }
 
@@ -32,7 +32,7 @@ export default defineEventHandler(async (event) => {
         pageLineHeight: body.pageLineHeight || 1.9,
         pageBackground: body.pageBackground || 'default',
         pageThemeColor: body.pageThemeColor || '0,0,0',
-        imagePosition: JSON.stringify(body.imagePosition || { top: 66, left: 391, scale: '0.8 0.8' }),
+        imagePosition: JSON.stringify(body.imagePosition || '{ top: 66, left: 391, scale: \'0.8 0.8\' }'),
         isScrollable: body.isScrollable || false,
         editorMode: body.editorMode || 'source',
       },
@@ -44,9 +44,17 @@ export default defineEventHandler(async (event) => {
     }
   }
   catch (error: any) {
+    // 错误处理优化：使用 message 字段
+    if (error.code === 'P2003') {
+      throw createError({
+        statusCode: 400,
+        message: '外键约束错误：关联的简历不存在',
+      })
+    }
+
     throw createError({
       statusCode: 500,
-      statusMessage: error.message || '更新设置失败',
+      message: error.message || '更新设置失败',
     })
   }
 })

@@ -1,9 +1,17 @@
 <script setup lang="ts">
 import Moveable from 'vue3-moveable'
 import { useI18n } from 'vue-i18n'
-import { useResumeSettingsStore } from '~/composables/stores/settings'
 
-const resumeSettingsStore = useResumeSettingsStore()
+const props = defineProps<{
+  imagePosition?: {
+    left: number
+    top: number
+    scale: number | string
+  }
+}>()
+const emit = defineEmits<{
+  (e: 'update:imagePosition', pos: { left: number, top: number, scale: number | string }): void
+}>()
 
 const { t } = useI18n()
 
@@ -16,14 +24,26 @@ interface DragEvent {
 }
 
 function onDrag({ left, top }: DragEvent) {
-  resumeSettingsStore.currentSettings.imagePosition.left = left
-  resumeSettingsStore.currentSettings.imagePosition.top = top
+  if (!props.imagePosition)
+    return
+
+  emit('update:imagePosition', {
+    ...props.imagePosition,
+    left,
+    top,
+  })
 }
 
 function onScale(event: any) {
+  if (!props.imagePosition)
+    return
+
   const scaleMatch = event.transform.match(/scale\(([^)]+)\)/)
   const scale = scaleMatch ? scaleMatch[1] : '1'
-  resumeSettingsStore.currentSettings.imagePosition.scale = scale
+  emit('update:imagePosition', {
+    ...props.imagePosition,
+    scale,
+  })
 }
 </script>
 

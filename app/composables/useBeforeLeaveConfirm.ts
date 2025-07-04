@@ -5,11 +5,7 @@ import { useBeforeUnload } from './useBeforeUnload'
 export function useBeforeLeaveConfirm(message = '你有未保存的更改，确定要离开页面吗？') {
   const showLeaveConfirm = ref(false)
   const pendingNavigation = ref<any>(null)
-  const resumeStore = useResumeStore()
-  const isContentDirty = computed(() =>
-    !!(resumeStore.currentResume && resumeStore.resumeContent !== resumeStore.currentResume.content),
-  )
-  const isDirty = computed(() => isContentDirty.value)
+  const isDirty = computed(() => false)
 
   useBeforeUnload({
     enabled: isDirty.value,

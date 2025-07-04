@@ -5,6 +5,7 @@ export interface PaginationConfig {
   noSplitTags: string[]
   themeClass: string
   themeName: string
+  truncateToOnePage?: boolean // 只展示第一页，超出部分丢弃
 }
 
 // 默认配置
@@ -220,6 +221,10 @@ export function autoPaginate(
         currentPage.appendChild(element)
         currentPageHeight += elementHeight
       }
+    }
+
+    if (config.truncateToOnePage && currentPageIndex > 0) {
+      wrapper.innerHTML = (wrapper.childNodes[0] as any)!.outerHTML
     }
 
     // 清理临时容器

@@ -32,7 +32,7 @@ export default defineEventHandler(async (event) => {
         userId: user.id,
       },
       include: {
-        settings: false,
+        settings: true,
       },
       orderBy: { createdAt: 'desc' },
     })

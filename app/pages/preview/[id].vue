@@ -1,27 +1,38 @@
 <script setup lang="ts">
 import type { EditMarkdownPreview } from '#components'
+import type { ResumeData } from '~~/types/resume'
+import { isClient } from '@vueuse/core'
 import { Download, FileImage } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
+import resumeController from '~/composables/action/resume'
 
 const route = useRoute()
-const resumeStore = useResumeStore()
 const { t } = useI18n()
-
+const currentResume = ref<ResumeData>({
+  content: '',
+  id: '',
+  name: '',
+  theme: '',
+  plugins: [],
+  createdAt: new Date(),
+  updatedAt: new Date(),
+  settings: getDefaultSettings(),
+})
 // 根据路由参数切换简历
 const resumeId = (route.params as Record<string, any>)?.id as string | undefined
-
-watch(() => resumeId, () => {
+async function fetchCurrentResume() {
   if (!resumeId)
     return
 
-  resumeStore.fetchResumesById(resumeId)
+  currentResume.value = await resumeController.fetchResumeById(resumeId) as ResumeData
+}
+
+watch(() => resumeId, () => {
+  fetchCurrentResume()
 })
 
 onMounted(() => {
-  if (!resumeId)
-    return
-
-  resumeStore.fetchResumesById(resumeId)
+  fetchCurrentResume()
 })
 
 const preRef = ref<InstanceType<typeof EditMarkdownPreview>>()
@@ -56,12 +67,27 @@ async function handleExportImage() {
     imageLoading.value = false
   }
 }
+
+watch(
+  () => currentResume.value.settings,
+  (settings) => {
+    if (settings && isClient) {
+      useResumeStyleSync(settings)
+    }
+  },
+  { immediate: true, deep: true },
+)
 </script>
 
 <template>
   <div class="flex h-full justify-center relative">
     <ClientOnly>
-      <EditMarkdownPreview ref="preRef" :content="resumeStore.resumeContent" />
+      <EditMarkdownPreview
+        ref="preRef"
+        :content="currentResume.content"
+        :settings="currentResume.settings"
+        :theme="currentResume.theme"
+      />
     </ClientOnly>
 
     <!-- 导出按钮 -->

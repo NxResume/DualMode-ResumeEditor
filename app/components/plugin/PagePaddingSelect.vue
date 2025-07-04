@@ -10,12 +10,19 @@ import {
 } from '@/components/ui/select'
 import { pagePaddingList } from '~/constants'
 
-const resumeSettingsStore = useResumeSettingsStore()
+defineProps<{
+  data?: number
+}>()
+
+const emit = defineEmits<{
+  (e: 'update:data', data: any): void
+}>()
+
 const { t } = useI18n()
 </script>
 
 <template>
-  <Select v-model="resumeSettingsStore.currentSettings.pagePadding">
+  <Select :model-value="data" @update:model-value="emit('update:data', $event)">
     <SelectTrigger class="text-xs p-1 bg-white h-6 w-14 cursor-pointer">
       <SelectValue :placeholder="t('pagePaddingSelect.placeholder')" />
     </SelectTrigger>

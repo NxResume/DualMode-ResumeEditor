@@ -1,9 +1,10 @@
 <script setup lang="ts">
+import type { ResumeData } from '~~/types/resume'
 import { Copy, Edit, Plus, Trash2 } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import resumeController from '~/composables/action/resume'
 
-const resumeStore = useResumeStore()
 const router = useRouter()
 const localePath = useLocalePath()
 const { status, signIn } = useAuth()
@@ -13,9 +14,11 @@ const newResumeName = ref('')
 const editingResumeId = ref<string | null>(null)
 const editingResumeName = ref('')
 
+const resumes = ref<ResumeData[]>([])
+
 async function handleCreateResume() {
   if (newResumeName.value.trim()) {
-    const newResume = await resumeStore.createResume(newResumeName.value.trim())
+    const newResume = await resumeController.createResume(newResumeName.value.trim())
     showCreateDialog.value = false
     newResumeName.value = ''
     router.push(localePath({
@@ -32,12 +35,15 @@ function handleEditResume(id: string) {
   }))
 }
 
-function handleDuplicateResume(id: string) {
-  resumeStore.duplicateResume(id)
+async function reloadResumes() {
+  resumes.value = await resumeController.fetchResumes()
 }
 
-function handleDeleteResume(id: string) {
-  resumeStore.deleteResume(id)
+async function handleDeleteResume(id: string) {
+  const res = await resumeController.deleteResume(id)
+  if (res.success) {
+    reloadResumes()
+  }
 }
 
 function formatDate(date: Date) {
@@ -55,20 +61,32 @@ function startEditResumeName(resume: any) {
   })
 }
 
-function saveEditResumeName(resume: any) {
+function saveEditResumeName(current: any) {
   if (
-    editingResumeId.value === resume.id
+    editingResumeId.value === current.id
     && editingResumeName.value.trim()
-    && editingResumeName.value !== resume.name
+    && editingResumeName.value !== current.name
   ) {
-    resumeStore.renameResume(resume.id, editingResumeName.value.trim())
+    resumeController.renameResume(current.id, editingResumeName.value.trim())
+      .then((res) => {
+        if (res) {
+          reloadResumes()
+          editingResumeId.value = null
+        }
+      })
   }
-  editingResumeId.value = null
 }
 
-onMounted(async () => {
+async function handleDuplicateResume(id: string) {
+  const res = await resumeController.duplicateResume(id, resumes.value)
+  if (res) {
+    reloadResumes()
+  }
+}
+
+onMounted(() => {
   if (status.value === 'authenticated') {
-    await resumeStore.fetchResumes()
+    reloadResumes()
   }
 })
 
@@ -134,7 +152,7 @@ definePageMeta({
       <!-- 已登录状态 -->
       <ClientOnly v-else>
         <!-- Resume Empty State -->
-        <div v-if="resumeStore.resumes.length === 0" class="py-24 text-center col-span-full">
+        <div v-if="resumes.length === 0" class="py-24 text-center col-span-full">
           <div class="flex flex-col items-center justify-center">
             <div class="i-ri-file-list-3-line text-7xl text-gray-300 mb-4" />
             <h2 class="text-2xl text-gray-700 font-bold mb-2">
@@ -155,7 +173,7 @@ definePageMeta({
         </div>
         <div v-else class="gap-6 grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2">
           <div
-            v-for="resume in resumeStore.resumes"
+            v-for="resume in resumes"
             :key="resume.id"
             class="p-6 rounded-lg bg-white shadow-md transition-shadow hover:shadow-lg"
           >

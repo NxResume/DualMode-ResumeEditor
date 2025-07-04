@@ -12,7 +12,14 @@ import {
 } from '@/components/ui/dialog'
 import { reTheme } from '~/utils'
 
-const resumeStore = useResumeStore()
+const props = defineProps<{
+  modelValue: ThemeName
+}>()
+
+const emit = defineEmits<{
+  (e: 'update:modelValue', value: ThemeName): void
+}>()
+
 const { t } = useI18n()
 
 const themeList = computed(() => {
@@ -21,14 +28,14 @@ const themeList = computed(() => {
       value: theme,
       label: theme,
       image: `/assets/themes/${theme}.png`,
-      isSelected: theme === resumeStore.currentResume?.theme,
+      isSelected: theme === props.modelValue,
     }
   })
 })
 
 function handleThemeSelect(theme: ThemeName) {
-  if (resumeStore.currentResume && theme)
-    resumeStore.currentResume.theme = theme
+  if (theme)
+    emit('update:modelValue', theme)
 
   reTheme.setTheme(theme)
 }

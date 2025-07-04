@@ -9,11 +9,17 @@ import {
 } from '@/components/ui/select'
 import { fontList } from '~/constants'
 
-const resumeSettingsStore = useResumeSettingsStore()
+defineProps<{
+  data?: string
+}>()
+
+const emit = defineEmits<{
+  (e: 'update:data', data: any): void
+}>()
 </script>
 
 <template>
-  <Select v-model="resumeSettingsStore.currentSettings.fontname">
+  <Select :model-value="data" @update:model-value="emit('update:data', $event)">
     <SelectTrigger class="text-xs bg-white h-6 w-[100px] cursor-pointer">
       <SelectValue placeholder="Select a font" />
     </SelectTrigger>

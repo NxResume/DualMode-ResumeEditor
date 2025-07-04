@@ -8,7 +8,7 @@ import { WysiwygTags } from '~/constants'
 
 const props = defineProps<{
   modelValue: string | undefined
-  mode: 'source' | 'wysiwyg'
+  mode: 'source' | 'wysiwyg' | undefined
 }>()
 
 const emit = defineEmits<{

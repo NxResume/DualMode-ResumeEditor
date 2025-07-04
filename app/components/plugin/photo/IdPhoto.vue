@@ -10,8 +10,14 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 
+const props = defineProps<{
+  resumeContent: string
+}>()
+const emit = defineEmits<{
+  (e: 'update:resumeContent', content: string): void
+}>()
+
 const { t } = useI18n()
-const resumeStore = useResumeStore()
 
 const { files, open, reset } = useFileDialog({
   accept: 'image/*', // Set to accept only image files
@@ -24,12 +30,12 @@ const imagePreviewUrl = ref<string | null>(null)
 const dialogOpen = ref(false)
 const loading = ref(false)
 
-function getIdPhotoSrcFromContent(content: string) {
+function getIdPhotoSrcFromContent() {
   const imgTagRegex = /<img\b[^>]*>/gi
   const srcRegex = /\bsrc\s*=\s*["']([^"']+)["']/i
   const idRegex = /\bid\s*=\s*["']id-photo["']/i
 
-  const imgTags = content.match(imgTagRegex)
+  const imgTags = props.resumeContent.match(imgTagRegex)
   if (!imgTags)
     return null
 
@@ -43,8 +49,8 @@ function getIdPhotoSrcFromContent(content: string) {
   return null
 }
 
-watch(() => resumeStore.resumeContent, () => {
-  const src = getIdPhotoSrcFromContent(resumeStore.resumeContent)
+watch(() => props.resumeContent, () => {
+  const src = getIdPhotoSrcFromContent()
   if (src) {
     imagePreviewUrl.value = src
   }
@@ -54,7 +60,7 @@ watch(() => resumeStore.resumeContent, () => {
 })
 
 onMounted(() => {
-  const src = getIdPhotoSrcFromContent(resumeStore.resumeContent)
+  const src = getIdPhotoSrcFromContent()
   if (src) {
     imagePreviewUrl.value = src
   }
@@ -84,10 +90,10 @@ function handleReset() {
     URL.revokeObjectURL(imagePreviewUrl.value)
     imagePreviewUrl.value = null
   }
-  // 移除resumeStore.resumeContent中的id-photo图片
-  const imgTagRegex = /<img[^>]*id\s*=\s*['"]id-photo['"][^>]*>/gi
 
-  resumeStore.resumeContent = resumeStore.resumeContent.replace(imgTagRegex, '')
+  const imgTagRegex = /<img[^>]*id\s*=\s*['"]id-photo['"][^>]*>/gi
+  emit('update:resumeContent', props.resumeContent.replace(imgTagRegex, ''))
+
   dialogOpen.value = false // 关闭 Dialog
 }
 
@@ -113,10 +119,10 @@ function handleConfirm() {
         if (result && result.Jobs) {
           const imgTag = `<img src="${result.Jobs}" id="id-photo" data-id-photo alt="" srcset="">`
           const imgTagRegex = /<img[^>]*id\s*=\s*['"]id-photo['"][^>]*>/gi
-          let newContent = resumeStore.resumeContent.replace(imgTagRegex, '')
+          let newContent = props.resumeContent.replace(imgTagRegex, '')
           newContent = `${imgTag}\n\n${newContent.trim()}`
-          if (resumeStore.currentResume && resumeStore.currentResume?.content !== newContent)
-            resumeStore.resumeContent = newContent
+          if (props?.resumeContent !== newContent)
+            emit('update:resumeContent', newContent)
 
           dialogOpen.value = false // 上传成功后关闭 Dialog
         }

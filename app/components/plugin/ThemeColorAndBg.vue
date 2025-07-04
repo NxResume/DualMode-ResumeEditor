@@ -14,8 +14,16 @@ import {
 import { pageBgList, presetColors } from '~/constants'
 import 'vue-color/style.css'
 
+const props = defineProps<{
+  pageBackground?: string
+  pageThemeColor?: string
+}>()
+const emit = defineEmits<{
+  (e: 'update:pageBackground', value: string): void
+  (e: 'update:pageThemeColor', value: string): void
+}>()
+
 const isColorPickerOpen = ref(false)
-const resumeSettingsStore = useResumeSettingsStore()
 const { t } = useI18n()
 
 const color = defineModel<string>({
@@ -25,26 +33,25 @@ const color = defineModel<string>({
 const backgroundList = computed(() => {
   return pageBgList?.map(item => ({
     ...item,
-    isSelected: item.value === resumeSettingsStore.currentSettings.pageBackground,
+    isSelected: item.value === props.pageBackground,
   })) ?? []
 })
 
 const currentColorValue = computed(() => {
-  return resumeSettingsStore.currentSettings.pageThemeColor === 'default'
+  return props.pageThemeColor === 'default' || !props.pageThemeColor
     ? 'rgb(0,0,0)'
-    : `rgb(${resumeSettingsStore.currentSettings.pageThemeColor})`
+    : `rgb(${props.pageThemeColor})`
 })
 
 function selectPresetColor(colorValue: string) {
   const rgb = tinycolor(colorValue).toRgb()
   const rgbString = `${rgb.r},${rgb.g},${rgb.b}`
-
-  resumeSettingsStore.currentSettings.pageThemeColor = rgbString
+  emit('update:pageThemeColor', rgbString)
   color.value = colorValue
 }
 
 function handleBackgroundSelect(backgroundValue: string) {
-  resumeSettingsStore.currentSettings.pageBackground = backgroundValue
+  emit('update:pageBackground', backgroundValue)
 }
 
 function toggleColorPicker() {
@@ -58,7 +65,7 @@ function closeColorPicker() {
 watch(color, (newColor) => {
   if (newColor && newColor !== currentColorValue.value) {
     const rgb = tinycolor(newColor).toRgb()
-    resumeSettingsStore.currentSettings.pageThemeColor = `${rgb.r},${rgb.g},${rgb.b}`
+    emit('update:pageThemeColor', `${rgb.r},${rgb.g},${rgb.b}`)
   }
 }, { immediate: false })
 
@@ -101,10 +108,10 @@ onMounted(() => {
           <div class="flex items-center space-x-3">
             <div
               class="border-2 border-gray-200 rounded-lg h-10 w-10 cursor-pointer shadow-sm transition-all hover:scale-105"
-              :style="{ backgroundColor: `rgb(${resumeSettingsStore.currentSettings.pageThemeColor})` }"
+              :style="{ backgroundColor: `rgb(${pageThemeColor})` }"
               @click.stop="toggleColorPicker"
             />
-            <span class="text-sm text-gray-600 font-mono">{{ resumeSettingsStore.currentSettings.pageThemeColor }}</span>
+            <span class="text-sm text-gray-600 font-mono">{{ pageThemeColor }}</span>
           </div>
         </div>
 

@@ -1,27 +1,39 @@
 <script setup lang="ts">
 import type { EditCodeMirror, EditMarkdownPreview } from '#components'
+import type { ResumeData } from '~~/types/resume'
+import { isClient } from '@vueuse/core'
+import resumeController from '~/composables/action/resume'
 
 const route = useRoute()
-const resumeStore = useResumeStore()
+const currentResume = ref<ResumeData>({
+  content: '',
+  id: '',
+  name: '',
+  theme: '',
+  plugins: [],
+  createdAt: new Date(),
+  updatedAt: new Date(),
+  settings: getDefaultSettings(),
+})
 
 // 根据路由参数切换简历
 const resumeId = (route.params as Record<string, any>)?.id as string | undefined
 
-watch(() => resumeId, () => {
+async function fetchCurrentResume() {
   if (!resumeId)
     return
 
-  resumeStore.fetchResumesById(resumeId)
+  currentResume.value = await resumeController.fetchResumeById(resumeId) as ResumeData
+}
+
+watch(() => resumeId, () => {
+  fetchCurrentResume()
 })
 
 onMounted(() => {
-  if (!resumeId)
-    return
-
-  resumeStore.fetchResumesById(resumeId)
+  fetchCurrentResume()
 })
 
-const resumeSettingsStore = useResumeSettingsStore()
 const el = useTemplateRef('el')
 const leftRef = ref<InstanceType<typeof EditCodeMirror>>()
 const preRef = ref<InstanceType<typeof EditMarkdownPreview>>()
@@ -42,9 +54,9 @@ onMounted(start)
 onUnmounted(stop)
 
 // app/pages/edit/[id].vue
-watch(() => [resumeSettingsStore.currentSettings.isScrollable, resumeSettingsStore.currentSettings.editorMode], () => {
-  if (resumeSettingsStore.currentSettings.isScrollable) {
-    watch(() => resumeSettingsStore.currentSettings.isScrollable, (newValue) => {
+watch(() => [currentResume.value?.settings?.isScrollable, currentResume.value?.settings?.editorMode], () => {
+  if (currentResume.value?.settings?.isScrollable) {
+    watch(() => currentResume.value?.settings?.isScrollable, (newValue) => {
       if (!newValue) {
         stop()
       }
@@ -61,6 +73,20 @@ async function handleExport(type: 'pdf' | 'png') {
 
   return preRef.value?.exportToPDF()
 }
+
+async function updateData(data: ResumeData) {
+  currentResume.value = data
+}
+
+watch(
+  () => currentResume.value.settings,
+  (settings) => {
+    if (settings && isClient) {
+      useResumeStyleSync(settings)
+    }
+  },
+  { immediate: true, deep: true },
+)
 </script>
 
 <template>
@@ -71,7 +97,7 @@ async function handleExport(type: 'pdf' | 'png') {
       class="p-2 pt-10 rounded-lg bg-white flex-none h-full w-480px shadow-lg overflow-x-hidden overflow-y-auto dark:bg-gray-800"
     >
       <ClientOnly>
-        <EditCodeMirror v-model="resumeStore.resumeContent" :mode="resumeSettingsStore.currentSettings.editorMode" />
+        <EditCodeMirror :model-value="currentResume?.content" :mode="currentResume.settings?.editorMode" @update:model-value="currentResume.content = $event" />
       </ClientOnly>
     </div>
     <!-- 右侧预览 -->
@@ -83,11 +109,18 @@ async function handleExport(type: 'pdf' | 'png') {
         }"
       >
         <ClientOnly>
-          <EditMarkdownPreview ref="preRef" :content="resumeStore.resumeContent" />
+          <EditMarkdownPreview
+            ref="preRef" :content="currentResume?.content"
+            :settings="currentResume?.settings"
+            @update:image-position="(e) => {
+              if (currentResume.settings)
+                currentResume.settings.imagePosition = e
+            }"
+          />
         </ClientOnly>
       </div>
       <ClientOnly>
-        <Plugin :download-img="() => handleExport('png')" :download-pdf="() => handleExport('pdf')" />
+        <Plugin :data="currentResume" :download-img="() => handleExport('png')" :download-pdf="() => handleExport('pdf')" @update:data="updateData" />
       </ClientOnly>
     </div>
   </div>

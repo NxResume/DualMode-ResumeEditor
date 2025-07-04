@@ -74,7 +74,10 @@ export class LocalStorageProvider implements IStorageProvider {
     return updatedResume
   }
 
-  async deleteResume(id: string): Promise<void> {
+  async deleteResume(id: string): Promise<{
+    success: boolean
+    message: string
+  }> {
     if (!import.meta.client)
       throw new Error('Local storage only available on client')
 
@@ -86,6 +89,10 @@ export class LocalStorageProvider implements IStorageProvider {
     const allSettings = this.getAllSettings()
     delete allSettings[id]
     localStorage.setItem(this.SETTINGS_KEY, JSON.stringify(allSettings))
+    return {
+      success: true,
+      message: '删除成功',
+    }
   }
 
   async getSettings(resumeId: string): Promise<ResumeSettings> {

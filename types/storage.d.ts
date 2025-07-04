@@ -11,7 +11,10 @@ export interface IStorageProvider {
   getResumeById: (id: string) => Promise<ResumeData | undefined>
   createResume: (resume: Omit<ResumeData, 'id' | 'createdAt' | 'updatedAt'>) => Promise<ResumeData>
   updateResume: (id: string, updates: Partial<ResumeData>) => Promise<ResumeData>
-  deleteResume: (id: string) => Promise<void>
+  deleteResume: (id: string) => Promise<{
+    success: boolean
+    message: string
+  }>
 
   // 设置相关
   getSettings: (resumeId: string) => Promise<ResumeSettings>

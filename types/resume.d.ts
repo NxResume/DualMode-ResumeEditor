@@ -2,11 +2,12 @@ export interface ResumeData {
   id: string
   name: string
   content: string
-  theme: string
+  theme: ThemeName
   plugins: string[]
   createdAt: Date
   updatedAt: Date
   isDefault?: boolean
+  settings?: ResumeSettings
 }
 
 export interface ResumeSettings {
