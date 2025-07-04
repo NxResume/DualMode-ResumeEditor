@@ -38,9 +38,7 @@ function handleDuplicateResume(id: string) {
 }
 
 function handleDeleteResume(id: string) {
-  if (resumeStore.resumes.length > 1) {
-    resumeStore.deleteResume(id)
-  }
+  resumeStore.deleteResume(id)
 }
 
 function formatDate(date: Date) {
@@ -136,8 +134,27 @@ definePageMeta({
 
       <!-- 已登录状态 -->
       <ClientOnly v-else>
-        <!-- Resume Grid -->
-        <div class="gap-6 grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2">
+        <!-- Resume Empty State -->
+        <div v-if="resumeStore.resumes.length === 0" class="py-24 text-center col-span-full">
+          <div class="flex flex-col items-center justify-center">
+            <div class="i-ri-file-list-3-line text-7xl text-gray-300 mb-4" />
+            <h2 class="text-2xl text-gray-700 font-bold mb-2">
+              {{ $t('resumes.emptyTitle') }}
+            </h2>
+            <p class="text-gray-500 mb-6">
+              {{ $t('resumes.emptyDescription') }}
+            </p>
+            <Button
+              class="text-white px-6 py-3 bg-black cursor-pointer hover:bg-gray-900"
+              size="lg"
+              @click="showCreateDialog = true"
+            >
+              <Plus class="h-4 w-4" />
+              {{ $t('resumes.createNew') }}
+            </Button>
+          </div>
+        </div>
+        <div v-else class="gap-6 grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2">
           <div
             v-for="resume in resumeStore.resumes"
             :key="resume.id"
@@ -170,7 +187,6 @@ definePageMeta({
                   <Copy class="h-4 w-4" />
                 </button>
                 <button
-                  v-if="resumeStore.resumes.length > 1"
                   class="text-gray-600 p-2 rounded cursor-pointer hover:text-red-600 hover:bg-red-50"
                   :title="$t('resumes.delete')"
                   @click="handleDeleteResume(resume.id)"

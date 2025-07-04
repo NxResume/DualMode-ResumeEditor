@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
+import LoadingButton from '@/components/ui/button/LoadingButton.vue'
 import Input from '@/components/ui/input/Input.vue'
 import {
   PinInput,
@@ -144,31 +145,49 @@ function handlePinComplete(_val: string[]) {
             </template>
           </PinInputGroup>
         </PinInput>
-        <button
+        <LoadingButton
           class="text-xs text-white px-3 py-2 rounded bg-gray-800 cursor-pointer"
+          :loading="loading && countdown === 0"
           :disabled="loading || countdown > 0"
           style="white-space: nowrap;"
+          size="sm"
+          variant="secondary"
           @click="handleSendCode"
         >
+          <template #loading>
+            {{ t('login.sending') }}
+          </template>
           {{ countdown > 0 ? t('login.resend', { count: countdown }) : t('login.sendCode') }}
-        </button>
+        </LoadingButton>
       </div>
-      <button
+      <LoadingButton
         class="text-white mt-2 py-2 rounded bg-gray-700 w-full"
+        :loading="loading"
         :disabled="pin.join('').length !== 5 || loading"
+        size="default"
+        variant="default"
         @click="handleRegister"
       >
+        <template #loading>
+          {{ t('login.registering') }}
+        </template>
         {{ t('login.register') }}
-      </button>
+      </LoadingButton>
     </template>
     <template v-else>
-      <button
+      <LoadingButton
         class="text-white py-2 rounded bg-gray-800 w-full"
+        :loading="loading"
         :disabled="loading"
+        size="default"
+        variant="default"
         @click="handleLogin"
       >
+        <template #loading>
+          {{ t('login.logining') }}
+        </template>
         {{ t('login.login') }}
-      </button>
+      </LoadingButton>
     </template>
     <div v-if="message" class="text-sm text-red-500 mt-2">
       {{ message }}
