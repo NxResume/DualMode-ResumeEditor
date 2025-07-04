@@ -6,7 +6,7 @@
 
 <p align="center">
 <a href="README_US.md"><img src="https://img.shields.io/badge/-English-blue?logo=markdown" alt="English"></a><a href="https://resume.ryanuo.cc" target="_blank">
-<img src="https://img.shields.io/badge/在线体验-点击进入-brightgreen?logo=vercel" alt="在线体验">
+<img src="https://img.shields.io/badge/Web-Experience-brightgreen?logo=vercel" alt="Experience">
 </a>
 </p>
 
@@ -86,6 +86,27 @@
 - **导出**：jsPDF, html-to-image, jszip
 - **PWA**：@vite-pwa/nuxt
 - **国际化**：vue-i18n
+
+## 🖇️ 系统核心流程序列图
+
+```mermaid
+sequenceDiagram
+    participant U as 用户
+    participant FE as 前端
+    participant BE as 后端
+    participant DB as 数据库
+
+    U->>FE: 打开简历编辑器
+    FE->>BE: 请求用户认证状态
+    BE->>DB: 查询用户信息
+    DB-->>BE: 返回用户信息
+    BE-->>FE: 返回认证结果
+    FE->>BE: 保存/同步简历内容
+    BE->>DB: 写入/更新简历数据
+    DB-->>BE: 操作结果
+    BE-->>FE: 返回保存结果
+    FE-->>U: 显示保存/同步状态
+```
 
 ## 🤝 贡献与许可
 
