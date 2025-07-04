@@ -50,17 +50,15 @@ definePageMeta({
 
 const { stop, start } = useScrollSync(leftRef, el)
 
-onMounted(start)
 onUnmounted(stop)
 
-// app/pages/edit/[id].vue
-watch(() => [currentResume.value?.settings?.isScrollable, currentResume.value?.settings?.editorMode], () => {
-  if (currentResume.value?.settings?.isScrollable) {
-    watch(() => currentResume.value?.settings?.isScrollable, (newValue) => {
-      if (!newValue) {
-        stop()
-      }
-    })
+// 修复滚动同步控制逻辑
+watch(() => currentResume.value?.settings?.isScrollable, (newValue) => {
+  if (newValue) {
+    start()
+  }
+  else {
+    stop()
   }
 }, {
   immediate: true,
