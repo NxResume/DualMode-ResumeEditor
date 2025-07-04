@@ -1,7 +1,13 @@
  <p align="center">
-<a href="README.md"><img src="https://img.shields.io/badge/-中文-red?logo=markdown" alt="中文"></a><a href="https://resume.ryanuo.cc" target="_blank">
+<img src="https://raw.githubusercontent.com/NxResume/DualMode-ResumeEditor/refs/heads/main/public/pwa-512x512.png" style="width:100px;" />
+</p>
+
+ <h1 align="center">MARK RESUME</h1>
+ <p align="center">
+<a href="README.md"><img src="https://img.shields.io/badge/Docs-中文-red?logo=markdown" alt="中文"></a><a href="https://resume.ryanuo.cc" target="_blank">
 <img src="https://img.shields.io/badge/Web-Experience-brightgreen?logo=vercel" alt="Experience">
-</a>
+</a><a href="https://github.com/NxResume/nuxt-resume-editor"><img src="https://img.shields.io/badge/Storage-Local-orange?logo=github" alt="GitHub"></a>
+<a href="https://ryanuo.cc/posts/resume"><img src="https://img.shields.io/badge/Details-Doc-black?logo=decapcms" alt="Document"></a>
 </p>
 
 # DualMode-ResumeEditor Resume Editor
