@@ -49,6 +49,7 @@ catalogs:
     '@prisma/client': ^6.11.1
     '@sidebase/nuxt-auth': ^1.0.0
     '@vueuse/core': ^13.5.0
+    case-police: ^2.0.0
     codemirror: ^6.0.2
     font-awesome: ^4.7.0
     html-to-image: ^1.11.13

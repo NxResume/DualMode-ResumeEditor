@@ -128,6 +128,9 @@ catalogs:
     '@vueuse/core':
       specifier: ^13.5.0
       version: 13.5.0
+    case-police:
+      specifier: ^2.0.0
+      version: 2.0.0
     codemirror:
       specifier: ^6.0.2
       version: 6.0.2
@@ -282,6 +285,9 @@ importers:
       bcrypt:
         specifier: catalog:build
         version: 6.0.0
+      case-police:
+        specifier: catalog:frontend
+        version: 2.0.0
       class-variance-authority:
         specifier: catalog:dev
         version: 0.7.1
@@ -2954,6 +2960,10 @@ packages:
   canvg@3.0.11:
     resolution: {integrity: sha512-5ON+q7jCTgMp9cjpu4Jo6XbvfYwSB2Ow3kzHKfIyJfaCAOHLbdKPQqGKgfED/R5B+3TFFfe8pegYA+b423SRyA==}
     engines: {node: '>=10.0.0'}
+
+  case-police@2.0.0:
+    resolution: {integrity: sha512-jPVlo+mrmaLQOc4PH00noGFcJsZBWy+eKnAoiqdDJZAx23l6JqvxzElug0GgvZf8zDOODWs9PmEY9GjZb+oMHg==}
+    hasBin: true
 
   ccount@2.0.1:
     resolution: {integrity: sha512-eyrF0jiFpY+3drT6383f1qhkbGsLSifNAjA61IUjZjmLCWjItY6LB9ft9YhoDgwfmclB2zhu51Lc7+95b8NRAg==}
@@ -10106,6 +10116,8 @@ snapshots:
       stackblur-canvas: 2.7.0
       svg-pathdata: 6.0.3
     optional: true
+
+  case-police@2.0.0: {}
 
   ccount@2.0.1: {}
 

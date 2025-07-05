@@ -156,6 +156,7 @@ const localePath = useLocalePath()
       <Label class="plugin-label">{{ t('plugin.fullscreen') }}</Label>
     </div>
     <PluginExportButton :on-export="downloadPdf" />
+    <PluginCorrectCase :content="data.content" @update:content="updateData('content', $event)" />
     <NuxtLink
       :to="localePath({
         name: 'preview-id',

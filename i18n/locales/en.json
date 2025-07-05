@@ -78,6 +78,7 @@
     "exportImage": "Export Image"
   },
   "plugin": {
+    "correctcase": "Correct Case",
     "save": "Save",
     "preview": "Preview",
     "resumeTemplate": "Resume Template",

@@ -47,6 +47,7 @@
     "@vueuse/core": "catalog:frontend",
     "@vueuse/nuxt": "catalog:build",
     "bcrypt": "catalog:build",
+    "case-police": "catalog:frontend",
     "class-variance-authority": "catalog:dev",
     "clsx": "catalog:dev",
     "codemirror": "catalog:frontend",
@@ -78,6 +79,7 @@
     "vue-color": "catalog:frontend",
     "vue-tsc": "catalog:dev",
     "vue3-moveable": "catalog:frontend"
+
   },
   "resolutions": {
     "@nuxt/devtools": "catalog:build",
