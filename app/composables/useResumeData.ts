@@ -23,7 +23,12 @@ export function useResumeData() {
     if (!resumeId)
       return
 
-    currentResume.value = await resumeController.fetchResumeById(resumeId) as ResumeData
+    const result = await resumeController.fetchResumeById(resumeId) as ResumeData
+    if (!result.settings) {
+      result.settings = getDefaultSettings()
+    }
+
+    currentResume.value = result
   }
 
   // 监听路由变化
