@@ -3,8 +3,7 @@ import process from 'node:process'
 import { NuxtAuthHandler } from '#auth'
 import { encode } from '@auth/core/jwt'
 import GithubProvider from '@auth/core/providers/github'
-import GoogleProvider from '@auth/core/providers/google'
-import { CredentialsProvider, getAdapter, GiteeProvider } from '~/utils/providers'
+import { CredentialsProvider, getAdapter, GiteeProvider, GoogleProvider } from '~/utils/providers'
 
 const isDev = import.meta.dev
 const SESSION_MAX_AGE = 30 * 24 * 60 * 60
@@ -21,11 +20,6 @@ export default NuxtAuthHandler({
       clientId: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
       allowDangerousEmailAccountLinking: true,
-      authorization: {
-        params: {
-          prompt: 'consent',
-        },
-      },
     }),
     GiteeProvider({
       clientId: process.env.GITEE_CLIENT_ID,
