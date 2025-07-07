@@ -16,7 +16,7 @@ const isDev = import.meta.dev
     <section class="border-b border-gray-200 bg-white">
       <div class="mx-auto px-4 py-12 max-w-4xl lg:px-8 sm:px-6">
         <div class="text-center">
-          <h2 class="text-3xl text-gray-900 font-bold sm:text-4xl">
+          <h2 class="text-3xl text-gray-900 font-bold font-serif sm:text-4xl">
             {{ $t('app.title') }}
           </h2>
           <p class="text-lg text-gray-600 mt-4">

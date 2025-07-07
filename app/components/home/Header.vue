@@ -14,7 +14,7 @@ const navLinks = [
       <!-- 左侧 Logo 和标题 -->
       <div class="flex gap-3 items-center">
         <img src="/nuxt.svg" alt="Logo" class="h-8 w-8">
-        <h1 class="text-xl text-gray-900 tracking-tight font-bold">
+        <h1 class="text-xl text-gray-900 tracking-tight font-bold font-serif">
           {{ $t('app.title') }}
         </h1>
       </div>
