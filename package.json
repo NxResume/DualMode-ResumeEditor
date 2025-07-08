@@ -79,7 +79,6 @@
     "vue-color": "catalog:frontend",
     "vue-tsc": "catalog:dev",
     "vue3-moveable": "catalog:frontend"
-
   },
   "resolutions": {
     "@nuxt/devtools": "catalog:build",

@@ -51,7 +51,8 @@ function getIconSVG(iconName: string): string {
   // Get content for icon
   const iconData = getIconData(icons, iconName)
   if (!iconData) {
-    throw new Error(`Icon "${iconName}" is missing`)
+    console.warn(`Icon "${iconName}" is missing`)
+    return `Icon "${iconName}" is missing`
   }
 
   // Use it to render icon
