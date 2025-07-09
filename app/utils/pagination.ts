@@ -227,6 +227,8 @@ export function autoPaginate(
       wrapper.innerHTML = (wrapper.childNodes[0] as any)!.outerHTML
     }
 
+    console.warn('[Pagination]', 'Generated', currentPageIndex + 1, 'pages')
+    console.warn('tempContainer removed', tempContainer)
     // 清理临时容器
     document.body.removeChild(tempContainer)
   }

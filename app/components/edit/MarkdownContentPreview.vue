@@ -31,6 +31,7 @@ watch(() => [
   props.settings?.pageLineHeight,
   props.settings?.fontname,
 ], () => {
+  console.warn('MarkdownPurePreview watch')
   handleAutoPaginate()
 }, {
   immediate: true,
