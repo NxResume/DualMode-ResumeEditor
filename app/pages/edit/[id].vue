@@ -66,6 +66,7 @@ async function handleExport(type: 'pdf' | 'png') {
           <EditMarkdownPreview
             ref="preRef" :content="currentResume?.content"
             :settings="currentResume?.settings"
+            :theme="currentResume?.theme"
             @update:image-position="(e) => {
               if (currentResume.settings)
                 currentResume.settings.imagePosition = e
