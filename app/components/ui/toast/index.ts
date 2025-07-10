@@ -21,13 +21,13 @@ export const toastVariants = cva(
       variant: {
         default: 'border bg-background text-foreground',
         destructive:
-                    'destructive group border-destructive bg-destructive text-destructive-foreground',
+          'destructive group border-destructive bg-background text-foreground',
         success:
-          'border-success bg-success text-success-foreground',
+          'border-success bg-background text-foreground',
         info:
-          'border-info bg-info text-info-foreground',
+          'border-info bg-background text-foreground',
         warning:
-          'border-warning bg-warning text-warning-foreground',
+          'border-warning bg-background text-foreground',
       },
     },
     defaultVariants: {

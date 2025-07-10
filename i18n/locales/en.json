@@ -48,7 +48,9 @@
     "lastModified": "Last Modified",
     "created": "Created",
     "emptyTitle": "No resumes yet",
-    "emptyDescription": "You haven't created any resumes. Click below to create your first one!"
+    "emptyDescription": "You haven't created any resumes. Click below to create your first one!",
+    "limitTitle": "Resume Limit Reached",
+    "limitDescription": "You can create up to {max} resumes. Please delete some before creating new ones."
   },
   "common": {
     "cancel": "Cancel",

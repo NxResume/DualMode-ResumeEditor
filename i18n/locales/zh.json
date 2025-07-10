@@ -48,7 +48,9 @@
     "lastModified": "最后修改",
     "created": "创建时间",
     "emptyTitle": "暂无简历",
-    "emptyDescription": "你还没有创建任何简历，点击下方按钮新建一份吧！"
+    "emptyDescription": "你还没有创建任何简历，点击下方按钮新建一份吧！",
+    "limitTitle": "简历数量已达上限",
+    "limitDescription": "最多只能创建{max}份简历，请先删除部分简历后再试。"
   },
   "common": {
     "cancel": "取消",

@@ -4,12 +4,15 @@ import { Copy, Edit, Plus, Trash2 } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
+import { useToast } from '@/components/ui/toast/use-toast'
 import resumeController from '~/composables/action/resume'
 
 const router = useRouter()
 const localePath = useLocalePath()
 const { status, signIn } = useAuth()
+const { toast } = useToast()
 
+const MAX_RESUMES = 10
 const showCreateDialog = ref(false)
 const newResumeName = ref('')
 const editingResumeId = ref<string | null>(null)
@@ -19,6 +22,14 @@ const resumes = ref<ResumeData[]>([])
 const loading = ref(false)
 
 async function handleCreateResume() {
+  if (resumes.value.length >= MAX_RESUMES) {
+    toast({
+      title: $t('resumes.limitTitle'),
+      description: $t('resumes.limitDescription', { max: MAX_RESUMES }),
+      variant: 'destructive',
+    })
+    return
+  }
   if (newResumeName.value.trim()) {
     const newResume = await resumeController.createResume(newResumeName.value.trim())
     showCreateDialog.value = false
@@ -82,6 +93,14 @@ function saveEditResumeName(current: any) {
 }
 
 async function handleDuplicateResume(id: string) {
+  if (resumes.value.length >= MAX_RESUMES) {
+    toast({
+      title: $t('resumes.limitTitle'),
+      description: $t('resumes.limitDescription', { max: MAX_RESUMES }),
+      variant: 'destructive',
+    })
+    return
+  }
   const res = await resumeController.duplicateResume(id, resumes.value)
   if (res) {
     reloadResumes()
@@ -109,8 +128,9 @@ definePageMeta({
             <div class="i-ri-arrow-left-line" />
           </NuxtLink>
           <div>
-            <h1 class="text-3xl text-gray-900 font-bold">
+            <h1 class="text-3xl text-gray-900 font-bold flex gap-2 items-center">
               {{ $t('resumes.title') }}
+              <span class="text-base text-gray-500 font-normal ml-2">{{ resumes.length }}/{{ MAX_RESUMES }}</span>
             </h1>
             <p class="text-gray-600 mt-2">
               {{ $t('resumes.description') }}
@@ -121,6 +141,7 @@ definePageMeta({
           v-if="status === 'authenticated'"
           class="text-white px-4 py-2 bg-black cursor-pointer hover:bg-gray-900"
           variant="default"
+          :disabled="resumes.length >= MAX_RESUMES"
           @click="showCreateDialog = true"
         >
           <Plus class="h-4 w-4" />
@@ -168,6 +189,7 @@ definePageMeta({
             <Button
               class="text-white px-6 py-3 bg-black cursor-pointer hover:bg-gray-900"
               size="lg"
+              :disabled="resumes.length >= MAX_RESUMES"
               @click="showCreateDialog = true"
             >
               <Plus class="h-4 w-4" />
@@ -272,7 +294,7 @@ definePageMeta({
           <Button variant="outline" @click="showCreateDialog = false">
             {{ $t('common.cancel') }}
           </Button>
-          <Button :disabled="!newResumeName.trim()" class="text-white bg-black hover:bg-gray-900" variant="default" @click="handleCreateResume">
+          <Button :disabled="!newResumeName.trim() || resumes.length >= MAX_RESUMES" class="text-white bg-black hover:bg-gray-900" variant="default" @click="handleCreateResume">
             {{ $t('common.create') }}
           </Button>
         </DialogFooter>
