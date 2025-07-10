@@ -3,6 +3,7 @@ import type { ResumeData } from '~~/types/resume'
 import { Copy, Edit, Plus, Trash2 } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Skeleton } from '@/components/ui/skeleton'
 import resumeController from '~/composables/action/resume'
 
 const router = useRouter()
@@ -15,6 +16,7 @@ const editingResumeId = ref<string | null>(null)
 const editingResumeName = ref('')
 
 const resumes = ref<ResumeData[]>([])
+const loading = ref(false)
 
 async function handleCreateResume() {
   if (newResumeName.value.trim()) {
@@ -36,7 +38,9 @@ function handleEditResume(id: string) {
 }
 
 async function reloadResumes() {
+  loading.value = true
   resumes.value = await resumeController.fetchResumes()
+  loading.value = false
 }
 
 async function handleDeleteResume(id: string) {
@@ -152,7 +156,7 @@ definePageMeta({
       <!-- 已登录状态 -->
       <ClientOnly v-else>
         <!-- Resume Empty State -->
-        <div v-if="resumes.length === 0" class="py-24 text-center col-span-full">
+        <div v-if="resumes.length === 0 && !loading" class="py-24 text-center col-span-full">
           <div class="flex flex-col items-center justify-center">
             <div class="i-ri-file-list-3-line text-7xl text-gray-300 mb-4" />
             <h2 class="text-2xl text-gray-700 font-bold mb-2">
@@ -171,7 +175,19 @@ definePageMeta({
             </Button>
           </div>
         </div>
-        <div v-else class="gap-6 grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2">
+        <!-- Loading Skeletons -->
+        <div v-if="loading" class="gap-6 grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2">
+          <div v-for="i in 3" :key="i">
+            <div class="flex flex-col space-y-3">
+              <Skeleton class="rounded-xl h-[125px] w-[250px]" />
+              <div class="space-y-2">
+                <Skeleton class="h-4 w-[250px]" />
+                <Skeleton class="h-4 w-[200px]" />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div v-else-if="resumes.length > 0" class="gap-6 grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2">
           <div
             v-for="resume in resumes"
             :key="resume.id"
