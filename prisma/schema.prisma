@@ -9,7 +9,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
@@ -20,13 +20,13 @@ model Account {
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String?
-  access_token      String?
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
   expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String?
-  session_state     String?
+  token_type        String? @db.Text
+  scope             String? @db.Text
+  id_token          String? @db.Text
+  session_state     String? @db.Text
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -66,17 +66,17 @@ model VerificationToken {
 model Resume {
   id        String   @id @default(cuid())
   name      String
-  content   String
+  content   String   @db.Text
   theme     String   @default("default")
-  plugins   String   // JSON string
+  plugins   String   @db.Text
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   isDefault Boolean  @default(false)
-  
+
   // 关联用户
   userId    String?
   user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+
   // 关联设置
   settings ResumeSettings?
 }
@@ -85,16 +85,16 @@ model ResumeSettings {
   id              String  @id @default(cuid())
   resumeId        String  @unique
   resume          Resume  @relation(fields: [resumeId], references: [id], onDelete: Cascade)
-  
+
   fontname        String  @default("default")
   pagePadding     Int     @default(36)
   pageLineHeight  Float   @default(1.9)
   pageBackground  String  @default("default")
   pageThemeColor  String  @default("0,0,0")
-  imagePosition   String  // JSON string: {top, left, scale}
+  imagePosition   String  @db.Text
   isScrollable    Boolean @default(false)
   editorMode      String  @default("source")
-  
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
