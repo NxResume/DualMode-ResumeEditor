@@ -51,7 +51,10 @@ async function handleExport(type: 'pdf' | 'png') {
       class="p-2 pt-10 rounded-lg bg-white flex-none h-full w-480px shadow-lg overflow-x-hidden overflow-y-auto dark:bg-gray-800"
     >
       <ClientOnly>
-        <EditCodeMirror :model-value="currentResume?.content" :mode="currentResume.settings?.editorMode" @update:model-value="currentResume.content = $event" />
+        <EditCodeMirror
+          :model-value="currentResume?.content" :mode="currentResume.settings?.editorMode"
+          @update:model-value="currentResume.content = $event"
+        />
       </ClientOnly>
     </div>
     <!-- 右侧预览 -->
@@ -64,18 +67,22 @@ async function handleExport(type: 'pdf' | 'png') {
       >
         <ClientOnly>
           <EditMarkdownPreview
-            ref="preRef" :content="currentResume?.content"
-            :settings="currentResume?.settings"
-            :theme="currentResume?.theme"
-            @update:image-position="(e) => {
+            ref="preRef" :content="currentResume?.content" :settings="currentResume?.settings"
+            :theme="currentResume?.theme" @update:image-position="(e) => {
               if (currentResume.settings)
                 currentResume.settings.imagePosition = e
+            }" @update:content="(e) => {
+              if (currentResume.content && e)
+                currentResume.content = e
             }"
           />
         </ClientOnly>
       </div>
       <ClientOnly>
-        <Plugin :data="currentResume" :download-img="() => handleExport('png')" :download-pdf="() => handleExport('pdf')" @update:data="updateResumeData" />
+        <Plugin
+          :data="currentResume" :download-img="() => handleExport('png')"
+          :download-pdf="() => handleExport('pdf')" @update:data="updateResumeData"
+        />
       </ClientOnly>
     </div>
   </div>
