@@ -9,6 +9,7 @@
 <img src="https://img.shields.io/badge/Web-体验-brightgreen?logo=vercel" alt="Experience">
 </a><a href="https://github.com/NxResume/nuxt-resume-editor"><img src="https://img.shields.io/badge/存储-本地-orange?logo=github" alt="GitHub"></a>
 <a href="https://ryanuo.cc/zh/posts/resume"><img src="https://img.shields.io/badge/细节-详解-black?logo=decapcms" alt="Document"></a>
+<a href="https://deepwiki.com/NxResume/DualMode-ResumeEditor"><img src="https://deepwiki.com/badge.svg" alt="Ask DeepWiki"></a>
 </p>
 
 一个基于 Nuxt 3 & Vue 3 的现代化、功能丰富的简历编辑器，支持 Markdown/WYSIWYG 双模式、GitHub 登录、本地与云端双存储、主题切换、PDF/图片/ZIP 导出、PWA 离线、国际化等特性。

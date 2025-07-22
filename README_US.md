@@ -8,6 +8,7 @@
 <img src="https://img.shields.io/badge/Web-Experience-brightgreen?logo=vercel" alt="Experience">
 </a><a href="https://github.com/NxResume/nuxt-resume-editor"><img src="https://img.shields.io/badge/Storage-Local-orange?logo=github" alt="GitHub"></a>
 <a href="https://ryanuo.cc/posts/resume"><img src="https://img.shields.io/badge/Details-Doc-black?logo=decapcms" alt="Document"></a>
+<a href="https://deepwiki.com/NxResume/DualMode-ResumeEditor"><img src="https://deepwiki.com/badge.svg" alt="Ask DeepWiki"></a>
 </p>
 
 # DualMode-ResumeEditor Resume Editor
