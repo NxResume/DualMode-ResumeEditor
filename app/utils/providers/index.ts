@@ -4,6 +4,7 @@ import { prisma } from '~/utils/db'
 import CredentialsProvider from '~/utils/providers/credentials'
 import GiteeProvider from '~/utils/providers/gitee'
 import GoogleProvider from '~/utils/providers/google'
+import LinuxDoProvider from '~/utils/providers/linuxdo'
 
 function stripUndefined<T>(obj: T) {
   const data = {} as T
@@ -39,4 +40,4 @@ function getAdapter() {
   return adapter as any
 }
 
-export { CredentialsProvider, getAdapter, GiteeProvider, GoogleProvider }
+export { CredentialsProvider, getAdapter, GiteeProvider, GoogleProvider, LinuxDoProvider }
