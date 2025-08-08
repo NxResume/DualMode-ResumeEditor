@@ -20,8 +20,11 @@ const editingResumeName = ref('')
 
 const resumes = ref<ResumeData[]>([])
 const loading = ref(false)
+const creatingResume = ref(false)
 
 async function handleCreateResume() {
+  if (creatingResume.value)
+    return
   if (resumes.value.length >= MAX_RESUMES) {
     toast({
       title: $t('resumes.limitTitle'),
@@ -31,13 +34,19 @@ async function handleCreateResume() {
     return
   }
   if (newResumeName.value.trim()) {
-    const newResume = await resumeController.createResume(newResumeName.value.trim())
-    showCreateDialog.value = false
-    newResumeName.value = ''
-    router.push(localePath({
-      name: 'edit-id',
-      params: { id: newResume.id },
-    }))
+    creatingResume.value = true
+    try {
+      const newResume = await resumeController.createResume(newResumeName.value.trim())
+      showCreateDialog.value = false
+      newResumeName.value = ''
+      router.push(localePath({
+        name: 'edit-id',
+        params: { id: newResume.id },
+      }))
+    }
+    finally {
+      creatingResume.value = false
+    }
   }
 }
 
@@ -228,7 +237,11 @@ definePageMeta({
                 </template>
                 <template v-else>
                   <span class="cursor-pointer select-text" @click="startEditResumeName(resume)">{{ resume.name }}</span>
-                  <button class="text-gray-500 ml-1 hover:text-black" :title="$t('resumes.edit')" @click="startEditResumeName(resume)">
+                  <button
+                    class="text-gray-500 ml-1 hover:text-black"
+                    :title="$t('resumes.edit')"
+                    @click="startEditResumeName(resume)"
+                  >
                     <Edit class="h-4 w-4" />
                   </button>
                 </template>
@@ -286,16 +299,28 @@ definePageMeta({
               id="resume-name"
               v-model="newResumeName"
               :placeholder="$t('resumes.namePlaceholder')"
+              :disabled="creatingResume"
               @keyup.enter="handleCreateResume"
             />
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" @click="showCreateDialog = false">
+          <Button variant="outline" :disabled="creatingResume" @click="showCreateDialog = false">
             {{ $t('common.cancel') }}
           </Button>
-          <Button :disabled="!newResumeName.trim() || resumes.length >= MAX_RESUMES" class="text-white bg-black hover:bg-gray-900" variant="default" @click="handleCreateResume">
-            {{ $t('common.create') }}
+          <Button
+            :disabled="!newResumeName.trim() || resumes.length >= MAX_RESUMES || creatingResume"
+            class="text-white bg-black hover:bg-gray-900"
+            variant="default"
+            @click="handleCreateResume"
+          >
+            <span v-if="creatingResume">
+              <svg class="mr-2 h-4 w-4 inline animate-spin" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none" /><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" /></svg>
+              {{ $t('common.creating') || $t('common.create') }}
+            </span>
+            <span v-else>
+              {{ $t('common.create') }}
+            </span>
           </Button>
         </DialogFooter>
       </DialogContent>

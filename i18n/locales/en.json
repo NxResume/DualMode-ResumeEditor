@@ -57,7 +57,8 @@
     "create": "Create",
     "save": "Save",
     "delete": "Delete",
-    "confirm": "Confirm"
+    "confirm": "Confirm",
+    "creating": "Creating..."
   },
   "guide": {
     "title": "Quick Start",

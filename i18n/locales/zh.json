@@ -57,7 +57,8 @@
     "create": "创建",
     "save": "保存",
     "delete": "删除",
-    "confirm": "确认"
+    "confirm": "确认",
+    "creating": "创建中..."
   },
   "guide": {
     "title": "快速开始",

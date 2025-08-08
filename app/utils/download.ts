@@ -1,8 +1,6 @@
 // download.ts
 import { toPng } from 'html-to-image'
 
-const A4_WIDTH_PT = 595.28
-
 // 将单个 DOM 元素渲染为 PNG Data URL
 async function renderPageToPng(page: HTMLElement): Promise<string> {
   return await toPng(page, {
@@ -41,6 +39,13 @@ function downloadBase64Image(dataUrl: string, filename: string) {
   link.click()
 }
 
+const MM_TO_INCH_FACTOR = 1 / 25.4 // 毫米转换为英寸的系数
+const INCH_TO_PT_FACTOR = 72 // 英寸转换为 Points 的系数
+const A4_WIDTH_MM = 210 // A4 纸张宽度 (mm)
+const A4_HEIGHT_MM = 297 // A4 纸张高度 (mm)
+// 动态计算 A4 宽度 (pt)
+const A4_WIDTH_PT = A4_WIDTH_MM * MM_TO_INCH_FACTOR * INCH_TO_PT_FACTOR
+const A4_HEIGHT_PT = A4_HEIGHT_MM * MM_TO_INCH_FACTOR * INCH_TO_PT_FACTOR - 50
 /**
  * 导出为 PDF
  */
@@ -54,7 +59,7 @@ export async function exportToPDF(previewRef: HTMLElement | null, filename = 're
   const pdf = new JSPDF({
     orientation: 'portrait',
     unit: 'pt',
-    format: 'a4',
+    format: [A4_WIDTH_PT, A4_HEIGHT_PT],
     compress: true,
   })
 
