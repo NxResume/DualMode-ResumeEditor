@@ -64,14 +64,31 @@ export async function exportToPDF(previewRef: HTMLElement | null, filename = 're
   })
 
   for (let i = 0; i < pages.length; i++) {
-    const page = pages[i]
-    const dataUrl = await renderPageToPng(page!)
-    const scale = A4_WIDTH_PT / page!.offsetWidth
-    const imgHeight = page!.offsetHeight * scale
+    const page = pages[i]!
+    const dataUrl = await renderPageToPng(page)
+
+    const scale = A4_WIDTH_PT / page.offsetWidth
+    const imgHeight = page.offsetHeight * scale
 
     if (i > 0)
       pdf.addPage()
     pdf.addImage(dataUrl, 'PNG', 0, 0, A4_WIDTH_PT, imgHeight)
+
+    // 计算链接位置并添加可点击区域
+    const pageRect = page.getBoundingClientRect()
+    const links = page.querySelectorAll('a')
+
+    links.forEach((link) => {
+      const rect = link.getBoundingClientRect()
+      const x = (rect.left - pageRect.left) * scale
+      const y = (rect.top - pageRect.top) * scale
+      const w = rect.width * scale
+      const h = rect.height * scale
+
+      if (link.href) {
+        pdf.link(x, y, w, h, { url: link.href })
+      }
+    })
   }
 
   removePageBackgrounds(pages)
