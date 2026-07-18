@@ -11,6 +11,8 @@ export default defineEventHandler(async (event) => {
       })
     }
 
+    await assertResumeOwnership(event, id)
+
     const body = await readBody(event)
     const settings = await prisma.resumeSettings.upsert({
       where: { resumeId: id },
@@ -32,7 +34,7 @@ export default defineEventHandler(async (event) => {
         pageLineHeight: body.pageLineHeight || 1.9,
         pageBackground: body.pageBackground || 'default',
         pageThemeColor: body.pageThemeColor || '0,0,0',
-        imagePosition: JSON.stringify(body.imagePosition || '{ top: 66, left: 391, scale: \'0.8 0.8\' }'),
+        imagePosition: JSON.stringify(body.imagePosition || { top: 66, left: 391, scale: '0.8 0.8' }),
         isScrollable: body.isScrollable || false,
         editorMode: body.editorMode || 'source',
       },
@@ -44,6 +46,10 @@ export default defineEventHandler(async (event) => {
     }
   }
   catch (error: any) {
+    // 已带状态码的错误（400/401/403/404 等）直接透传，避免被包装成 500
+    if (error?.statusCode)
+      throw error
+
     // 错误处理优化：使用 message 字段
     if (error.code === 'P2003') {
       throw createError({
