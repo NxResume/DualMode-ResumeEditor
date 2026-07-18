@@ -2,14 +2,16 @@ import MarkdownIt from 'markdown-it'
 import remarkContainer from 'markdown-it-container'
 import iconPlugin from '~/utils/markdown-it-icon'
 
-export function useMarkdown(content?: string) {
-  if (!content) {
-    return {
-      html: '',
-    }
-  }
+// 模块级单例：MarkdownIt 实例与插件只创建一次。
+// render() 本身无状态，重复使用同一实例输出与每次新建完全一致，
+// 避免每次内容变化（每个按键）都重建实例并重新注册插件。
+let md: MarkdownIt | null = null
 
-  const md = new MarkdownIt({
+function getMd(): MarkdownIt {
+  if (md)
+    return md
+
+  md = new MarkdownIt({
     html: true,
     linkify: true,
     typographer: true,
@@ -55,7 +57,17 @@ export function useMarkdown(content?: string) {
     type: 'svg',
   })
 
+  return md
+}
+
+export function useMarkdown(content?: string) {
+  if (!content) {
+    return {
+      html: '',
+    }
+  }
+
   return {
-    html: md.render(content),
+    html: getMd().render(content),
   }
 }

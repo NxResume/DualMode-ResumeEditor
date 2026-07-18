@@ -1,6 +1,6 @@
-import type { Reactive } from 'vue'
+import type { MaybeRefOrGetter } from 'vue'
 import { useCssVar } from '@vueuse/core'
-import { watch } from 'vue'
+import { toValue, watch } from 'vue'
 import { fontList } from '~/constants'
 
 interface ResumeSettings {
@@ -14,8 +14,13 @@ interface ResumeSettings {
 
 const loadedFonts = new Set<string>()
 
+/**
+ * 将简历设置同步到 CSS 变量。
+ * 只需调用一次：通过 getter 始终读取最新的 settings 对象，
+ * settings 对象整体被替换（如 fetch 后）或字段变化时都会触发对应同步。
+ */
 export function useResumeStyleSync(
-  settings: Reactive<ResumeSettings>,
+  settings: MaybeRefOrGetter<ResumeSettings | undefined>,
   el: HTMLElement = document.documentElement,
 ) {
   const fontFamily = useCssVar('--defaults-markdwon-family', el)
@@ -71,7 +76,16 @@ export function useResumeStyleSync(
     },
   }
 
-  Object.keys(fieldWatchers).forEach((key) => {
-    watch(() => settings[key as keyof ResumeSettings], fieldWatchers[key as keyof ResumeSettings], { immediate: true })
+  ;(Object.keys(fieldWatchers) as (keyof ResumeSettings)[]).forEach((key) => {
+    watch(
+      () => toValue(settings)?.[key],
+      (val) => {
+        if (val === undefined)
+          return
+        fieldWatchers[key](val)
+      },
+      // imagePosition 是对象，deep 兼容就地修改；其余为原始值
+      { immediate: true, deep: key === 'imagePosition' },
+    )
   })
 }

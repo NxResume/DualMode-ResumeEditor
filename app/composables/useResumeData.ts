@@ -41,16 +41,11 @@ export function useResumeData() {
     fetchCurrentResume()
   })
 
-  // 样式同步
-  watch(
-    () => currentResume.value.settings,
-    (settings) => {
-      if (settings && isClient) {
-        useResumeStyleSync(settings)
-      }
-    },
-    { immediate: true, deep: true },
-  )
+  // 样式同步：只注册一次，getter 始终跟踪最新的 settings 对象
+  // （旧写法在 deep watch 回调里反复调用 useResumeStyleSync，每次变更都新注册一批 watcher，造成泄漏）
+  if (isClient) {
+    useResumeStyleSync(() => currentResume.value.settings)
+  }
 
   // 更新简历数据
   function updateResumeData(data: ResumeData) {

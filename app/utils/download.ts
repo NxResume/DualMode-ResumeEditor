@@ -55,44 +55,49 @@ export async function exportToPDF(previewRef: HTMLElement | null, filename = 're
     return
   injectPageBackgrounds(pages)
 
-  const { jsPDF: JSPDF } = await import('jspdf')
-  const pdf = new JSPDF({
-    orientation: 'portrait',
-    unit: 'pt',
-    format: [A4_WIDTH_PT, A4_HEIGHT_PT],
-    compress: true,
-  })
-
-  for (let i = 0; i < pages.length; i++) {
-    const page = pages[i]!
-    const dataUrl = await renderPageToPng(page)
-
-    const scale = A4_WIDTH_PT / page.offsetWidth
-    const imgHeight = page.offsetHeight * scale
-
-    if (i > 0)
-      pdf.addPage()
-    pdf.addImage(dataUrl, 'PNG', 0, 0, A4_WIDTH_PT, imgHeight)
-
-    // 计算链接位置并添加可点击区域
-    const pageRect = page.getBoundingClientRect()
-    const links = page.querySelectorAll('a')
-
-    links.forEach((link) => {
-      const rect = link.getBoundingClientRect()
-      const x = (rect.left - pageRect.left) * scale
-      const y = (rect.top - pageRect.top) * scale
-      const w = rect.width * scale
-      const h = rect.height * scale
-
-      if (link.href) {
-        pdf.link(x, y, w, h, { url: link.href })
-      }
+  try {
+    const { jsPDF: JSPDF } = await import('jspdf')
+    const pdf = new JSPDF({
+      orientation: 'portrait',
+      unit: 'pt',
+      format: [A4_WIDTH_PT, A4_HEIGHT_PT],
+      compress: true,
     })
-  }
 
-  removePageBackgrounds(pages)
-  pdf.save(filename)
+    for (let i = 0; i < pages.length; i++) {
+      const page = pages[i]!
+      const dataUrl = await renderPageToPng(page)
+
+      const scale = A4_WIDTH_PT / page.offsetWidth
+      const imgHeight = page.offsetHeight * scale
+
+      if (i > 0)
+        pdf.addPage()
+      pdf.addImage(dataUrl, 'PNG', 0, 0, A4_WIDTH_PT, imgHeight)
+
+      // 计算链接位置并添加可点击区域
+      const pageRect = page.getBoundingClientRect()
+      const links = page.querySelectorAll('a')
+
+      links.forEach((link) => {
+        const rect = link.getBoundingClientRect()
+        const x = (rect.left - pageRect.left) * scale
+        const y = (rect.top - pageRect.top) * scale
+        const w = rect.width * scale
+        const h = rect.height * scale
+
+        if (link.href) {
+          pdf.link(x, y, w, h, { url: link.href })
+        }
+      })
+    }
+
+    pdf.save(filename)
+  }
+  finally {
+    // 无论成功失败都清理注入的背景节点
+    removePageBackgrounds(pages)
+  }
 }
 
 /**
@@ -104,26 +109,31 @@ export async function exportToImage(previewRef: HTMLElement | null, baseName = '
     return
   injectPageBackgrounds(pages)
 
-  if (pages.length === 1) {
-    const dataUrl = await renderPageToPng(pages[0] as HTMLElement)
-    downloadBase64Image(dataUrl, `${baseName}.png`)
-    return
+  try {
+    if (pages.length === 1) {
+      const dataUrl = await renderPageToPng(pages[0] as HTMLElement)
+      downloadBase64Image(dataUrl, `${baseName}.png`)
+      return
+    }
+
+    const JSZip = (await import('jszip')).default
+    const zip = new JSZip()
+
+    for (let i = 0; i < pages.length; i++) {
+      const page = pages[i]
+      const dataUrl = await renderPageToPng(page!)
+      const base64 = dataUrl.split(',')[1]
+      const blob = await fetch(`data:image/png;base64,${base64}`).then(res => res.blob())
+      zip.file(`${baseName}-page-${i + 1}.png`, blob)
+    }
+
+    const zipBlob = await zip.generateAsync({ type: 'blob' })
+    downloadBlob(zipBlob, `${baseName}-pages.zip`)
   }
-
-  const JSZip = (await import('jszip')).default
-  const zip = new JSZip()
-
-  for (let i = 0; i < pages.length; i++) {
-    const page = pages[i]
-    const dataUrl = await renderPageToPng(page!)
-    const base64 = dataUrl.split(',')[1]
-    const blob = await fetch(`data:image/png;base64,${base64}`).then(res => res.blob())
-    zip.file(`${baseName}-page-${i + 1}.png`, blob)
+  finally {
+    // 无论成功失败都清理注入的背景节点（原实现单页导出会漏清理）
+    removePageBackgrounds(pages)
   }
-
-  const zipBlob = await zip.generateAsync({ type: 'blob' })
-  removePageBackgrounds(pages)
-  downloadBlob(zipBlob, `${baseName}-pages.zip`)
 }
 
 // 添加背景元素

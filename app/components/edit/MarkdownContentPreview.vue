@@ -6,23 +6,27 @@ const props = defineProps<{
   settings?: ResumeSettings
 }>()
 const theme = 'markdown-body'
+const wrapperRef = ref<HTMLElement | null>(null)
 const md = computed(() => useMarkdown(props.content))
 
-function handleAutoPaginate() {
-  nextTick(() => {
-    setTimeout(() => {
-      const wrapper = document.querySelector('.rs-page-item-wrapper')
-      if (wrapper) {
-        autoPaginate(wrapper as HTMLElement, md.value.html, {
-          ...DEFAULT_CONFIG,
-          themeClass: theme,
-          themeName: props.themeName,
-          padding: props.settings?.pagePadding,
-        })
-      }
-    }, 0)
-  })
+async function paginateNow() {
+  // 图标数据就绪后再渲染，保证首次分页不缺图标
+  await ensureIconsLoaded()
+  await nextTick()
+  await new Promise(resolve => setTimeout(resolve, 0))
+
+  if (wrapperRef.value) {
+    autoPaginate(wrapperRef.value, md.value.html, {
+      ...DEFAULT_CONFIG,
+      themeClass: theme,
+      themeName: props.themeName,
+      padding: props.settings?.pagePadding,
+    })
+  }
 }
+
+// 输入防抖：200ms 内的连续变更合并为一次分页重排，减少打字时的全量 DOM 重建
+const paginateDebounced = useDebounceFn(paginateNow, 200)
 
 watch(() => [
   props.content,
@@ -31,18 +35,17 @@ watch(() => [
   props.settings?.pageLineHeight,
   props.settings?.fontname,
 ], () => {
-  handleAutoPaginate()
-}, {
-  immediate: true,
+  paginateDebounced()
 })
 
 onMounted(() => {
-  handleAutoPaginate()
+  // 首次渲染不防抖，进入页面立即分页
+  paginateNow()
 })
 </script>
 
 <template>
-  <div class="rs-page-item-wrapper" :class="theme" />
+  <div ref="wrapperRef" class="rs-page-item-wrapper" :class="theme" />
 </template>
 
 <style>

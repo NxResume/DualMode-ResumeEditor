@@ -1,8 +1,24 @@
 import type MarkdownIt from 'markdown-it'
-import { icons } from '@iconify-json/ri'
-
 import { getIconData, iconToHTML, iconToSVG, replaceIDs } from '@iconify/utils'
 import { coreRuler, rendererRule } from 'markdown-it-regex'
+
+type RiIcons = typeof import('@iconify-json/ri')['icons']
+
+// 图标数据懒加载（icons.json 约 1MB），避免被静态打进页面 chunk。
+// 渲染入口（MarkdownContentPreview）会在渲染前 await ensureIconsLoaded()，
+// 因此正常流程中渲染时数据必定已就绪。
+let icons: RiIcons | null = null
+let iconsPromise: Promise<RiIcons> | null = null
+
+export function ensureIconsLoaded(): Promise<RiIcons> {
+  if (!iconsPromise) {
+    iconsPromise = import('@iconify-json/ri').then((mod) => {
+      icons = mod.icons
+      return mod.icons
+    })
+  }
+  return iconsPromise
+}
 
 /**
  * markdown-it 图标插件
@@ -48,6 +64,11 @@ export default function iconPlugin(md: MarkdownIt, {
  * @returns A string of the SVG markup for the icon.
  */
 function getIconSVG(iconName: string): string {
+  // 数据未就绪时回退到线上 SVG（渲染入口已 await ensureIconsLoaded，正常不会走到这里）
+  if (!icons) {
+    return `<img class='icon-md' src="https://api.iconify.design/ri/${iconName}.svg?color=%23747474" alt="${iconName}" />`
+  }
+
   // Get content for icon
   const iconData = getIconData(icons, iconName)
   if (!iconData) {
