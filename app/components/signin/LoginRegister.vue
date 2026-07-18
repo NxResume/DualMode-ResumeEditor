@@ -20,90 +20,160 @@ const email = ref('')
 const password = ref('')
 const confirmPassword = ref('')
 const pin = ref<string[]>([])
-const loading = ref(false)
+const sendingCode = ref(false)
+const registering = ref(false)
+const loggingIn = ref(false)
 const message = ref('')
+const messageType = ref<'success' | 'error'>('error')
 const isRegister = ref(false)
 const countdown = ref(0)
 let timer: ReturnType<typeof setInterval> | null = null
 
+function setMessage(text: string, type: 'success' | 'error' = 'error') {
+  message.value = text
+  messageType.value = type
+}
+
+// 切换登录/注册时清空旧提示
+function switchTab(register: boolean) {
+  if (isRegister.value === register)
+    return
+  isRegister.value = register
+  message.value = ''
+}
+
+function startCountdown() {
+  countdown.value = 60
+  if (timer)
+    clearInterval(timer)
+  timer = setInterval(() => {
+    countdown.value--
+    if (countdown.value <= 0 && timer) {
+      clearInterval(timer)
+      timer = null
+    }
+  }, 1000)
+}
+
+onUnmounted(() => {
+  if (timer) {
+    clearInterval(timer)
+    timer = null
+  }
+})
+
 async function handleSendCode() {
-  if (countdown.value > 0)
+  if (sendingCode.value || countdown.value > 0)
     return
   if (!email.value || !password.value || !confirmPassword.value) {
-    message.value = t('login.fillEmailAndPasswords')
+    setMessage(t('login.fillEmailAndPasswords'))
     return
   }
   if (password.value !== confirmPassword.value) {
-    message.value = t('login.passwordsNotMatch')
+    setMessage(t('login.passwordsNotMatch'))
     return
   }
-  loading.value = true
-  const res = await $fetch('/api/auth/register', {
-    method: 'POST',
-    body: { email: email.value, password: password.value },
-  })
-  loading.value = false
-  if (res.success) {
-    message.value = t('login.codeSent')
-    countdown.value = 60
-    timer && clearInterval(timer)
-    timer = setInterval(() => {
-      countdown.value--
-      if (countdown.value <= 0) {
-        clearInterval(timer!)
-        timer = null
-      }
-    }, 1000)
+  sendingCode.value = true
+  try {
+    const res = await $fetch('/api/auth/register', {
+      method: 'POST',
+      body: { email: email.value, password: password.value },
+    })
+    if (res.success) {
+      setMessage(t('login.codeSent'), 'success')
+      startCountdown()
+    }
+    else {
+      setMessage(res.message)
+    }
   }
-  else {
-    message.value = res.message
+  catch (error: any) {
+    setMessage(error?.data?.message || t('login.sendCodeFailed'))
+  }
+  finally {
+    sendingCode.value = false
   }
 }
 
-async function handleRegister() {
-  const code = pin.value.join('')
-  if (!email.value || !password.value || !confirmPassword.value || code.length !== 5) {
-    message.value = t('login.fillAllInfo')
-    return
-  }
-  if (password.value !== confirmPassword.value) {
-    message.value = t('login.passwordsNotMatch')
-    return
-  }
-  loading.value = true
-  const res = await $fetch('/api/auth/verify-email', {
-    method: 'POST',
-    body: { email: email.value, code },
-  })
-  loading.value = false
-  if (res.success) {
-    message.value = t('login.registerSuccess')
-    isRegister.value = false // 注册成功后切换到登录
-  }
-  else {
-    message.value = res.message
-  }
-}
-
-async function handleLogin() {
-  if (!email.value || !password.value) {
-    message.value = t('login.fillEmailAndPassword')
-    return
-  }
-  loading.value = true
+async function autoLogin() {
   const res = await signIn('credentials', {
     email: email.value,
     password: password.value,
     redirect: false,
   })
-  loading.value = false
-  if (res.ok && !res.error) {
-    message.value = t('login.loginSuccess')
-    props.callback?.()
-    // navigateTo('/')
+  return Boolean(res?.ok && !res?.error)
+}
+
+async function handleRegister() {
+  if (registering.value)
+    return
+  const code = pin.value.join('')
+  if (!email.value || !password.value || !confirmPassword.value || code.length !== 5) {
+    setMessage(t('login.fillAllInfo'))
+    return
   }
-  else {
-    message.value = res?.error || '登录失败'
+  if (password.value !== confirmPassword.value) {
+    setMessage(t('login.passwordsNotMatch'))
+    return
+  }
+  registering.value = true
+  try {
+    const res = await $fetch('/api/auth/verify-email', {
+      method: 'POST',
+      body: { email: email.value, code },
+    })
+    if (!res.success) {
+      setMessage(res.message)
+      return
+    }
+
+    // 注册成功后自动登录
+    if (await autoLogin()) {
+      setMessage(t('login.registerSuccessAutoLogin'), 'success')
+      props.callback?.()
+    }
+    else {
+      // 自动登录失败则回退到登录表单
+      isRegister.value = false
+      setMessage(t('login.registerSuccess'), 'success')
+    }
+  }
+  catch (error: any) {
+    setMessage(error?.data?.message || t('login.registerFailed'))
+  }
+  finally {
+    registering.value = false
+  }
+}
+
+async function handleLogin() {
+  if (loggingIn.value)
+    return
+  if (!email.value || !password.value) {
+    setMessage(t('login.fillEmailAndPassword'))
+    return
+  }
+  loggingIn.value = true
+  try {
+    const res = await signIn('credentials', {
+      email: email.value,
+      password: password.value,
+      redirect: false,
+    })
+    if (res?.ok && !res?.error) {
+      setMessage(t('login.loginSuccess'), 'success')
+      props.callback?.()
+      // navigateTo('/')
+    }
+    else {
+      setMessage(t('login.loginFailed'))
+    }
+  }
+  catch {
+    setMessage(t('login.loginFailed'))
+  }
+  finally {
+    loggingIn.value = false
   }
 }
 
@@ -116,10 +186,10 @@ function handlePinComplete(_val: string[]) {
 <template>
   <div class="mx-auto max-w-xs w-full space-y-4">
     <div class="mb-2 flex justify-center">
-      <button class="px-4 py-2" :class="[!isRegister ? 'font-bold underline' : '']" @click="isRegister = false">
+      <button class="px-4 py-2" :class="[!isRegister ? 'font-bold underline' : '']" @click="switchTab(false)">
         {{ t('login.login') }}
       </button>
-      <button class="px-4 py-2" :class="[isRegister ? 'font-bold underline' : '']" @click="isRegister = true">
+      <button class="px-4 py-2" :class="[isRegister ? 'font-bold underline' : '']" @click="switchTab(true)">
         {{ t('login.register') }}
       </button>
     </div>
@@ -147,8 +217,8 @@ function handlePinComplete(_val: string[]) {
         </PinInput>
         <LoadingButton
           class="text-xs text-white px-3 py-2 rounded bg-gray-800 cursor-pointer"
-          :loading="loading && countdown === 0"
-          :disabled="loading || countdown > 0"
+          :loading="sendingCode"
+          :disabled="sendingCode || countdown > 0"
           style="white-space: nowrap;"
           size="sm"
           variant="secondary"
@@ -162,8 +232,8 @@ function handlePinComplete(_val: string[]) {
       </div>
       <LoadingButton
         class="text-white mt-2 py-2 rounded bg-gray-700 w-full"
-        :loading="loading"
-        :disabled="pin.join('').length !== 5 || loading"
+        :loading="registering"
+        :disabled="pin.join('').length !== 5 || registering"
         size="default"
         variant="default"
         @click="handleRegister"
@@ -177,8 +247,8 @@ function handlePinComplete(_val: string[]) {
     <template v-else>
       <LoadingButton
         class="text-white py-2 rounded bg-gray-800 w-full"
-        :loading="loading"
-        :disabled="loading"
+        :loading="loggingIn"
+        :disabled="loggingIn"
         size="default"
         variant="default"
         @click="handleLogin"
@@ -189,7 +259,7 @@ function handlePinComplete(_val: string[]) {
         {{ t('login.login') }}
       </LoadingButton>
     </template>
-    <div v-if="message" class="text-sm text-red-500 mt-2">
+    <div v-if="message" class="text-sm mt-2" :class="messageType === 'success' ? 'text-green-600' : 'text-red-500'">
       {{ message }}
     </div>
   </div>

@@ -234,6 +234,10 @@
     "sendCode": "发送验证码",
     "sending": "正在发送...",
     "registering": "注册中...",
-    "logining": "登录中..."
+    "logining": "登录中...",
+    "loginFailed": "登录失败，请检查邮箱和密码，或确认邮箱已完成验证",
+    "sendCodeFailed": "发送失败，请稍后重试",
+    "registerFailed": "注册失败，请稍后重试",
+    "registerSuccessAutoLogin": "注册成功，已自动登录"
   }
 }

@@ -234,6 +234,10 @@
     "and": "and",
     "sending": "Sending...",
     "registering": "Registering...",
-    "logining": "Logging in..."
+    "logining": "Logging in...",
+    "loginFailed": "Login failed. Please check your email and password, or verify your email first.",
+    "sendCodeFailed": "Failed to send, please try again later",
+    "registerFailed": "Registration failed, please try again later",
+    "registerSuccessAutoLogin": "Registration successful, you are now logged in"
   }
 }
