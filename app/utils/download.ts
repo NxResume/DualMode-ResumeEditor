@@ -1,15 +1,24 @@
 // download.ts
-import { toPng } from 'html-to-image'
+import { toJpeg, toPng } from 'html-to-image'
 
-// 将单个 DOM 元素渲染为 PNG Data URL
-async function renderPageToPng(page: HTMLElement): Promise<string> {
+// 将单个 DOM 元素渲染为 PNG Data URL（截图导出用）
+async function renderPageToPng(page: HTMLElement, pixelRatio = 2): Promise<string> {
   return await toPng(page, {
+    quality: 1.0,
+    pixelRatio,
+    skipFonts: false,
+    style: { transform: 'none' },
+    filter: () => true,
+  })
+}
+
+// 将单个 DOM 元素渲染为 JPEG Data URL（PDF 导出用，体积小解码快）
+async function renderPageToJpeg(page: HTMLElement): Promise<string> {
+  return await toJpeg(page, {
     quality: 1.0,
     pixelRatio: 2,
     skipFonts: false,
-    style: {
-      transform: 'none',
-    },
+    style: { transform: 'none' },
     filter: () => true,
   })
 }
@@ -66,14 +75,14 @@ export async function exportToPDF(previewRef: HTMLElement | null, filename = 're
 
     for (let i = 0; i < pages.length; i++) {
       const page = pages[i]!
-      const dataUrl = await renderPageToPng(page)
+      const dataUrl = await renderPageToJpeg(page)
 
       const scale = A4_WIDTH_PT / page.offsetWidth
       const imgHeight = page.offsetHeight * scale
 
       if (i > 0)
         pdf.addPage()
-      pdf.addImage(dataUrl, 'PNG', 0, 0, A4_WIDTH_PT, imgHeight)
+      pdf.addImage(dataUrl, 'JPEG', 0, 0, A4_WIDTH_PT, imgHeight)
 
       // 计算链接位置并添加可点击区域
       const pageRect = page.getBoundingClientRect()
