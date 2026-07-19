@@ -17,6 +17,15 @@ export default defineEventHandler(async (event) => {
     return { success: false, message: '邮箱已注册' }
   }
 
+  // 冷却检查：60 秒内不允许重复发送验证码
+  if (exist?.emailVerificationExpires) {
+    const cooldownRemaining = exist.emailVerificationExpires.getTime() - Date.now() - 4 * 60 * 1000
+    if (cooldownRemaining > 0) {
+      const seconds = Math.ceil(cooldownRemaining / 1000)
+      return { success: false, message: `请${seconds}秒后再发送验证码` }
+    }
+  }
+
   // 生成5位数字验证码
   const code = Math.floor(10000 + Math.random() * 90000).toString()
   const expires = new Date(Date.now() + 5 * 60 * 1000) // 5分钟
@@ -33,6 +42,7 @@ export default defineEventHandler(async (event) => {
           passwordHash,
           emailVerificationCode: code,
           emailVerificationExpires: expires,
+          emailVerificationAttempts: 0,
         },
       })
     : await prisma.user.create({

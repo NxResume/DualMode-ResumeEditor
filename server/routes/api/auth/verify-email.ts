@@ -13,11 +13,21 @@ export default defineEventHandler(async (event) => {
     return { success: false, message: '用户不存在' }
   }
 
+  // 检查是否超过最大尝试次数
+  if (user.emailVerificationAttempts >= 5) {
+    return { success: false, message: '验证码尝试次数过多，请重新发送验证码' }
+  }
+
   if (
     user.emailVerificationCode !== code
     || !user.emailVerificationExpires
     || user.emailVerificationExpires < new Date()
   ) {
+    // 验证失败：递增尝试次数
+    await prisma.user.update({
+      where: { email },
+      data: { emailVerificationAttempts: { increment: 1 } },
+    })
     return { success: false, message: '验证码错误或已过期' }
   }
 
@@ -27,6 +37,7 @@ export default defineEventHandler(async (event) => {
       emailVerified: new Date(),
       emailVerificationCode: null,
       emailVerificationExpires: null,
+      emailVerificationAttempts: 0,
     },
   })
 

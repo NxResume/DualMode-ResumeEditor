@@ -16,14 +16,14 @@ export function useResumeData() {
     settings: getDefaultSettings(),
   })
 
-  // 根据路由参数切换简历
-  const resumeId = (route.params as Record<string, any>)?.id as string | undefined
+  // 根据路由参数切换简历（computed 保证路由变化时响应式更新）
+  const resumeId = computed(() => (route.params as Record<string, any>)?.id as string | undefined)
 
   async function fetchCurrentResume() {
-    if (!resumeId)
+    if (!resumeId.value)
       return
 
-    const result = await resumeController.fetchResumeById(resumeId) as ResumeData
+    const result = await resumeController.fetchResumeById(resumeId.value) as ResumeData
     if (!result.settings) {
       result.settings = getDefaultSettings()
     }
@@ -32,7 +32,7 @@ export function useResumeData() {
   }
 
   // 监听路由变化
-  watch(() => resumeId, () => {
+  watch(resumeId, () => {
     fetchCurrentResume()
   })
 
