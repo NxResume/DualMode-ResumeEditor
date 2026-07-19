@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import type { ResumeData } from '~~/types/resume'
+import { isClient } from '@vueuse/core'
 import { Label, LabelLoading } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import {
@@ -41,7 +42,7 @@ function updateData(key: string, value: any) {
   }
 }
 const { t } = useI18n()
-const { toggle } = useFullscreen(document.body)
+const { toggle } = useFullscreen(isClient ? document.body : null)
 const localePath = useLocalePath()
 </script>
 

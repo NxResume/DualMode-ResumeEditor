@@ -1,9 +1,9 @@
-import type { ConfigurableWindow } from '@vueuse/core'
+import type { ConfigurableWindow, MaybeRef } from '@vueuse/core'
 import { useEventListener } from '@vueuse/core'
 import { toRef } from 'vue'
 
 export interface UseBeforeUnloadOptions extends ConfigurableWindow {
-  enabled?: boolean
+  enabled?: MaybeRef<boolean>
   message?: string
 }
 
