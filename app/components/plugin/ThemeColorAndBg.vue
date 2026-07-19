@@ -43,6 +43,9 @@ const currentColorValue = computed(() => {
     : `rgb(${props.pageThemeColor})`
 })
 
+// 立即同步 props 初始值，避免 onMounted 前的颜色闪烁
+color.value = currentColorValue.value
+
 function selectPresetColor(colorValue: string) {
   const rgb = tinycolor(colorValue).toRgb()
   const rgbString = `${rgb.r},${rgb.g},${rgb.b}`
@@ -68,10 +71,6 @@ watch(color, (newColor) => {
     emit('update:pageThemeColor', `${rgb.r},${rgb.g},${rgb.b}`)
   }
 }, { immediate: false })
-
-onMounted(() => {
-  color.value = currentColorValue.value
-})
 </script>
 
 <template>

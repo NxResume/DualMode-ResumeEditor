@@ -13,15 +13,14 @@ export default function Credentials() {
       const email = typeof credentials?.email === 'string' ? credentials.email : ''
       const password = typeof credentials?.password === 'string' ? credentials.password : ''
       const user = await prisma.user.findUnique({ where: { email } })
-      if (!user)
-        return null
-      if (!user.passwordHash)
+      if (!user || !user.passwordHash)
         return null
       const valid = await bcrypt.compare(password, user.passwordHash)
       if (!valid)
         return null
-      if (!user.emailVerified)
-        return null
+      if (!user.emailVerified) {
+        throw new Error('邮箱未验证，请先完成注册验证')
+      }
       return { id: user.id, email: user.email, name: user.name }
     },
   })

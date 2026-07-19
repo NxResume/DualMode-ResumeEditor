@@ -7,6 +7,9 @@ import 'resume-theme/themes'
 
 export { reTheme, ThemeName }
 
+/** A4 纸张像素宽度 (96dpi) */
+export const A4_WIDTH_PX = 794
+
 interface ResumeSettings {
   fontname: string
   pagePadding: number

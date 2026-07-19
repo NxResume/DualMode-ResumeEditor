@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { EditCodeMirror, EditMarkdownPreview } from '#components'
 import { useResumeData } from '~/composables/useResumeData'
+import { A4_WIDTH_PX } from '~/utils'
 
 const { currentResume, updateResumeData } = useResumeData()
 
@@ -10,7 +11,7 @@ const preRef = ref<InstanceType<typeof EditMarkdownPreview>>()
 const { width } = useElementSize(el)
 
 const scalePre = computed(() => {
-  return width.value / 794
+  return width.value / A4_WIDTH_PX
 })
 
 definePageMeta({

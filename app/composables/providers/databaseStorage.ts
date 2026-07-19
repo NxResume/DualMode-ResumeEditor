@@ -62,11 +62,16 @@ export class DatabaseStorageProvider implements IStorageProvider {
         return undefined
       }
 
-      if (response.data.settings)
-        response.data.settings.imagePosition = JSON.parse(response.data.settings?.imagePosition as unknown as string)
+      const settings = response.data.settings
+        ? {
+            ...response.data.settings,
+            imagePosition: JSON.parse((response.data.settings.imagePosition as unknown as string) || '{}'),
+          }
+        : undefined
 
       return {
         ...response.data,
+        settings,
         plugins: JSON.parse(response.data.plugins || '[]'),
         createdAt: new Date(response.data.createdAt),
         updatedAt: new Date(response.data.updatedAt),
