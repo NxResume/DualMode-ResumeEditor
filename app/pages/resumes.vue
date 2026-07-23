@@ -20,6 +20,8 @@ const editingResumeName = ref('')
 
 const resumes = ref<ResumeData[]>([])
 const loading = ref(false)
+const refreshing = ref(false)
+const actionLoading = ref<string | null>(null)
 const creatingResume = ref(false)
 
 async function handleCreateResume() {
@@ -58,15 +60,22 @@ function handleEditResume(id: string) {
 }
 
 async function reloadResumes() {
-  loading.value = true
+  refreshing.value = true
   resumes.value = await resumeController.fetchResumes()
-  loading.value = false
+  refreshing.value = false
 }
 
 async function handleDeleteResume(id: string) {
-  const res = await resumeController.deleteResume(id)
-  if (res.success) {
-    reloadResumes()
+  actionLoading.value = id
+  await nextTick()
+  try {
+    const res = await resumeController.deleteResume(id)
+    if (res.success) {
+      resumes.value = resumes.value.filter(r => r.id !== id)
+    }
+  }
+  finally {
+    actionLoading.value = null
   }
 }
 
@@ -85,18 +94,26 @@ function startEditResumeName(resume: any) {
   })
 }
 
-function saveEditResumeName(current: any) {
+async function saveEditResumeName(current: any) {
   if (
     editingResumeId.value === current.id
     && editingResumeName.value.trim()
     && editingResumeName.value !== current.name
   ) {
-    resumeController.renameResume(current.id, editingResumeName.value.trim())
+    const newName = editingResumeName.value.trim()
+    actionLoading.value = current.id
+    await nextTick()
+    resumeController.renameResume(current.id, newName)
       .then((res) => {
         if (res) {
-          reloadResumes()
+          const idx = resumes.value.findIndex(r => r.id === current.id)
+          if (idx !== -1)
+            resumes.value[idx]!.name = newName
           editingResumeId.value = null
         }
+      })
+      .finally(() => {
+        actionLoading.value = null
       })
   }
 }
@@ -110,9 +127,16 @@ async function handleDuplicateResume(id: string) {
     })
     return
   }
-  const res = await resumeController.duplicateResume(id, resumes.value)
-  if (res) {
-    reloadResumes()
+  actionLoading.value = id
+  await nextTick()
+  try {
+    const res = await resumeController.duplicateResume(id, resumes.value)
+    if (res) {
+      await reloadResumes()
+    }
+  }
+  finally {
+    actionLoading.value = null
   }
 }
 
@@ -222,8 +246,18 @@ definePageMeta({
           <div
             v-for="resume in resumes"
             :key="resume.id"
-            class="p-6 rounded-lg bg-white shadow-md transition-shadow hover:shadow-lg"
+            class="relative p-6 rounded-lg bg-white shadow-md transition-shadow hover:shadow-lg"
           >
+            <!-- 卡片级 loading 蒙版 -->
+            <div
+              v-if="actionLoading === resume.id"
+              class="absolute inset-0 bg-white/70 rounded-lg flex items-center justify-center z-10"
+            >
+              <svg class="animate-spin h-6 w-6 text-gray-500" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none" />
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+              </svg>
+            </div>
             <div class="mb-4 flex items-start justify-between">
               <h3 class="text-lg text-gray-900 font-semibold">
                 <template v-if="editingResumeId === resume.id">
