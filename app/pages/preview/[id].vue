@@ -13,8 +13,24 @@ const imageLoading = ref(false)
 
 definePageMeta({
   layout: false,
-  // 移除 sidebase-auth 中间件：本地存储模式下不需要登录即可预览
+  // 不使用全局 sidebase-auth 中间件：本地模式允许匿名访问，database 模式在客户端守卫中跳转
 })
+
+// 客户端运行时守卫：database 模式 + 未登录 → 跳回简历列表（那里有登录引导，也可去设置切换本地模式）
+const storageManager = useStorageManager()
+const { currentMode } = storageManager
+const { status } = useAuth()
+const router = useRouter()
+const localePath = useLocalePath()
+
+function requireAuthIfDatabase() {
+  if (import.meta.client && currentMode.value === 'database' && status.value !== 'authenticated') {
+    router.push(localePath('resumes'))
+  }
+}
+
+onMounted(requireAuthIfDatabase)
+watch([currentMode, status], requireAuthIfDatabase)
 
 async function handleExportPDF() {
   if (pdfLoading.value)

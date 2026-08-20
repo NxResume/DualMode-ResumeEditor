@@ -16,8 +16,25 @@ const scalePre = computed(() => {
 
 definePageMeta({
   layout: 'default',
-  // 移除 sidebase-auth 中间件：本地存储模式下不需要登录即可编辑
+  // 不使用全局 sidebase-auth 中间件：本地模式允许匿名访问，database 模式在客户端守卫中跳转
 })
+
+// 客户端运行时守卫：database 模式 + 未登录 → 跳回简历列表（那里有登录引导，也可去设置切换本地模式）
+const storageManager = useStorageManager()
+const { currentMode } = storageManager
+const { status } = useAuth()
+const router = useRouter()
+const localePath = useLocalePath()
+
+function requireAuthIfDatabase() {
+  if (import.meta.client && currentMode.value === 'database' && status.value !== 'authenticated') {
+    router.push(localePath('resumes'))
+  }
+}
+
+onMounted(requireAuthIfDatabase)
+// 登录态 / 存储模式在页面停留期间发生变化时也重新校验（例如用户打开编辑页后中途退出登录）
+watch([currentMode, status], requireAuthIfDatabase)
 
 const { stop, start } = useScrollSync(leftRef, el)
 
