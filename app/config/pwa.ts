@@ -5,6 +5,9 @@ import { appDescription, appName } from '../constants/index'
 const scope = '/'
 
 export const pwa: ModuleOptions = {
+  // 开发模式下彻底禁用 PWA，避免之前 build 残留的 Service Worker
+  // 拦截 dev 服务器请求，引发 "Expected JS module but got text/css" 类缓存错乱
+  disable: process.env.NODE_ENV === 'development' && process.env.VITE_PLUGIN_PWA !== 'true',
   registerType: 'autoUpdate',
   scope,
   base: scope,

@@ -3,8 +3,9 @@ definePageMeta({
   layout: 'default',
 })
 
-const localePath = useLocalePath()
-const isDev = import.meta.dev
+// 组件放在 home/ 子目录下，Nuxt 自动导入会把一级目录拼为前缀 HomeQuickStartDialog，
+// 故显式导入，避免猜测自动导入名
+import QuickStartDialog from '@/components/home/QuickStartDialog.vue'
 </script>
 
 <template>
@@ -23,13 +24,8 @@ const isDev = import.meta.dev
             {{ $t('app.description') }}
           </p>
 
-          <NuxtLink :to="localePath('resumes')">
-            <div
-              class="text-lg text-white leading-[48px] font-semibold mx-auto mt-10 text-center rounded-4xl h-12 w-40 cursor-pointer select-none shadow-md transition-all duration-500 from-black to-gray-700 bg-linear-to-r hover:shadow-xl hover:scale-105"
-            >
-              {{ $t('app.startButton') }}
-            </div>
-          </NuxtLink>
+          <!-- 快速开始：点击先弹存储选择引导（本地=免登录，云端=需登录） -->
+          <QuickStartDialog />
         </div>
       </div>
     </section>
@@ -46,22 +42,5 @@ const isDev = import.meta.dev
     </main>
 
     <HomeFooterSection />
-
-    <!-- 开发模式下的测试链接 -->
-    <div v-if="isDev" class="bottom-4 right-4 fixed z-50">
-      <div class="text-white p-4 rounded-lg bg-blue-500 shadow-lg">
-        <h3 class="font-semibold mb-2">
-          {{ $t('devTools') }}
-        </h3>
-        <div class="space-y-2">
-          <NuxtLink
-            to="/settings"
-            class="text-sm block hover:underline"
-          >
-            ⚙️ {{ $t('settingsPage') }}
-          </NuxtLink>
-        </div>
-      </div>
-    </div>
   </div>
 </template>

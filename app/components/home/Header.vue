@@ -1,5 +1,12 @@
 <script setup lang="ts">
 const localePath = useLocalePath()
+const route = useRoute()
+
+// 存储设置仅允许在首页调整（避免编辑中切模式导致上下文错乱）
+// 多语言下路由名为 index___zh / index___en，统一用前缀判断
+const showSettings = computed(
+  () => typeof route.name === 'string' && route.name.startsWith('index'),
+)
 
 const navLinks = [
   { label: 'nav.resumes', href: localePath('resumes'), type: 'nuxt-link' },
@@ -36,10 +43,9 @@ const navLinks = [
             />
           </a>
         </li>
-        <li class="nuxt-btn-link">
-          <NuxtLink :to="localePath('settings')" title="设置">
-            <div class="i-ri-settings-3-line" />
-          </NuxtLink>
+        <li v-if="showSettings" class="nuxt-btn-link">
+          <!-- 设置弹窗：仅首页可见，编辑中禁止切存储模式避免上下文错乱 -->
+          <SettingsDialog />
         </li>
         <li class="nuxt-btn-link">
           <HomeLanguageSwitcher />
