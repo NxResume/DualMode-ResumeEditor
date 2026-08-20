@@ -39,6 +39,8 @@ catalogs:
     unocss-preset-animations: ^1.2.1
     unocss-preset-shadcn: ^0.5.0
     vue-tsc: ^2.2.12
+    wrangler: ^4.124.0
+
   frontend:
     '@auth/core': ^0.40.0
     '@auth/prisma-adapter': ^2.10.0
@@ -82,5 +84,3 @@ onlyBuiltDependencies:
   - '@parcel/watcher'
   - esbuild
   - unrs-resolver
-catalog:
-  wrangler: ^4.124.0
