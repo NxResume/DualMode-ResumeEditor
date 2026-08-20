@@ -81,6 +81,7 @@ export default defineNuxtConfig({
     //   - Prisma 6.x 使用 wasm engine（见 app/utils/db.ts），不需要 Driver Adapter
     //   - DATABASE_URL 由 Pages Functions 的 env 动态拼接 Hyperdrive host/port/user/password/database
     // ============================================================
+    // eslint-disable-next-line node/prefer-global/process -- Nitro 配置读 env 的标准方式
     preset: process.env.NITRO_PRESET === 'cloudflare_pages' ? 'cloudflare_pages' : 'node-server',
     rollupConfig: {
       external: [

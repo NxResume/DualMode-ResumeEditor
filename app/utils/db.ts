@@ -27,6 +27,10 @@ const globalForPrisma = globalThis as unknown as {
  *      PrismaClient，避免 import 阶段 Nitro useRuntimeConfig 尚未就绪。
  */
 
+// 该文件同时运行在 Node 与 Workers（edge）环境：Workers 上 process 是全局
+// polyfill，不能 require("process")，故禁用 prefer-global/process 检查
+/* eslint-disable node/prefer-global/process */
+
 function buildDatabaseUrl(envLike: Record<string, any> = process.env): string {
   // 1) 直接配了 DATABASE_URL（本地 Node / Node 生产 / 手动 override）
   if (envLike.DATABASE_URL)
@@ -36,7 +40,11 @@ function buildDatabaseUrl(envLike: Record<string, any> = process.env): string {
   const hyper = envLike.HYPERDRIVE
   if (hyper && typeof hyper === 'object' && hyper.host && hyper.database) {
     const {
-      host, port = 3306, user, password, database,
+      host,
+      port = 3306,
+      user,
+      password,
+      database,
     } = hyper /* MySQL 默认 3306 */
     const userInfo = user ? `${encodeURIComponent(user)}${password ? `:${encodeURIComponent(password)}` : ''}@` : ''
     // schema.prisma datasource 里是 mysql provider
@@ -57,7 +65,7 @@ function detectWorkersRuntime(env: Record<string, any>): boolean {
     // Cloudflare Workers 全局特有
     typeof g.WebSocketPair !== 'undefined'
     || typeof g.__STATIC_CONTENT !== 'undefined'
-    || typeof g.caches !== 'undefined' && g.caches?.default && typeof g.addEventListener === 'function'
+    || (typeof g.caches !== 'undefined' && g.caches?.default && typeof g.addEventListener === 'function')
     // Nitro preset 明确是 Cloudflare
     || /cloudflare/i.test(env.NITRO_PRESET ?? '')
     // 或已经拿到 Hyperdrive binding（最常见）
@@ -86,12 +94,20 @@ function getEnvWithHyperdriveBindings(): Record<string, any> {
 
       // sidebase-auth / oauth secrets 也顺带兜底（Dashboard 里常和 Hyperdrive 一起配）
       for (const k of [
-        'AUTH_SECRET', 'AUTH_ORIGIN',
-        'GITHUB_CLIENT_ID', 'GITHUB_CLIENT_SECRET',
-        'GOOGLE_CLIENT_ID', 'GOOGLE_CLIENT_SECRET',
-        'GITEE_CLIENT_ID', 'GITEE_CLIENT_SECRET',
-        'LINUXDO_CLIENT_ID', 'LINUXDO_CLIENT_SECRET',
-        'SMTP_HOST', 'SMTP_PORT', 'SMTP_USER', 'SMTP_PASS',
+        'AUTH_SECRET',
+        'AUTH_ORIGIN',
+        'GITHUB_CLIENT_ID',
+        'GITHUB_CLIENT_SECRET',
+        'GOOGLE_CLIENT_ID',
+        'GOOGLE_CLIENT_SECRET',
+        'GITEE_CLIENT_ID',
+        'GITEE_CLIENT_SECRET',
+        'LINUXDO_CLIENT_ID',
+        'LINUXDO_CLIENT_SECRET',
+        'SMTP_HOST',
+        'SMTP_PORT',
+        'SMTP_USER',
+        'SMTP_PASS',
       ]) {
         if (nitroCloudflareEnv?.[k] != null)
           env[k] = nitroCloudflareEnv[k]
@@ -108,10 +124,11 @@ function createPrismaClient(): PrismaClient {
   const datasourceUrl = buildDatabaseUrl(env)
   const isWorkers = detectWorkersRuntime(env)
 
-  // eslint-disable-next-line ts/no-require-imports
   const mod: typeof import('@prisma/client') = isWorkers
-    ? require('@prisma/client/edge')  // Workers → wasm engine，不 spawn 子进程
-    : require('@prisma/client')       // Node → binary engine，cold start 更快
+    // eslint-disable-next-line ts/no-require-imports -- 运行时按环境动态选择入口，不能用静态 import
+    ? require('@prisma/client/edge') // Workers → wasm engine，不 spawn 子进程
+    // eslint-disable-next-line ts/no-require-imports -- 同上：Node → binary engine，cold start 更快
+    : require('@prisma/client') // Node → binary engine，cold start 更快
 
   const { PrismaClient } = mod
 

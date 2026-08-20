@@ -1,11 +1,11 @@
 <script setup lang="ts">
-definePageMeta({
-  layout: 'default',
-})
-
 // 组件放在 home/ 子目录下，Nuxt 自动导入会把一级目录拼为前缀 HomeQuickStartDialog，
 // 故显式导入，避免猜测自动导入名
 import QuickStartDialog from '@/components/home/QuickStartDialog.vue'
+
+definePageMeta({
+  layout: 'default',
+})
 </script>
 
 <template>

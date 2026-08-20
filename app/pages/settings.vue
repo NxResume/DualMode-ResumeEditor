@@ -26,9 +26,9 @@ definePageMeta({
           <StorageModeSwitcher />
           <template #fallback>
             <div class="space-y-3">
-              <div class="h-4 w-24 rounded bg-muted animate-pulse" />
-              <div class="h-9 w-64 rounded-md border border-input bg-background p-0.5 animate-pulse" />
-              <div class="h-4 w-48 rounded bg-muted animate-pulse" />
+              <div class="rounded bg-muted h-4 w-24 animate-pulse" />
+              <div class="p-0.5 border border-input rounded-md bg-background h-9 w-64 animate-pulse" />
+              <div class="rounded bg-muted h-4 w-48 animate-pulse" />
             </div>
           </template>
         </ClientOnly>

@@ -44,24 +44,24 @@ import {
         <ClientOnly>
           <StorageModeSwitcher />
           <template #fallback>
-            <div class="grid gap-4 sm:grid-cols-2">
-              <div class="border rounded-xl p-5 space-y-3">
-                <div class="h-6 w-28 rounded bg-muted animate-pulse" />
+            <div class="gap-4 grid sm:grid-cols-2">
+              <div class="p-5 border rounded-xl space-y-3">
+                <div class="rounded bg-muted h-6 w-28 animate-pulse" />
                 <div class="space-y-1.5">
-                  <div class="h-4 w-full rounded bg-muted animate-pulse" />
-                  <div class="h-4 w-11/12 rounded bg-muted animate-pulse" />
-                  <div class="h-4 w-10/12 rounded bg-muted animate-pulse" />
+                  <div class="rounded bg-muted h-4 w-full animate-pulse" />
+                  <div class="rounded bg-muted h-4 w-11/12 animate-pulse" />
+                  <div class="rounded bg-muted h-4 w-10/12 animate-pulse" />
                 </div>
-                <div class="h-10 w-full rounded-md bg-muted animate-pulse mt-4" />
+                <div class="mt-4 rounded-md bg-muted h-10 w-full animate-pulse" />
               </div>
-              <div class="border rounded-xl p-5 space-y-3">
-                <div class="h-6 w-28 rounded bg-muted animate-pulse" />
+              <div class="p-5 border rounded-xl space-y-3">
+                <div class="rounded bg-muted h-6 w-28 animate-pulse" />
                 <div class="space-y-1.5">
-                  <div class="h-4 w-full rounded bg-muted animate-pulse" />
-                  <div class="h-4 w-11/12 rounded bg-muted animate-pulse" />
-                  <div class="h-4 w-10/12 rounded bg-muted animate-pulse" />
+                  <div class="rounded bg-muted h-4 w-full animate-pulse" />
+                  <div class="rounded bg-muted h-4 w-11/12 animate-pulse" />
+                  <div class="rounded bg-muted h-4 w-10/12 animate-pulse" />
                 </div>
-                <div class="h-10 w-full rounded-md bg-muted animate-pulse mt-4" />
+                <div class="mt-4 rounded-md bg-muted h-10 w-full animate-pulse" />
               </div>
             </div>
           </template>

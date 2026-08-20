@@ -182,7 +182,7 @@ watch(color, (newColor) => {
               <div class="theme-label">
                 <div
                   v-if="theme.isSelected"
-                  class="theme-selected-icon i-ri-checkbox-circle-line"
+                  class="i-ri-checkbox-circle-line theme-selected-icon"
                 />
               </div>
             </div>

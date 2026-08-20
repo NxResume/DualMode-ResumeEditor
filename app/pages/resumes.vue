@@ -259,14 +259,14 @@ definePageMeta({
           <div
             v-for="resume in resumes"
             :key="resume.id"
-            class="relative p-6 rounded-lg bg-white shadow-md transition-shadow hover:shadow-lg"
+            class="p-6 rounded-lg bg-white shadow-md transition-shadow relative hover:shadow-lg"
           >
             <!-- 卡片级 loading 蒙版 -->
             <div
               v-if="actionLoading === resume.id"
-              class="absolute inset-0 bg-white/70 rounded-lg flex items-center justify-center z-10"
+              class="rounded-lg bg-white/70 flex items-center inset-0 justify-center absolute z-10"
             >
-              <svg class="animate-spin h-6 w-6 text-gray-500" viewBox="0 0 24 24">
+              <svg class="text-gray-500 h-6 w-6 animate-spin" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none" />
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
               </svg>
