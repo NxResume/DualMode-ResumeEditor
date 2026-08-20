@@ -15,8 +15,7 @@ catalogs:
     '@vueuse/nuxt': ^13.5.0
     bcrypt: ^6.0.0
     drizzle-kit: ^0.31.10
-    drizzle-orm: ^0.45.2
-    mysql2: ^3.23.4
+    drizzle-orm: 0.45.2
     nodemailer: ^7.0.4
     nuxt: ^3.17.6
     unocss: ^66.3.2
@@ -25,12 +24,14 @@ catalogs:
   dev:
     '@antfu/eslint-config': ^4.16.2
     '@types/bcrypt': ^5.0.2
+    '@types/better-sqlite3': ^9.6.0
     '@types/codemirror': ^5.60.16
     '@types/markdown-it': ^14.1.2
     '@types/markdown-it-container': ^2.0.10
     '@types/nodemailer': ^6.4.17
     '@types/turndown': ^5.0.5
     '@unocss/preset-wind3': ^66.3.2
+    better-sqlite3: 13.0.3
     class-variance-authority: ^0.7.1
     clsx: ^2.1.1
     eslint: ^9.30.1
@@ -44,7 +45,6 @@ catalogs:
     unocss-preset-shadcn: ^0.5.0
     vue-tsc: ^2.2.12
     wrangler: ^4.124.0
-
   frontend:
     '@auth/core': ^0.40.0
     '@codemirror/commands': ^6.8.1

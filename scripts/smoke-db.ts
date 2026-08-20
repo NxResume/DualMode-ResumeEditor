@@ -1,4 +1,4 @@
-// 数据层冒烟测试：Node 环境直连真实 MySQL，验证 Drizzle 查询与 schema 对齐
+// 数据层冒烟测试：本地 SQLite（better-sqlite3），验证 Drizzle 查询与 schema 对齐
 // 仅本地运行，process 是全局对象
 /* eslint-disable node/prefer-global/process */
 import { desc, sql } from 'drizzle-orm'
@@ -19,8 +19,8 @@ async function main() {
   console.log(`resumes: ${resumes.length}`, resumes.map(r => ({ id: r.id, name: r.name, hasSettings: !!r.settings })))
 
   console.log('\n=== 3. SELECT 1（连接健康）===')
-  const result: any = await db.execute(sql`SELECT 1 AS ok`)
-  console.log('SELECT 1:', result[0]?.[0] ?? result.rows?.[0])
+  const row = await db.get(sql`SELECT 1 AS ok`)
+  console.log('SELECT 1:', row)
 
   console.log('\n=== 4. account 查询（验证 auth 表）===')
   const accounts = await db.select().from(schema.accounts).limit(2)

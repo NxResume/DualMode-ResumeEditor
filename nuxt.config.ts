@@ -72,14 +72,13 @@ export default defineNuxtConfig({
       },
     },
     // ============================================================
-    // Cloudflare Pages Functions + Hyperdrive 部署（Nitro preset）
+    // Cloudflare Pages Functions + D1 部署（Nitro preset）
     // 用法：
     //   生产：    NITRO_PRESET=cloudflare_pages pnpm build
-    //   本地调试：pnpm dev（node-server + 本地 MySQL DATABASE_URL）
+    //   本地调试：pnpm dev（node-server + better-sqlite3 本地文件）
     // 说明：
-    //   - 开启 nodejs_compat，mysql2/bcrypt/nodemailer 等 Node API 依赖能在 Workers 运行
-    //   - Drizzle ORM + mysql2（见 app/utils/db.ts）：Node 直连 DATABASE_URL，
-    //     Workers 走 env.HYPERDRIVE（mysql2 v3.13+ 原生支持 Hyperdrive 参数）
+    //   - D1 是原生 SQLite（HTTP 协议），Drizzle 走 drizzle-orm/d1，无 mysql2/Hyperdrive
+    //   - bcrypt/nodemailer 依赖 nodejs_compat（wrangler.jsonc 已开）
     // ============================================================
     // eslint-disable-next-line node/prefer-global/process -- Nitro 配置读 env 的标准方式
     preset: process.env.NITRO_PRESET === 'cloudflare_pages' ? 'cloudflare_pages' : 'node-server',
@@ -87,10 +86,11 @@ export default defineNuxtConfig({
       external: [
         // Node 原生模块（Workers 上由 nodejs_compat 提供）
         'node:crypto',
-        'node:buffer',
         'node:stream',
         'node:util',
         'node:events',
+        // better-sqlite3 仅本地 Node 分支动态加载，不要打进 Workers bundle
+        'better-sqlite3',
       ],
     },
     // 把 wrangler.jsonc 里的 Hyperdrive binding 注入到 runtime（env.HYPERDRIVE）

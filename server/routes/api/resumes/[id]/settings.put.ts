@@ -50,7 +50,7 @@ export default defineEventHandler(async (event) => {
         isScrollable: body.isScrollable ? 1 : 0,
         editorMode: body.editorMode || 'source',
         updatedAt: new Date(),
-      }).$returningId()
+      }).returning()
       settings = created
     }
 

@@ -1,60 +1,44 @@
-// Cloudflare Pages Functions + Hyperdrive 部署配置
-// 对应 Nitro preset: cloudflare_pages 的产物 .output/public
+// Cloudflare Pages Functions + D1 部署配置
+// 对应 Nitro preset: cloudflare_pages 的产物 dist
 //
 // 前置准备（只做一次）：
-//   1) 创建 Hyperdrive 并绑定到源 MySQL：
-//        wrangler hyperdrive create my-hyperdrive \
-//          --connection-string="mysql://user:pass@your-mysql-host:3306/yourdb"
-//        # 记下打印出来的 Hyperdrive ID，填到下方 hyperdrive.HYPERDRIVE.id
-//   2) 部署构建产物到 Pages：
-//        NITRO_PRESET=cloudflare_pages pnpm build
-//        wrangler pages deploy .output/public --project-name=your-pages-project
-//   3) 本地调试：走 `pnpm dev`（node-server + 本地 MySQL DATABASE_URL）。
-//      ⚠️ 不要用 wrangler pages dev 调 Hyperdrive —— 本地模拟只支持
-//      Postgres，MySQL 项目会报错（详见下方 hyperdrive 绑定注释）。
+//   1) 创建 D1 数据库（已创建：resume）：
+//        wrangler d1 create resume
+//   2) 建表 + 迁移数据（MySQL → D1）：
+//        wrangler d1 execute resume --remote --file=migrations/d1.sql
+//   3) 部署：
+//        pnpm build:cf && wrangler pages deploy dist
 //
 // 注意：
-//   · Hyperdrive 是"账号/环境绑定"——Dashboard 或 wrangler.toml/jsonc 写 id 即可，
-//     真正的 MySQL 账密保存在 Cloudflare Hyperdrive config，不泄漏到代码或 Pages Secrets。
+//   · D1 是 Cloudflare 原生 SQLite（HTTP 协议），绑定名 env.DB，
+//     无 TCP/mysql2/Hyperdrive 兼容问题
 //   · Pages 生产环境的 secrets（AUTH_SECRET、OAuth client_id/secret 等）推荐用
 //     Dashboard → Pages Project → Settings → Environment variables 里配，不要写
 //     进 git；wrangler.jsonc 里的 `vars` 只放非敏感变量（AUTH_ORIGIN 等公开变量）。
 {
   // Pages Project 名；与 Cloudflare 侧实际 Pages 项目名保持一致
-  // （wrangler v3.109+ 会校验并提示修正，避免部署失败）
   "name": "resume",
-  // 必须设为新日期：旧日期下 workerd 的 node:buffer polyfill 缺少 hasOwnProperty，
-  // mysql2 打包代码会崩（TR.hasOwnProperty is not a function）
   "compatibility_date": "2026-08-20",
   "compatibility_flags": [
-    // ——— 关键！必须开 ———
-    // bcrypt、nodemailer、mysql2 等都依赖 Node 原生模块
+    // bcrypt、nodemailer 等依赖 Node 原生模块
     "nodejs_compat"
   ],
 
-  // Pages Functions 资源限制：mysql2 连接池 + Drizzle 查询，这里给足
+  // Pages Functions 资源限制
   "limits": {
     "cpu_ms": 30000,
     "memory": "256 MB"
   },
 
   // ============================================================
-  // Hyperdrive 绑定（wrangler v4 格式：数组）
-  //   binding 名 = "HYPERDRIVE"   → runtime: env.HYPERDRIVE
-  //   id          = 用 wrangler hyperdrive create / list 得到的配置 ID
-  //
-  // ⚠️ 本地模拟限制（wrangler 4.x 实测）：
-  //   wrangler pages dev 的 Hyperdrive 本地模拟只支持 Postgres，
-  //   本项目是 MySQL —— 本地 pages dev 会报错要求
-  //   localConnectionString，配了也会因协议不匹配连不上。
-  //   · 本地调试请走 `pnpm dev`（node-server + 本地 MySQL DATABASE_URL）
-  //   · 生产/预发部署验证走 `pnpm build:cf` 构建通过后
-  //     `pnpm deploy:cf` 直接上远端，Hyperdrive 在远端真实生效
+  // D1 数据库绑定
+  //   binding 名 = "DB"   → runtime: env.DB
   // ============================================================
-  "hyperdrive": [
+  "d1_databases": [
     {
-      "binding": "HYPERDRIVE",
-      "id": "07c019e8bc704f16baa73faf40543ec7"
+      "binding": "DB",
+      "database_name": "resume",
+      "database_id": "ffe37c47-09c5-4112-9c82-0a857776daf8"
     }
   ],
 
@@ -63,29 +47,19 @@
   //
   //   常见要配的 secret（Dashboard → Pages → Settings → Environment variables）：
   //     AUTH_SECRET                     （sidebase-auth 必需）
-  //     AUTH_ORIGIN                     （生产域名，例如 https://resume.example.com）
+  //     AUTH_ORIGIN                     （生产域名）
   //     GITHUB_CLIENT_ID / GITHUB_CLIENT_SECRET
   //     GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET
   //     GITEE_CLIENT_ID  / GITEE_CLIENT_SECRET
   //     LINUXDO_CLIENT_ID / LINUXDO_CLIENT_SECRET
   //     SMTP_HOST / SMTP_PORT / SMTP_USER / SMTP_PASS  （verify-email 用）
-  //
-  //   本地 wrangler pages dev 调试时：
-  //     · Hyperdrive 绑定会自动从 wrangler.jsonc 读（上面 hyperdrive.HYPERDRIVE.id）
-  //     · secrets 可以用 .dev.vars（与 wrangler.jsonc 同目录），格式和 .env 一样：
-  //         AUTH_SECRET=xxxx
-  //         GITHUB_CLIENT_ID=xxxx
-  //         ...
   // -------------------------------------------------------------
   // AUTH_ORIGIN 是公开域名（非敏感），放 vars 由 wrangler 部署时注入；
-  // 其余 secrets（AUTH_SECRET/OAuth/SMTP）在 Pages Dashboard 配置，
-  // 不要在 vars 里重复定义，否则与 secret 同名 binding 冲突导致部署失败
+  // 其余 secrets 在 Pages Dashboard 配置，不要在 vars 里重复定义
   "vars": {
-    "AUTH_ORIGIN": "https://resume.ryanuo.cc"
+    "AUTH_ORIGIN": "https://resume.ryanuo.cc/api/auth"
   },
 
   // Nitro preset=cloudflare_pages 构建后 Pages 静态 + Functions 打包产物根目录
-  // （构建日志会写：Generated dist/_routes.json / dist/_headers，
-  //   并且提示 You can preview using npx wrangler --cwd dist/ pages dev）
   "pages_build_output_dir": "dist"
 }

@@ -17,7 +17,7 @@ export default defineEventHandler(async (event) => {
       isDefault: isDefault ? 1 : 0,
       userId: user.id,
       updatedAt: new Date(),
-    }).$returningId()
+    }).returning()
 
     return {
       success: true,

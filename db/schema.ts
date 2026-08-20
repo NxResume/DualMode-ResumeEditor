@@ -1,52 +1,52 @@
 import { relations, sql } from 'drizzle-orm'
 import {
-  datetime,
-  double,
   index,
-  int,
-  mysqlTable,
+  integer,
   primaryKey,
+  real,
+  sqliteTable,
   text,
-  tinyint,
   uniqueIndex,
-  varchar,
-} from 'drizzle-orm/mysql-core'
+} from 'drizzle-orm/sqlite-core'
+
+// Auth.js DrizzleAdapter 插入 session/account 时不传 id，依赖列的
+// $defaultFn 自动生成（与 Prisma 的 @default(cuid()) 等价）
+const idDefault = () => crypto.randomUUID()
 
 // ============================================================
-// 与现有 MySQL 表结构严格对齐（原 Prisma 迁移生成的表）
-// 表名/列名/类型/索引必须与 SHOW CREATE TABLE 完全一致，
-// 不要在这里改结构 —— 否则与线上数据不匹配
+// D1（Cloudflare SQLite）表结构 —— 从 MySQL 迁移而来
+// 表名/列名与旧库一致（Prisma 单数表名），日期用 timestamp 模式存 Date
 // ============================================================
 
-export const users = mysqlTable(
+export const users = sqliteTable(
   'user',
   {
-    id: varchar('id', { length: 191 }).primaryKey(),
-    name: varchar('name', { length: 191 }),
-    email: varchar('email', { length: 191 }),
-    emailVerified: datetime('emailVerified', { mode: 'date', fsp: 3 }),
-    image: varchar('image', { length: 191 }),
-    passwordHash: varchar('passwordHash', { length: 191 }),
-    emailVerificationCode: varchar('emailVerificationCode', { length: 191 }),
-    emailVerificationExpires: datetime('emailVerificationExpires', { mode: 'date', fsp: 3 }),
-    emailVerificationAttempts: int('emailVerificationAttempts').notNull().default(0),
+    id: text('id').primaryKey().$defaultFn(idDefault),
+    name: text('name'),
+    email: text('email'),
+    emailVerified: integer('emailVerified', { mode: 'timestamp' }),
+    image: text('image'),
+    passwordHash: text('passwordHash'),
+    emailVerificationCode: text('emailVerificationCode'),
+    emailVerificationExpires: integer('emailVerificationExpires', { mode: 'timestamp' }),
+    emailVerificationAttempts: integer('emailVerificationAttempts').notNull().default(0),
   },
   t => [
     uniqueIndex('User_email_key').on(t.email),
   ],
 )
 
-export const accounts = mysqlTable(
+export const accounts = sqliteTable(
   'account',
   {
-    id: varchar('id', { length: 191 }).primaryKey(),
-    userId: varchar('userId', { length: 191 }).notNull(),
-    type: varchar('type', { length: 191 }).notNull(),
-    provider: varchar('provider', { length: 191 }).notNull(),
-    providerAccountId: varchar('providerAccountId', { length: 191 }).notNull(),
+    id: text('id').primaryKey().$defaultFn(idDefault),
+    userId: text('userId').notNull(),
+    type: text('type').notNull(),
+    provider: text('provider').notNull(),
+    providerAccountId: text('providerAccountId').notNull(),
     refreshToken: text('refresh_token'),
     accessToken: text('access_token'),
-    expiresAt: int('expires_at'),
+    expiresAt: integer('expires_at'),
     tokenType: text('token_type'),
     scope: text('scope'),
     idToken: text('id_token'),
@@ -58,13 +58,13 @@ export const accounts = mysqlTable(
   ],
 )
 
-export const sessions = mysqlTable(
+export const sessions = sqliteTable(
   'session',
   {
-    id: varchar('id', { length: 191 }).primaryKey(),
-    sessionToken: varchar('sessionToken', { length: 191 }).notNull(),
-    userId: varchar('userId', { length: 191 }).notNull(),
-    expires: datetime('expires', { mode: 'date', fsp: 3 }).notNull(),
+    id: text('id').primaryKey().$defaultFn(idDefault),
+    sessionToken: text('sessionToken').notNull(),
+    userId: text('userId').notNull(),
+    expires: integer('expires', { mode: 'timestamp' }).notNull(),
   },
   t => [
     uniqueIndex('Session_sessionToken_key').on(t.sessionToken),
@@ -72,12 +72,12 @@ export const sessions = mysqlTable(
   ],
 )
 
-export const verificationTokens = mysqlTable(
+export const verificationTokens = sqliteTable(
   'verificationtoken',
   {
-    identifier: varchar('identifier', { length: 191 }).notNull(),
-    token: varchar('token', { length: 191 }).notNull(),
-    expires: datetime('expires', { mode: 'date', fsp: 3 }).notNull(),
+    identifier: text('identifier').notNull(),
+    token: text('token').notNull(),
+    expires: integer('expires', { mode: 'timestamp' }).notNull(),
   },
   t => [
     uniqueIndex('VerificationToken_token_key').on(t.token),
@@ -86,39 +86,39 @@ export const verificationTokens = mysqlTable(
   ],
 )
 
-export const resumes = mysqlTable(
+export const resumes = sqliteTable(
   'resume',
   {
-    id: varchar('id', { length: 191 }).primaryKey(),
-    name: varchar('name', { length: 191 }).notNull(),
+    id: text('id').primaryKey().$defaultFn(idDefault),
+    name: text('name').notNull(),
     content: text('content').notNull(),
-    theme: varchar('theme', { length: 191 }).notNull().default('default'),
+    theme: text('theme').notNull().default('default'),
     plugins: text('plugins').notNull(),
-    createdAt: datetime('createdAt', { mode: 'date', fsp: 3 }).notNull().default(sql`CURRENT_TIMESTAMP(3)`),
-    updatedAt: datetime('updatedAt', { mode: 'date', fsp: 3 }).notNull(),
-    isDefault: tinyint('isDefault').notNull().default(0),
-    userId: varchar('userId', { length: 191 }),
+    createdAt: integer('createdAt', { mode: 'timestamp' }).notNull().default(sql`(unixepoch() * 1000)`),
+    updatedAt: integer('updatedAt', { mode: 'timestamp' }).notNull(),
+    isDefault: integer('isDefault').notNull().default(0),
+    userId: text('userId'),
   },
   t => [
     index('Resume_userId_fkey').on(t.userId),
   ],
 )
 
-export const resumeSettings = mysqlTable(
+export const resumeSettings = sqliteTable(
   'resumesettings',
   {
-    id: varchar('id', { length: 191 }).primaryKey(),
-    resumeId: varchar('resumeId', { length: 191 }).notNull(),
-    fontname: varchar('fontname', { length: 191 }).notNull().default('default'),
-    pagePadding: int('pagePadding').notNull().default(36),
-    pageLineHeight: double('pageLineHeight').notNull().default(1.9),
-    pageBackground: varchar('pageBackground', { length: 191 }).notNull().default('default'),
-    pageThemeColor: varchar('pageThemeColor', { length: 191 }).notNull().default('0,0,0'),
+    id: text('id').primaryKey().$defaultFn(idDefault),
+    resumeId: text('resumeId').notNull(),
+    fontname: text('fontname').notNull().default('default'),
+    pagePadding: integer('pagePadding').notNull().default(36),
+    pageLineHeight: real('pageLineHeight').notNull().default(1.9),
+    pageBackground: text('pageBackground').notNull().default('default'),
+    pageThemeColor: text('pageThemeColor').notNull().default('0,0,0'),
     imagePosition: text('imagePosition').notNull(),
-    isScrollable: tinyint('isScrollable').notNull().default(0),
-    editorMode: varchar('editorMode', { length: 191 }).notNull().default('source'),
-    createdAt: datetime('createdAt', { mode: 'date', fsp: 3 }).notNull().default(sql`CURRENT_TIMESTAMP(3)`),
-    updatedAt: datetime('updatedAt', { mode: 'date', fsp: 3 }).notNull(),
+    isScrollable: integer('isScrollable').notNull().default(0),
+    editorMode: text('editorMode').notNull().default('source'),
+    createdAt: integer('createdAt', { mode: 'timestamp' }).notNull().default(sql`(unixepoch() * 1000)`),
+    updatedAt: integer('updatedAt', { mode: 'timestamp' }).notNull(),
   },
   t => [
     uniqueIndex('ResumeSettings_resumeId_key').on(t.resumeId),
