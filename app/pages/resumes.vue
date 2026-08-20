@@ -11,6 +11,11 @@ const router = useRouter()
 const localePath = useLocalePath()
 const { status, signIn } = useAuth()
 const { toast } = useToast()
+const storageManager = useStorageManager()
+const { currentMode } = storageManager
+
+// 本地模式 或 已登录 → 允许操作
+const canAccess = computed(() => currentMode.value === 'local' || status.value === 'authenticated')
 
 const MAX_RESUMES = 10
 const showCreateDialog = ref(false)
@@ -140,14 +145,22 @@ async function handleDuplicateResume(id: string) {
   }
 }
 
+// local 模式或已登录时都加载简历
 onMounted(() => {
-  if (status.value === 'authenticated') {
+  if (canAccess.value) {
+    reloadResumes()
+  }
+})
+
+// 模式/登录状态变化时重新加载（例如从未登录→登录，或用户切换到 local 模式）
+watch([currentMode, status], () => {
+  if (canAccess.value) {
     reloadResumes()
   }
 })
 
 definePageMeta({
-  middleware: 'sidebase-auth',
+  // 移除 sidebase-auth 中间件：本地模式不需要登录即可访问
 })
 </script>
 
@@ -171,7 +184,7 @@ definePageMeta({
           </div>
         </div>
         <Button
-          v-if="status === 'authenticated'"
+          v-if="canAccess"
           class="text-white px-4 py-2 bg-black cursor-pointer hover:bg-gray-900"
           variant="default"
           :disabled="resumes.length >= MAX_RESUMES"
@@ -182,8 +195,8 @@ definePageMeta({
         </Button>
       </div>
 
-      <!-- 未登录状态 -->
-      <div v-if="status !== 'authenticated'" class="py-12 text-center">
+      <!-- 仅 database 模式 + 未登录时提示登录；local 模式直接进入简历管理 -->
+      <div v-if="currentMode === 'database' && status !== 'authenticated'" class="py-12 text-center">
         <div class="mx-auto max-w-md">
           <div class="mb-6">
             <div class="i-ri-user-line text-6xl text-gray-400 mx-auto mb-4" />

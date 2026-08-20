@@ -13,7 +13,7 @@ const imageLoading = ref(false)
 
 definePageMeta({
   layout: false,
-  middleware: 'sidebase-auth',
+  // 移除 sidebase-auth 中间件：本地存储模式下不需要登录即可预览
 })
 
 async function handleExportPDF() {

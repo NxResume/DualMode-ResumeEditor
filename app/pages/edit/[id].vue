@@ -16,7 +16,7 @@ const scalePre = computed(() => {
 
 definePageMeta({
   layout: 'default',
-  middleware: 'sidebase-auth',
+  // 移除 sidebase-auth 中间件：本地存储模式下不需要登录即可编辑
 })
 
 const { stop, start } = useScrollSync(leftRef, el)
