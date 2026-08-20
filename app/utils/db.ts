@@ -1,76 +1,42 @@
-import type { PrismaClient } from '@prisma/client'
-
-const globalForPrisma = globalThis as unknown as {
-  prisma: PrismaClient | undefined
-}
-
-/**
- * 按运行时选择 Prisma 初始化方式：
- *
- *   - Node（本地 dev / 传统 node-server 部署）：
- *       `@prisma/client`（默认入口，binary engine） + process.env.DATABASE_URL
- *
- *   - Cloudflare Workers / Pages Functions（含 Hyperdrive）：
- *       `@prisma/client/edge`（wasm engine —— Prisma 5/6 官方 Edge 入口）
- *       + 从 env.HYPERDRIVE 拼出来的 DATABASE_URL。
- *       env.HYPERDRIVE 是 wrangler.jsonc 或 Pages Dashboard 中配置的
- *       Hyperdrive binding：
- *           { host, port, user, password, database, connectionString }
- *
- * 注意：
- *   1) 在 Pages Functions 里必须开 `nodejs_compat` flag（见 wrangler.jsonc），
- *      否则 bcrypt/nodemailer 等依赖用的 Node 原生模块会 undefined。
- *   2) Hyperdrive 是 Cloudflare 到源 MySQL 的代理：Prisma 只认 DATABASE_URL，
- *      所有 TCP 封包通过 Hyperdrive HTTP/WebSocket 隧道发出，源库看不出来区别。
- *   3) 为了不破坏现有 `import { prisma } from '~/utils/db'` 的使用方式，
- *      这里用 Proxy 做延迟初始化：第一次访问 prisma 的任意属性时才真正创建
- *      PrismaClient，避免 import 阶段 Nitro useRuntimeConfig 尚未就绪。
- */
-
 // 该文件同时运行在 Node 与 Workers（edge）环境：Workers 上 process 是全局
 // polyfill，不能 require("process")，故禁用 prefer-global/process 检查
 /* eslint-disable node/prefer-global/process */
+import type { MySql2Database } from 'drizzle-orm/mysql2'
+import { drizzle } from 'drizzle-orm/mysql2'
+import { createPool } from 'mysql2/promise'
+import * as schema from '../../db/schema'
 
-function buildDatabaseUrl(envLike: Record<string, any> = process.env): string {
-  // 1) 直接配了 DATABASE_URL（本地 Node / Node 生产 / 手动 override）
-  if (envLike.DATABASE_URL)
-    return envLike.DATABASE_URL
-
-  // 2) Cloudflare Hyperdrive binding：env.HYPERDRIVE.{host,port,user,password,database}
-  const hyper = envLike.HYPERDRIVE
-  if (hyper && typeof hyper === 'object' && hyper.host && hyper.database) {
-    const {
-      host,
-      port = 3306,
-      user,
-      password,
-      database,
-    } = hyper /* MySQL 默认 3306 */
-    const userInfo = user ? `${encodeURIComponent(user)}${password ? `:${encodeURIComponent(password)}` : ''}@` : ''
-    // schema.prisma datasource 里是 mysql provider
-    return `mysql://${userInfo}${host}:${port}/${encodeURIComponent(database)}`
-  }
-
-  // 3) 兜底：让 Prisma 自己报缺 DATABASE_URL 的错，方便排查
-  return ''
+const globalForDb = globalThis as unknown as {
+  __resumeDb: MySql2Database<typeof schema> | undefined
+  __resumePool: any
 }
 
 /**
- * 判断当前是不是 Cloudflare Workers / Pages Functions runtime。
- * （从多个特征综合判断，避免误判）
+ * 按运行时选择数据库连接方式：
+ *
+ *   - Node（本地 dev / 传统 node-server 部署）：
+ *       mysql2/promise 连接池直连 process.env.DATABASE_URL
+ *
+ *   - Cloudflare Workers / Pages Functions（含 Hyperdrive）：
+ *       mysql2 v3.13+ 直接把 env.HYPERDRIVE 的 host/port/user/password/database
+ *       传给 createConnection + disableEval:true，由 Hyperdrive 透明代理到源 MySQL
+ *       （Cloudflare 官方 mysql2 指南模式）
+ *
+ * 注意：
+ *   1) 在 Pages Functions 里必须开 `nodejs_compat` flag（见 wrangler.jsonc），
+ *      否则 mysql2 依赖的 Node 原生模块会 undefined。
+ *   2) env.HYPERDRIVE 是 wrangler.jsonc 或 Pages Dashboard 中配置的 Hyperdrive
+ *      binding：{ host, port, user, password, database, connectionString }
+ *   3) 为了不破坏现有 `import { db } from '~/utils/db'` 的使用方式，
+ *      这里用 Proxy 做延迟初始化：第一次访问 db 的任意属性时才真正创建
+ *      Drizzle 实例，避免 import 阶段 Nitro useRuntimeConfig 尚未就绪。
  */
-function detectWorkersRuntime(env: Record<string, any>): boolean {
-  const g = globalThis as any
-  return Boolean(
-    // Cloudflare Workers 全局特有
-    typeof g.WebSocketPair !== 'undefined'
-    || typeof g.__STATIC_CONTENT !== 'undefined'
-    || (typeof g.caches !== 'undefined' && g.caches?.default && typeof g.addEventListener === 'function')
-    // Nitro preset 明确是 Cloudflare
-    || /cloudflare/i.test(env.NITRO_PRESET ?? '')
-    // 或已经拿到 Hyperdrive binding（最常见）
-    || env.HYPERDRIVE,
-  )
+
+function parseDatabaseUrl(url: string) {
+  const m = url.match(/mysql:\/\/([^:]+):([^@]+)@([^:]+):(\d+)\/(.+)/)
+  if (!m)
+    throw new Error(`Invalid DATABASE_URL: ${url}`)
+  return { user: m[1], password: m[2], host: m[3], port: Number(m[4]), database: m[5] }
 }
 
 /**
@@ -78,12 +44,11 @@ function detectWorkersRuntime(env: Record<string, any>): boolean {
  * 不同版本有时会漏同步，这里兜底从 useRuntimeConfig().nitro.cloudflare.env 里再读一次。
  * （只在 event handler 中 safe；import 阶段 useRuntimeConfig 可能抛，已用 try/catch 忽略）
  */
-function getEnvWithHyperdriveBindings(): Record<string, any> {
+function getEnvWithBindings(): Record<string, any> {
   const env: Record<string, any> = { ...process.env }
 
   if (!env.HYPERDRIVE) {
     try {
-      // 仅在函数里已经 init runtime config 的情况下尝试兜底
       let rt: any = (globalThis as any).__NUXT_RUNTIME_CONFIG__
       if (!rt && typeof useRuntimeConfig === 'function')
         rt = useRuntimeConfig()
@@ -119,73 +84,86 @@ function getEnvWithHyperdriveBindings(): Record<string, any> {
   return env
 }
 
-function createPrismaClient(): PrismaClient {
-  const env = getEnvWithHyperdriveBindings()
-  const datasourceUrl = buildDatabaseUrl(env)
-  const isWorkers = detectWorkersRuntime(env)
+function createDrizzle(): MySql2Database<typeof schema> {
+  const env = getEnvWithBindings()
 
-  const mod: typeof import('@prisma/client') = isWorkers
-    // eslint-disable-next-line ts/no-require-imports -- 运行时按环境动态选择入口，不能用静态 import
-    ? require('@prisma/client/edge') // Workers → wasm engine，不 spawn 子进程
-    // eslint-disable-next-line ts/no-require-imports -- 同上：Node → binary engine，cold start 更快
-    : require('@prisma/client') // Node → binary engine，cold start 更快
+  // Workers / Pages Functions + Hyperdrive
+  if (env.HYPERDRIVE && typeof env.HYPERDRIVE === 'object' && env.HYPERDRIVE.host) {
+    const h = env.HYPERDRIVE
+    const pool = createPool({
+      host: h.host,
+      user: h.user,
+      password: h.password,
+      database: h.database,
+      port: h.port ?? 3306,
+      // Required to enable mysql2 compatibility for Workers
+      disableEval: true,
+      connectionLimit: 1,
+      maxIdle: 1,
+      waitForConnections: true,
+      enableKeepAlive: true,
+    })
+    globalForDb.__resumePool = pool
+    return drizzle(pool, { schema, mode: 'default' })
+  }
 
-  const { PrismaClient } = mod
+  // Node：直连 DATABASE_URL
+  const url = env.DATABASE_URL
+  if (!url)
+    throw new Error('DATABASE_URL is not set')
 
-  return new PrismaClient({
-    datasources: datasourceUrl ? { db: { url: datasourceUrl } } : undefined,
-    log: ['warn', 'error'],
-  }) as PrismaClient
+  const { host, port, user, password, database } = parseDatabaseUrl(url)
+  const pool = createPool({ host, port, user, password, database })
+  globalForDb.__resumePool = pool
+  return drizzle(pool, { schema, mode: 'default' })
 }
 
 // 延迟初始化单例
-let lazyPrisma: PrismaClient | undefined = globalForPrisma.prisma
+let lazyDb: MySql2Database<typeof schema> | undefined = globalForDb.__resumeDb
 
-export function getPrisma(): PrismaClient {
-  if (!lazyPrisma) {
-    lazyPrisma = createPrismaClient()
-    if (!globalForPrisma.prisma)
-      globalForPrisma.prisma = lazyPrisma
+export function getDb(): MySql2Database<typeof schema> {
+  if (!lazyDb) {
+    lazyDb = createDrizzle()
+    if (!globalForDb.__resumeDb)
+      globalForDb.__resumeDb = lazyDb
   }
-  return lazyPrisma
+  return lazyDb
 }
 
 /**
- * 向后兼容：保持 `import { prisma } from '~/utils/db'` 的写法不变
+ * 向后兼容：保持 `import { db } from '~/utils/db'` 的写法不变
  *
- * 用 Proxy 实现延迟：第一次真正访问 prisma.resume / prisma.user 等属性时
- * 才会创建 PrismaClient。这样：
+ * 用 Proxy 实现延迟：第一次真正访问 db.resume / db.select 等属性时
+ * 才会创建 Drizzle 实例。这样：
  *   · 模块 import 阶段不会急着去读 runtime（useRuntimeConfig 还没 ready）
  *   · HMR 不影响；module-level side-effect 被去掉
- *   · 原有 server routes / providers/index.ts 一行都不用改
+ *   · 原有 server routes 一行都不用改（除 prisma 属性名 → db 属性名）
  */
-export const prisma = new Proxy(
-  // 空的占位 object：不导出任何方法，全靠 target=getPrisma() 做转发
-  {} as PrismaClient,
+export const db = new Proxy(
+  {} as MySql2Database<typeof schema>,
   {
     get(_t, prop, recv) {
-      return Reflect.get(getPrisma(), prop, recv)
+      return Reflect.get(getDb(), prop, recv)
     },
     set(_t, prop, val, recv) {
-      return Reflect.set(getPrisma(), prop, val, recv)
+      return Reflect.set(getDb(), prop, val, recv)
     },
     getOwnPropertyDescriptor(_t, prop) {
-      const real = Object.getOwnPropertyDescriptor(getPrisma() as unknown as object, prop)
+      const real = Object.getOwnPropertyDescriptor(getDb() as unknown as object, prop)
       if (real)
         return real
-      // 对没有的属性也返回 writable/configurable，避免消费方做 Object.keys/解构时炸
       return typeof prop !== 'symbol'
         ? { configurable: true, enumerable: String(prop).startsWith('$'), writable: true }
         : undefined
     },
     ownKeys() {
-      const p = getPrisma() as unknown as object
-      return Reflect.ownKeys(p)
+      const d = getDb() as unknown as object
+      return Reflect.ownKeys(d)
     },
     has(_t, prop) {
-      return prop in getPrisma()
+      return prop in getDb()
     },
   },
-) as unknown as PrismaClient
+) as unknown as MySql2Database<typeof schema>
 
-export type { PrismaClient }
+export { schema }

@@ -1,4 +1,5 @@
-import { prisma } from '~/utils/db'
+import { eq } from 'drizzle-orm'
+import { db, schema } from '~/utils/db'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
@@ -8,7 +9,9 @@ export default defineEventHandler(async (event) => {
     return { success: false, message: '邮箱和验证码不能为空' }
   }
 
-  const user = await prisma.user.findUnique({ where: { email } })
+  const user = await db.query.users.findFirst({
+    where: (t, { eq: eqFn }) => eqFn(t.email, email),
+  })
   if (!user) {
     return { success: false, message: '用户不存在' }
   }
@@ -24,22 +27,18 @@ export default defineEventHandler(async (event) => {
     || user.emailVerificationExpires < new Date()
   ) {
     // 验证失败：递增尝试次数
-    await prisma.user.update({
-      where: { email },
-      data: { emailVerificationAttempts: { increment: 1 } },
-    })
+    await db.update(schema.users).set({
+      emailVerificationAttempts: user.emailVerificationAttempts + 1,
+    }).where(eq(schema.users.email, email))
     return { success: false, message: '验证码错误或已过期' }
   }
 
-  await prisma.user.update({
-    where: { email },
-    data: {
-      emailVerified: new Date(),
-      emailVerificationCode: null,
-      emailVerificationExpires: null,
-      emailVerificationAttempts: 0,
-    },
-  })
+  await db.update(schema.users).set({
+    emailVerified: new Date(),
+    emailVerificationCode: null,
+    emailVerificationExpires: null,
+    emailVerificationAttempts: 0,
+  }).where(eq(schema.users.email, email))
 
   return { success: true, message: '注册成功' }
 })

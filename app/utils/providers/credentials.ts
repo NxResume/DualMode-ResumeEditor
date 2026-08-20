@@ -1,6 +1,6 @@
 import CredentialsProvider from '@auth/core/providers/credentials'
 import bcrypt from 'bcrypt'
-import { prisma } from '~/utils/db'
+import { db } from '~/utils/db'
 
 export default function Credentials() {
   return CredentialsProvider({
@@ -12,7 +12,9 @@ export default function Credentials() {
     async authorize(credentials) {
       const email = typeof credentials?.email === 'string' ? credentials.email : ''
       const password = typeof credentials?.password === 'string' ? credentials.password : ''
-      const user = await prisma.user.findUnique({ where: { email } })
+      const user = await db.query.users.findFirst({
+        where: (t, { eq }) => eq(t.email, email),
+      })
       if (!user || !user.passwordHash)
         return null
       const valid = await bcrypt.compare(password, user.passwordHash)

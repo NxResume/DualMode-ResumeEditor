@@ -23,14 +23,16 @@
   // Pages Project 名；与 Cloudflare 侧实际 Pages 项目名保持一致
   // （wrangler v3.109+ 会校验并提示修正，避免部署失败）
   "name": "resume",
-  "compatibility_date": "2024-10-01",
+  // 必须设为新日期：旧日期下 workerd 的 node:buffer polyfill 缺少 hasOwnProperty，
+  // mysql2 打包代码会崩（TR.hasOwnProperty is not a function）
+  "compatibility_date": "2026-08-20",
   "compatibility_flags": [
     // ——— 关键！必须开 ———
-    // Prisma wasm engine、bcrypt、nodemailer、mysql2 等都依赖 Node 原生模块
+    // bcrypt、nodemailer、mysql2 等都依赖 Node 原生模块
     "nodejs_compat"
   ],
 
-  // Pages Functions 资源限制：Prisma wasm 启动有点重，这里给足
+  // Pages Functions 资源限制：mysql2 连接池 + Drizzle 查询，这里给足
   "limits": {
     "cpu_ms": 30000,
     "memory": "256 MB"
@@ -52,7 +54,7 @@
   "hyperdrive": [
     {
       "binding": "HYPERDRIVE",
-      "id": "0a4dbdc86d664c8085171ef7980bde21"
+      "id": "07c019e8bc704f16baa73faf40543ec7"
     }
   ],
 
@@ -75,10 +77,11 @@
   //         GITHUB_CLIENT_ID=xxxx
   //         ...
   // -------------------------------------------------------------
+  // AUTH_ORIGIN 是公开域名（非敏感），放 vars 由 wrangler 部署时注入；
+  // 其余 secrets（AUTH_SECRET/OAuth/SMTP）在 Pages Dashboard 配置，
+  // 不要在 vars 里重复定义，否则与 secret 同名 binding 冲突导致部署失败
   "vars": {
-    // AUTH_ORIGIN 可以填 Pages 生产域名；本地 dev 会回退到 http://localhost
-    // 为了避免硬编码多个域名，这里留空，实际用 Dashboard 覆盖
-    "AUTH_ORIGIN": ""
+    "AUTH_ORIGIN": "https://resume.ryanuo.cc"
   },
 
   // Nitro preset=cloudflare_pages 构建后 Pages 静态 + Functions 打包产物根目录

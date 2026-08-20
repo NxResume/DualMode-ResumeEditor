@@ -1,4 +1,5 @@
-import { prisma } from '~/utils/db'
+import { eq } from 'drizzle-orm'
+import { db, schema } from '~/utils/db'
 
 export default defineEventHandler(async (event) => {
   try {
@@ -7,23 +8,25 @@ export default defineEventHandler(async (event) => {
 
     const body = await readBody(event)
 
-    const resume = await prisma.resume.update({
-      where: { id },
-      data: {
-        name: body.name,
-        content: body.content,
-        theme: body.theme,
-        plugins: JSON.stringify(body.plugins || []),
-        updatedAt: new Date(),
-      },
-      include: {
+    const [resume] = await db.update(schema.resumes).set({
+      name: body.name,
+      content: body.content,
+      theme: body.theme,
+      plugins: JSON.stringify(body.plugins || []),
+      updatedAt: new Date(),
+    }).where(eq(schema.resumes.id, id!))
+
+    // 查询更新后的完整简历（带 settings）
+    const updated = await db.query.resumes.findFirst({
+      where: (t, { eq: eqFn }) => eqFn(t.id, id!),
+      with: {
         settings: true,
       },
     })
 
     return {
       success: true,
-      data: resume,
+      data: updated ?? resume,
     }
   }
   catch (error: any) {

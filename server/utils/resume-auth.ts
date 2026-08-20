@@ -1,6 +1,6 @@
 import type { H3Event } from 'h3'
 import { getServerSession } from '#auth'
-import { prisma } from '~/utils/db'
+import { db } from '~/utils/db'
 
 /**
  * 获取当前登录用户，未登录或用户不存在时抛出 401
@@ -16,8 +16,8 @@ export async function requireCurrentUser(event: H3Event) {
     })
   }
 
-  const user = await prisma.user.findUnique({
-    where: { email },
+  const user = await db.query.users.findFirst({
+    where: (t, { eq }) => eq(t.email, email),
   })
 
   if (!user) {
@@ -47,9 +47,9 @@ export async function assertResumeOwnership(event: H3Event, id: string | undefin
 
   const user = await requireCurrentUser(event)
 
-  const resume = await prisma.resume.findUnique({
-    where: { id },
-    select: { id: true, userId: true },
+  const resume = await db.query.resumes.findFirst({
+    where: (t, { eq }) => eq(t.id, id),
+    columns: { id: true, userId: true },
   })
 
   if (!resume) {

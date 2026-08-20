@@ -1,4 +1,6 @@
-import { prisma } from '~/utils/db'
+import { randomUUID } from 'node:crypto'
+import { eq } from 'drizzle-orm'
+import { db, schema } from '~/utils/db'
 
 export default defineEventHandler(async (event) => {
   try {
@@ -14,20 +16,30 @@ export default defineEventHandler(async (event) => {
     await assertResumeOwnership(event, id)
 
     const body = await readBody(event)
-    const settings = await prisma.resumeSettings.upsert({
-      where: { resumeId: id },
-      update: {
+
+    // upsert：先查，存在则更新，不存在则插入
+    const existing = await db.query.resumeSettings.findFirst({
+      where: (t, { eq: eqFn }) => eqFn(t.resumeId, id),
+    })
+
+    let settings
+    if (existing) {
+      const [updated] = await db.update(schema.resumeSettings).set({
         fontname: body.fontname,
         pagePadding: body.pagePadding,
         pageLineHeight: body.pageLineHeight,
         pageBackground: body.pageBackground,
         pageThemeColor: body.pageThemeColor,
         imagePosition: JSON.stringify(body.imagePosition),
-        isScrollable: body.isScrollable,
+        isScrollable: body.isScrollable ? 1 : 0,
         editorMode: body.editorMode,
         updatedAt: new Date(),
-      },
-      create: {
+      }).where(eq(schema.resumeSettings.resumeId, id))
+      settings = updated
+    }
+    else {
+      const [created] = await db.insert(schema.resumeSettings).values({
+        id: randomUUID().replaceAll('-', '').slice(0, 25),
         resumeId: id,
         fontname: body.fontname || 'default',
         pagePadding: body.pagePadding || 36,
@@ -35,28 +47,27 @@ export default defineEventHandler(async (event) => {
         pageBackground: body.pageBackground || 'default',
         pageThemeColor: body.pageThemeColor || '0,0,0',
         imagePosition: JSON.stringify(body.imagePosition || { top: 66, left: 391, scale: '0.8 0.8' }),
-        isScrollable: body.isScrollable || false,
+        isScrollable: body.isScrollable ? 1 : 0,
         editorMode: body.editorMode || 'source',
-      },
+        updatedAt: new Date(),
+      }).$returningId()
+      settings = created
+    }
+
+    // 返回完整记录
+    const result = await db.query.resumeSettings.findFirst({
+      where: (t, { eq: eqFn }) => eqFn(t.resumeId, id),
     })
 
     return {
       success: true,
-      data: settings,
+      data: result ?? settings,
     }
   }
   catch (error: any) {
     // 已带状态码的错误（400/401/403/404 等）直接透传，避免被包装成 500
     if (error?.statusCode)
       throw error
-
-    // 错误处理优化：使用 message 字段
-    if (error.code === 'P2003') {
-      throw createError({
-        statusCode: 400,
-        message: '外键约束错误：关联的简历不存在',
-      })
-    }
 
     throw createError({
       statusCode: 500,

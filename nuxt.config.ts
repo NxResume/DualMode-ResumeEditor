@@ -75,20 +75,16 @@ export default defineNuxtConfig({
     // Cloudflare Pages Functions + Hyperdrive 部署（Nitro preset）
     // 用法：
     //   生产：    NITRO_PRESET=cloudflare_pages pnpm build
-    //   本地调试：pnpm add -D wrangler && wrangler pages dev .output/public --compatibility-flags=nodejs_compat
+    //   本地调试：pnpm dev（node-server + 本地 MySQL DATABASE_URL）
     // 说明：
     //   - 开启 nodejs_compat，mysql2/bcrypt/nodemailer 等 Node API 依赖能在 Workers 运行
-    //   - Prisma 6.x 使用 wasm engine（见 app/utils/db.ts），不需要 Driver Adapter
-    //   - DATABASE_URL 由 Pages Functions 的 env 动态拼接 Hyperdrive host/port/user/password/database
+    //   - Drizzle ORM + mysql2（见 app/utils/db.ts）：Node 直连 DATABASE_URL，
+    //     Workers 走 env.HYPERDRIVE（mysql2 v3.13+ 原生支持 Hyperdrive 参数）
     // ============================================================
     // eslint-disable-next-line node/prefer-global/process -- Nitro 配置读 env 的标准方式
     preset: process.env.NITRO_PRESET === 'cloudflare_pages' ? 'cloudflare_pages' : 'node-server',
     rollupConfig: {
       external: [
-        // Prisma wasm engine 与引擎二进制，rollup 不要打包，保留动态 require
-        '@prisma/client',
-        '@prisma/engines',
-        '@prisma/engines-version',
         // Node 原生模块（Workers 上由 nodejs_compat 提供）
         'node:crypto',
         'node:buffer',

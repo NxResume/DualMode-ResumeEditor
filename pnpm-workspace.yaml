@@ -2,6 +2,7 @@ packages: []
 
 catalogs:
   build:
+    '@auth/drizzle-adapter': ^1.11.3
     '@nuxt/devtools': ^2.6.2
     '@nuxt/eslint': ^1.5.2
     '@nuxt/kit': ^3.17.6
@@ -13,6 +14,9 @@ catalogs:
     '@vite-pwa/nuxt': ^1.0.4
     '@vueuse/nuxt': ^13.5.0
     bcrypt: ^6.0.0
+    drizzle-kit: ^0.31.10
+    drizzle-orm: ^0.45.2
+    mysql2: ^3.23.4
     nodemailer: ^7.0.4
     nuxt: ^3.17.6
     unocss: ^66.3.2
@@ -43,12 +47,10 @@ catalogs:
 
   frontend:
     '@auth/core': ^0.40.0
-    '@auth/prisma-adapter': ^2.10.0
     '@codemirror/commands': ^6.8.1
     '@codemirror/lang-markdown': ^6.3.3
     '@codemirror/state': ^6.5.2
     '@codemirror/view': ^6.38.0
-    '@prisma/client': ^6.11.1
     '@sidebase/nuxt-auth': ^1.0.0
     '@vueuse/core': ^13.5.0
     case-police: ^2.0.0
@@ -62,7 +64,6 @@ catalogs:
     markdown-it-regex: ^0.2.2
     next-auth: 4.21.1
     pinia: ^3.0.3
-    prisma: ^6.11.1
     resume-theme: ^0.3.4
     turndown: ^7.2.0
     vue: ^3.5.17
@@ -73,11 +74,8 @@ catalogs:
     '@iconify/utils': ^2.3.0
 
 ignoredBuiltDependencies:
-  - '@prisma/client'
-  - '@prisma/engines'
   - bcrypt
   - core-js
-  - prisma
   - vue-demi
 
 onlyBuiltDependencies:

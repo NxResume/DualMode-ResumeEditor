@@ -1,12 +1,12 @@
-import { prisma } from '~/utils/db'
+import { db } from '~/utils/db'
 
 export default defineEventHandler(async (event) => {
   try {
     const id = getRouterParam(event, 'id')
     await assertResumeOwnership(event, id)
 
-    const settings = await prisma.resumeSettings.findUnique({
-      where: { resumeId: id },
+    const settings = await db.query.resumeSettings.findFirst({
+      where: (t, { eq: eqFn }) => eqFn(t.resumeId, id!),
     })
 
     return { success: true, data: settings }

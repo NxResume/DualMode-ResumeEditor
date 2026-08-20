@@ -1,4 +1,5 @@
-import { prisma } from '~/utils/db'
+import { randomUUID } from 'node:crypto'
+import { db, schema } from '~/utils/db'
 
 export default defineEventHandler(async (event) => {
   try {
@@ -7,16 +8,16 @@ export default defineEventHandler(async (event) => {
     const body = await readBody(event)
     const { name, content, theme, plugins, isDefault } = body
 
-    const resume = await prisma.resume.create({
-      data: {
-        name,
-        content,
-        theme,
-        plugins: JSON.stringify(plugins || []),
-        isDefault: isDefault || false,
-        userId: user.id,
-      } as any,
-    })
+    const [resume] = await db.insert(schema.resumes).values({
+      id: randomUUID().replaceAll('-', '').slice(0, 25),
+      name,
+      content,
+      theme,
+      plugins: JSON.stringify(plugins || []),
+      isDefault: isDefault ? 1 : 0,
+      userId: user.id,
+      updatedAt: new Date(),
+    }).$returningId()
 
     return {
       success: true,

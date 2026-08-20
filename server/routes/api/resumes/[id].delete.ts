@@ -1,13 +1,12 @@
-import { prisma } from '~/utils/db'
+import { eq } from 'drizzle-orm'
+import { db, schema } from '~/utils/db'
 
 export default defineEventHandler(async (event) => {
   try {
     const id = getRouterParam(event, 'id')
     await assertResumeOwnership(event, id)
 
-    await prisma.resume.delete({
-      where: { id },
-    })
+    await db.delete(schema.resumes).where(eq(schema.resumes.id, id!))
 
     return {
       success: true,

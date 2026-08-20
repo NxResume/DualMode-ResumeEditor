@@ -1,5 +1,6 @@
 import { getServerSession } from '#auth'
-import { prisma } from '~/utils/db'
+import { desc } from 'drizzle-orm'
+import { db, schema } from '~/utils/db'
 
 export default defineEventHandler(async (event) => {
   try {
@@ -10,15 +11,21 @@ export default defineEventHandler(async (event) => {
       return { success: true, data: [] }
     }
 
-    // 一次查询获取简历列表（通过 user 关联避免两次 DB 往返）
-    const resumes = await prisma.resume.findMany({
-      where: {
-        user: { email: userEmail },
-      },
-      include: {
+    // 先找 user（通过 email），再查其简历列表（带 settings 关联）
+    const user = await db.query.users.findFirst({
+      where: (t, { eq }) => eq(t.email, userEmail),
+    })
+
+    if (!user) {
+      return { success: true, data: [] }
+    }
+
+    const resumes = await db.query.resumes.findMany({
+      where: (t, { eq }) => eq(t.userId, user.id),
+      with: {
         settings: true,
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: [desc(schema.resumes.createdAt)],
     })
 
     return {

@@ -1,7 +1,9 @@
+import { randomUUID } from 'node:crypto'
 import process from 'node:process'
 import bcrypt from 'bcrypt'
+import { eq } from 'drizzle-orm'
 import nodemailer from 'nodemailer'
-import { prisma } from '~/utils/db'
+import { db, schema } from '~/utils/db'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
@@ -12,7 +14,9 @@ export default defineEventHandler(async (event) => {
   }
 
   // 检查邮箱是否已注册（仅已完成验证的账号视为已注册）
-  const exist = await prisma.user.findUnique({ where: { email } })
+  const exist = await db.query.users.findFirst({
+    where: (t, { eq: eqFn }) => eqFn(t.email, email),
+  })
   if (exist?.emailVerified) {
     return { success: false, message: '邮箱已注册' }
   }
@@ -35,40 +39,52 @@ export default defineEventHandler(async (event) => {
 
   // 已存在但未验证的用户：更新验证码并重发（支持重新发送/过期重试）
   // 不存在则创建新用户
-  const user = exist
-    ? await prisma.user.update({
-        where: { email },
-        data: {
-          passwordHash,
-          emailVerificationCode: code,
-          emailVerificationExpires: expires,
-          emailVerificationAttempts: 0,
-        },
-      })
-    : await prisma.user.create({
-        data: {
-          email,
-          passwordHash,
-          emailVerificationCode: code,
-          emailVerificationExpires: expires,
-        },
-      })
+  if (exist) {
+    await db.update(schema.users).set({
+      passwordHash,
+      emailVerificationCode: code,
+      emailVerificationExpires: expires,
+      emailVerificationAttempts: 0,
+    }).where(eq(schema.users.email, email))
+  }
+  else {
+    await db.insert(schema.users).values({
+      id: randomUUID().replaceAll('-', '').slice(0, 25),
+      email,
+      passwordHash,
+      emailVerificationCode: code,
+      emailVerificationExpires: expires,
+    })
+  }
 
-  await prisma.account.upsert({
-    where: {
-      provider_providerAccountId: {
-        provider: 'credentials',
-        providerAccountId: email,
-      },
-    },
-    update: {},
-    create: {
+  // 取回最新用户记录（保证 user.id 可用）
+  const user = await db.query.users.findFirst({
+    where: (t, { eq: eqFn }) => eqFn(t.email, email),
+  })
+  if (!user) {
+    throw createError({
+      statusCode: 500,
+      message: '用户创建失败',
+    })
+  }
+
+  // upsert credentials account
+  const existingAccount = await db.query.accounts.findFirst({
+    where: (t, { and, eq: eqFn }) => and(
+      eqFn(t.provider, 'credentials'),
+      eqFn(t.providerAccountId, email),
+    ),
+  })
+
+  if (!existingAccount) {
+    await db.insert(schema.accounts).values({
+      id: randomUUID().replaceAll('-', '').slice(0, 25),
       userId: user.id,
       type: 'credentials',
       provider: 'credentials',
       providerAccountId: email,
-    },
-  })
+    })
+  }
 
   // 发送邮件（邮箱和授权码请在 .env 文件中配置）
   try {
@@ -89,7 +105,7 @@ export default defineEventHandler(async (event) => {
   }
   catch (error) {
     // 邮件发送失败不应留下不可恢复的状态：
-    // 用户仍处于未验证状态，下次点击“发送验证码”会重新生成并发送
+    // 用户仍处于未验证状态，下次点击"发送验证码"会重新生成并发送
     console.error('发送验证码邮件失败:', error)
     return { success: false, message: '验证码邮件发送失败，请稍后重试' }
   }
