@@ -37,6 +37,11 @@ const navLinks = [
           </a>
         </li>
         <li class="nuxt-btn-link">
+          <NuxtLink :to="localePath('settings')" title="设置">
+            <div class="i-ri-settings-3-line" />
+          </NuxtLink>
+        </li>
+        <li class="nuxt-btn-link">
           <HomeLanguageSwitcher />
         </li>
         <li class="nuxt-btn-link">
