@@ -82,3 +82,5 @@ onlyBuiltDependencies:
   - '@parcel/watcher'
   - esbuild
   - unrs-resolver
+catalog:
+  wrangler: ^4.124.0

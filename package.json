@@ -15,7 +15,11 @@
     "lint": "eslint .",
     "typecheck": "nuxt typecheck",
     "db:ui": "npx prisma studio --port 5556",
-    "db:build": "prisma generate && prisma migrate dev"
+    "db:build": "prisma generate && prisma migrate dev",
+    "build:cf": "NITRO_PRESET=cloudflare_pages pnpm build",
+    "wrangler": "pnpm exec wrangler 2>/dev/null || pnpm dlx wrangler@3",
+    "dev:cf": "pnpm build:cf && pnpm wrangler pages dev dist --compatibility-flags=nodejs_compat --ip=0.0.0.0 --port=8788",
+    "deploy:cf": "pnpm build:cf && pnpm wrangler pages deploy dist"
   },
   "devDependencies": {
     "@antfu/eslint-config": "catalog:dev",
@@ -78,7 +82,8 @@
     "vue": "catalog:frontend",
     "vue-color": "catalog:frontend",
     "vue-tsc": "catalog:dev",
-    "vue3-moveable": "catalog:frontend"
+    "vue3-moveable": "catalog:frontend",
+    "wrangler": "catalog:"
   },
   "resolutions": {
     "@nuxt/devtools": "catalog:build",
