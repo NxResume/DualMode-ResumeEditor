@@ -20,8 +20,9 @@
 //     Dashboard → Pages Project → Settings → Environment variables 里配，不要写
 //     进 git；wrangler.jsonc 里的 `vars` 只放非敏感变量（AUTH_ORIGIN 等公开变量）。
 {
-  // Pages Project 名；首次 deploy 后可以删掉这里改成 --project-name 命令行
-  "name": "mark-resume",
+  // Pages Project 名；与 Cloudflare 侧实际 Pages 项目名保持一致
+  // （wrangler v3.109+ 会校验并提示修正，避免部署失败）
+  "name": "resume",
   "compatibility_date": "2024-10-01",
   "compatibility_flags": [
     // ——— 关键！必须开 ———
