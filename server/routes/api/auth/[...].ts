@@ -15,6 +15,10 @@ export default NuxtAuthHandler({
       clientId: process.env.GITHUB_CLIENT_ID,
       clientSecret: process.env.GITHUB_CLIENT_SECRET,
       allowDangerousEmailAccountLinking: true,
+      // 必须有 issuer：openid-client oauthCallback 校验 'iss' in params 时
+      // 会 assertIssuerConfiguration(this.issuer, 'issuer')，缺失报
+      // "issuer must be configured on the issuer"（本地与 workerd 都会触发）
+      issuer: 'https://github.com',
     }),
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID,

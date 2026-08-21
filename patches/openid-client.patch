@@ -1,0 +1,293 @@
+diff --git a/lib/helpers/request.js b/lib/helpers/request.js
+index 2f936e74187cb3e118a380dc0d926e24c08e8247..ae7ab792a01c0b64277112a3c6cb19f3d86c970d 100644
+--- a/lib/helpers/request.js
++++ b/lib/helpers/request.js
+@@ -1,21 +1,17 @@
+-const assert = require('assert');
+-const querystring = require('querystring');
+-const http = require('http');
+-const https = require('https');
+-const { once } = require('events');
+-const { URL } = require('url');
++// 注意：不要 require('assert')/require('url') 等 node 内置模块——
++// Nitro 打包时对 node 内置的 CJS require 互操作会错接模块
++// （require('assert') 被接成 node:crypto，require('url') 被接成 node:util），
++// 一律用全局对象或手动判断。
+ 
+-const LRU = require('lru-cache');
+-
+-const pkg = require('../../package.json');
+-const { RPError } = require('../errors');
+-
+-const pick = require('./pick');
+-const { deep: defaultsDeep } = require('./defaults');
+ const { HTTP_OPTIONS } = require('./consts');
+ 
+-let DEFAULT_HTTP_OPTIONS;
+-const NQCHAR = /^[\x21\x23-\x5B\x5D-\x7E]+$/;
++let DEFAULT_HTTP_OPTIONS = {
++  headers: {
++    'User-Agent': 'openid-client/5.7.1 (https://github.com/panva/openid-client)',
++    'Accept-Encoding': 'identity',
++  },
++  timeout: 3500,
++};
+ 
+ const allowed = [
+   'agent',
+@@ -30,71 +26,53 @@ const allowed = [
+   'timeout',
+ ];
+ 
++const pick = (obj, ...props) => {
++  const out = {};
++  for (const prop of props) {
++    if (obj && obj[prop] !== undefined) out[prop] = obj[prop];
++  }
++  return out;
++};
++
+ const setDefaults = (props, options) => {
+-  DEFAULT_HTTP_OPTIONS = defaultsDeep(
++  DEFAULT_HTTP_OPTIONS = Object.assign(
+     {},
+     props.length ? pick(options, ...props) : options,
+     DEFAULT_HTTP_OPTIONS,
+   );
+ };
+ 
+-setDefaults([], {
+-  headers: {
+-    'User-Agent': `${pkg.name}/${pkg.version} (${pkg.homepage})`,
+-    'Accept-Encoding': 'identity',
+-  },
+-  timeout: 3500,
+-});
+-
+-function send(req, body, contentType) {
+-  if (contentType) {
+-    req.removeHeader('content-type');
+-    req.setHeader('content-type', contentType);
+-  }
+-  if (body) {
+-    req.removeHeader('content-length');
+-    req.setHeader('content-length', Buffer.byteLength(body));
+-    req.write(body);
+-  }
+-  req.end();
+-}
+-
+-const nonces = new LRU({ max: 100 });
+-
++// ---------------------------------------------------------------------------
++// workerd 兼容补丁（fetch 版 request）：
++// 原实现用 node:http/https 的 request()，在 Cloudflare workerd 下不可用
++// （unenv 只提供 stub，且打包后 require('url') 的 URL 会被 rollup 互操作
++// 错接成 undefined，报 "only valid absolute URLs can be requested"）。
++// 这里改用全局 fetch，接口保持与 openid-client 内部一致：
++//   request(options, { accessToken, mTLS, DPoP })
++//   → { statusCode, headers(plain object), body(getter，按 responseType 解析) }
++// 注意：不要 require('url')/require('http')/require('https')，全部走全局。
++// ---------------------------------------------------------------------------
+ module.exports = async function request(options, { accessToken, mTLS = false, DPoP } = {}) {
+   let url;
+   try {
+-    url = new URL(options.url);
++    url = new URL(options.url); // 全局 URL：Node 与 workerd 均可
+     delete options.url;
+-    assert(/^(https?:)$/.test(url.protocol));
++    if (!/^(https?:)$/.test(url.protocol)) {
++      throw new TypeError('protocol must be http(s)');
++    }
+   } catch (err) {
+     throw new TypeError('only valid absolute URLs can be requested');
+   }
+-  const optsFn = this[HTTP_OPTIONS];
+-  let opts = options;
+ 
+-  const nonceKey = `${url.origin}${url.pathname}`;
+-  if (DPoP && 'dpopProof' in this) {
+-    opts.headers = opts.headers || {};
+-    opts.headers.DPoP = await this.dpopProof(
+-      {
+-        htu: `${url.origin}${url.pathname}`,
+-        htm: options.method || 'GET',
+-        nonce: nonces.get(nonceKey),
+-      },
+-      DPoP,
+-      accessToken,
+-    );
+-  }
++  const optsFn = this && this[HTTP_OPTIONS];
++  let opts = options;
+ 
+-  let userOptions;
+   if (optsFn) {
+-    userOptions = pick(
+-      optsFn.call(this, url, defaultsDeep({}, opts, DEFAULT_HTTP_OPTIONS)),
+-      ...allowed,
+-    );
++    const userOptions = pick(optsFn.call(this, url, Object.assign({}, opts, DEFAULT_HTTP_OPTIONS)), ...allowed);
++    opts = Object.assign({}, DEFAULT_HTTP_OPTIONS, userOptions, opts);
++  } else {
++    opts = Object.assign({}, DEFAULT_HTTP_OPTIONS, opts);
+   }
+-  opts = defaultsDeep({}, userOptions, opts, DEFAULT_HTTP_OPTIONS);
+ 
+   if (mTLS && !opts.pfx && !(opts.key && opts.cert)) {
+     throw new TypeError('mutual-TLS certificate and key not set');
+@@ -113,88 +91,81 @@ module.exports = async function request(options, { accessToken, mTLS = false, DP
+   let body;
+   ({ form, responseType, json, body, ...opts } = opts);
+ 
+-  for (const [key, value] of Object.entries(opts.headers || {})) {
+-    if (value === undefined) {
+-      delete opts.headers[key];
+-    }
++  let fetchBody;
++  let contentType;
++  if (json) {
++    fetchBody = JSON.stringify(json);
++    contentType = 'application/json';
++  } else if (form) {
++    fetchBody = new URLSearchParams(form).toString();
++    contentType = 'application/x-www-form-urlencoded';
++  } else if (body) {
++    fetchBody = body;
+   }
+ 
+-  let response;
+-  const req = (url.protocol === 'https:' ? https.request : http.request)(url.href, opts);
+-  return (async () => {
+-    if (json) {
+-      send(req, JSON.stringify(json), 'application/json');
+-    } else if (form) {
+-      send(req, querystring.stringify(form), 'application/x-www-form-urlencoded');
+-    } else if (body) {
+-      send(req, body);
+-    } else {
+-      send(req);
+-    }
+-
+-    [response] = await Promise.race([once(req, 'response'), once(req, 'timeout')]);
+-
+-    // timeout reached
+-    if (!response) {
+-      req.destroy();
+-      throw new RPError(`outgoing request timed out after ${opts.timeout}ms`);
+-    }
++  const headers = {};
++  for (const [key, value] of Object.entries(opts.headers || {})) {
++    if (value !== undefined) headers[key] = value;
++  }
++  if (contentType) headers['content-type'] = contentType;
+ 
+-    const parts = [];
++  const timeoutMs = opts.timeout || DEFAULT_HTTP_OPTIONS.timeout || 3500;
++  const controller = new AbortController();
++  const timer = setTimeout(() => controller.abort(), timeoutMs);
+ 
+-    for await (const part of response) {
+-      parts.push(part);
+-    }
++  let response;
++  try {
++    const res = await fetch(url, {
++      method: opts.method || 'GET',
++      headers,
++      body: fetchBody,
++      signal: controller.signal,
++      redirect: 'follow',
++    });
+ 
+-    if (parts.length) {
+-      switch (responseType) {
+-        case 'json': {
+-          Object.defineProperty(response, 'body', {
+-            get() {
+-              let value = Buffer.concat(parts);
+-              try {
+-                value = JSON.parse(value);
+-              } catch (err) {
+-                Object.defineProperty(err, 'response', { value: response });
+-                throw err;
+-              } finally {
+-                Object.defineProperty(response, 'body', { value, configurable: true });
+-              }
+-              return value;
+-            },
+-            configurable: true,
+-          });
+-          break;
+-        }
+-        case undefined:
+-        case 'buffer': {
+-          Object.defineProperty(response, 'body', {
+-            get() {
+-              const value = Buffer.concat(parts);
++    const buf = new Uint8Array(await res.arrayBuffer());
++    response = { statusCode: res.status, headers: Object.fromEntries(res.headers.entries()) };
++
++    if (buf.length) {
++      if (responseType === 'json') {
++        Object.defineProperty(response, 'body', {
++          get() {
++            let value;
++            try {
++              value = JSON.parse(new TextDecoder().decode(buf));
++            } catch (err) {
++              Object.defineProperty(err, 'response', { value: response });
++              throw err;
++            } finally {
+               Object.defineProperty(response, 'body', { value, configurable: true });
+-              return value;
+-            },
+-            configurable: true,
+-          });
+-          break;
+-        }
+-        default:
+-          throw new TypeError('unsupported responseType request option');
++            }
++            return value;
++          },
++          configurable: true,
++        });
++      } else if (responseType === undefined || responseType === 'buffer') {
++        Object.defineProperty(response, 'body', {
++          get() {
++            const value = typeof Buffer !== 'undefined' ? Buffer.from(buf) : buf;
++            Object.defineProperty(response, 'body', { value, configurable: true });
++            return value;
++          },
++          configurable: true,
++        });
++      } else {
++        throw new TypeError('unsupported responseType request option');
+       }
+     }
++  } catch (err) {
++    if (err && err.name === 'AbortError') {
++      throw new Error(`outgoing request timed out after ${timeoutMs}ms`);
++    }
++    throw err;
++  } finally {
++    clearTimeout(timer);
++  }
+ 
+-    return response;
+-  })()
+-    .catch((err) => {
+-      if (response) Object.defineProperty(err, 'response', { value: response });
+-      throw err;
+-    })
+-    .finally(() => {
+-      const dpopNonce = response && response.headers['dpop-nonce'];
+-      if (dpopNonce && NQCHAR.test(dpopNonce)) {
+-        nonces.set(nonceKey, dpopNonce);
+-      }
+-    });
++  return response;
+ };
+ 
+ module.exports.setDefaults = setDefaults.bind(undefined, allowed);

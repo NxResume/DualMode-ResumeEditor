@@ -200,6 +200,11 @@ overrides:
   unplugin: ^2.3.5
   vite: ^6.3.5
 
+patchedDependencies:
+  openid-client@5.7.1:
+    hash: 6ae144a858ab4551eb978d376bb80de9825e451f82eae6e3c782e2d68fec6758
+    path: patches/openid-client.patch
+
 importers:
 
   .:
@@ -13455,7 +13460,7 @@ snapshots:
       cookie: 0.5.0
       jose: 4.15.9
       oauth: 0.9.15
-      openid-client: 5.7.1
+      openid-client: 5.7.1(patch_hash=6ae144a858ab4551eb978d376bb80de9825e451f82eae6e3c782e2d68fec6758)
       preact: 10.26.9
       preact-render-to-string: 5.2.6(preact@10.26.9)
       uuid: 8.3.2
@@ -13815,7 +13820,7 @@ snapshots:
       is-docker: 2.2.1
       is-wsl: 2.2.0
 
-  openid-client@5.7.1:
+  openid-client@5.7.1(patch_hash=6ae144a858ab4551eb978d376bb80de9825e451f82eae6e3c782e2d68fec6758):
     dependencies:
       jose: 4.15.9
       lru-cache: 6.0.0

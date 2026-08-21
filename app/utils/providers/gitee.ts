@@ -5,6 +5,7 @@ export default function Gitee(
     id: 'gitee',
     name: 'Gitee',
     type: 'oauth',
+    issuer: 'https://gitee.com',
     authorization: {
       url: 'https://gitee.com/oauth/authorize',
       params: { scope: '' },

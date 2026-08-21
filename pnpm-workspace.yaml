@@ -1,5 +1,8 @@
 packages: []
 
+patchedDependencies:
+  openid-client: patches/openid-client.patch
+
 catalogs:
   build:
     '@auth/drizzle-adapter': ^1.11.3

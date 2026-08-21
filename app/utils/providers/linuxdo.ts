@@ -5,6 +5,7 @@ export default function LinuxDo(
     id: 'linuxdo',
     name: 'Linux.do',
     type: 'oauth',
+    issuer: 'https://connect.linux.do',
     authorization: {
       url: 'https://connect.linux.do/oauth2/authorize',
       params: {
