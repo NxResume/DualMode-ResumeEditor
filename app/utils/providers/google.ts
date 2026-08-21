@@ -43,7 +43,9 @@ export default function Google(
       }
     },
     issuer: 'https://accounts.google.com',
-    wellKnown: 'https://accounts.google.com/.well-known/openid-configuration',
+    // 注意：不要配 wellKnown —— openid-client 的 Issuer.discover（url.parse + oauth4webapi
+    // request）在 Cloudflare workerd 下不兼容，报 "only valid absolute URLs can be requested"。
+    // 上面 authorization/token/userinfo URL 已完整，走显式 endpoint 路径（与 gitee/linuxdo 一致）。
     options: config,
   }
 }
