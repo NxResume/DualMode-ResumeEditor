@@ -15,10 +15,10 @@ export default NuxtAuthHandler({
       clientId: process.env.GITHUB_CLIENT_ID,
       clientSecret: process.env.GITHUB_CLIENT_SECRET,
       allowDangerousEmailAccountLinking: true,
-      // 必须有 issuer：openid-client oauthCallback 校验 'iss' in params 时
-      // 会 assertIssuerConfiguration(this.issuer, 'issuer')，缺失报
-      // "issuer must be configured on the issuer"（本地与 workerd 都会触发）
-      issuer: 'https://github.com',
+      // GitHub 授权响应带 iss 参数（draft-ietf-oauth-iss-auth-resp），值为
+      // https://github.com/login/oauth；若不配置 issuer 会报 "issuer must be
+      // configured on the issuer"，配成 https://github.com 则报 iss mismatch
+      issuer: 'https://github.com/login/oauth',
     }),
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID,
