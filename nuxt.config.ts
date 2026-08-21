@@ -102,6 +102,9 @@ export default defineNuxtConfig({
         // nodemailer 是 CJS 库，打进 ESM bundle 后 class 继承会崩；
         // 保持运行时导入：本地 Node 正常发邮件，Workers 上导入失败走降级分支
         'nodemailer',
+        // undici 仅本地 Node 的 outbound-proxy 插件动态 require；Workers 无该模块，
+        // 保持 external 避免 cloudflare_pages 打包时解析失败
+        'undici',
       ],
     },
     // 把 wrangler.jsonc 里的 Hyperdrive binding 注入到 runtime（env.HYPERDRIVE）

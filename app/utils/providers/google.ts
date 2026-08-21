@@ -43,6 +43,10 @@ export default function Google(
       }
     },
     issuer: 'https://accounts.google.com',
+    // Google 返回 id_token，next-auth 的 oauth callback 需用 JWKS 校验其签名。
+    // 因未配 wellKnown（Issuer.discover 在 workerd 下不兼容），需显式提供 jwks_endpoint
+    // 供 openid-client 构建 Issuer 时使用（next-auth 将其映射为 jwks_uri）。
+    jwks_endpoint: 'https://www.googleapis.com/oauth2/v3/certs',
     // 注意：不要配 wellKnown —— openid-client 的 Issuer.discover（url.parse + oauth4webapi
     // request）在 Cloudflare workerd 下不兼容，报 "only valid absolute URLs can be requested"。
     // 上面 authorization/token/userinfo URL 已完整，走显式 endpoint 路径（与 gitee/linuxdo 一致）。
