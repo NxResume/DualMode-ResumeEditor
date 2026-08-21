@@ -1,3 +1,4 @@
+import { fileURLToPath } from 'node:url'
 import { pwa } from './app/config/pwa'
 
 const devApi = 'http://localhost:7777/api/meituan'
@@ -82,6 +83,11 @@ export default defineNuxtConfig({
     // ============================================================
     // eslint-disable-next-line node/prefer-global/process -- Nitro 配置读 env 的标准方式
     preset: process.env.NITRO_PRESET === 'cloudflare_pages' ? 'cloudflare_pages' : 'node-server',
+    // @panva/hkdf 的 rollup CJS 互操作在 workerd 下崩（缺 __esModule 导致
+    // Babel _interopRequireDefault 二次包裹），用本地 shim 替代，见 scripts/hkdf-shim.mjs
+    alias: {
+      '@panva/hkdf': fileURLToPath(new URL('./scripts/hkdf-shim.mjs', import.meta.url)),
+    },
     rollupConfig: {
       external: [
         // Node 原生模块（Workers 上由 nodejs_compat 提供）
