@@ -13,7 +13,7 @@ catalogs:
     '@unocss/nuxt': ^66.3.2
     '@vite-pwa/nuxt': ^1.0.4
     '@vueuse/nuxt': ^13.5.0
-    bcrypt: ^6.0.0
+    bcryptjs: ^3.0.3
     drizzle-kit: ^0.31.10
     drizzle-orm: 0.45.2
     nodemailer: ^7.0.4
@@ -23,7 +23,6 @@ catalogs:
     vite: ^6.3.5
   dev:
     '@antfu/eslint-config': ^4.16.2
-    '@types/bcrypt': ^5.0.2
     '@types/better-sqlite3': ^9.6.0
     '@types/codemirror': ^5.60.16
     '@types/markdown-it': ^14.1.2
@@ -74,7 +73,6 @@ catalogs:
     '@iconify/utils': ^2.3.0
 
 ignoredBuiltDependencies:
-  - bcrypt
   - core-js
   - vue-demi
 

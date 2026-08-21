@@ -89,8 +89,13 @@ export default defineNuxtConfig({
         'node:stream',
         'node:util',
         'node:events',
-        // better-sqlite3 仅本地 Node 分支动态加载，不要打进 Workers bundle
+        'node:module',
+        // better-sqlite3 仅本地 Node 分支动态加载（createRequire），不要打进 Workers bundle
         'better-sqlite3',
+        'drizzle-orm/better-sqlite3',
+        // nodemailer 是 CJS 库，打进 ESM bundle 后 class 继承会崩；
+        // 保持运行时导入：本地 Node 正常发邮件，Workers 上导入失败走降级分支
+        'nodemailer',
       ],
     },
     // 把 wrangler.jsonc 里的 Hyperdrive binding 注入到 runtime（env.HYPERDRIVE）

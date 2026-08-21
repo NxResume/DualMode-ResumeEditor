@@ -1,8 +1,7 @@
 import { randomUUID } from 'node:crypto'
 import process from 'node:process'
-import bcrypt from 'bcrypt'
+import bcrypt from 'bcryptjs'
 import { eq } from 'drizzle-orm'
-import nodemailer from 'nodemailer'
 import { db, schema } from '~/utils/db'
 
 export default defineEventHandler(async (event) => {
@@ -87,7 +86,11 @@ export default defineEventHandler(async (event) => {
   }
 
   // 发送邮件（邮箱和授权码请在 .env 文件中配置）
+  // 注意：nodemailer 是 CJS 库，顶层静态导入在 Rollup 打成 ESM 后
+  // class 继承会崩（Workers 上模块加载即报错），故改为运行时动态导入；
+  // Workers 无 SMTP 出站权限，导入/发送失败均降级为可重试错误，而非 500。
   try {
+    const { default: nodemailer } = await import('nodemailer')
     const transporter = nodemailer.createTransport({
       service: 'qq', // 如用qq/163请改为对应服务
       auth: {

@@ -3,8 +3,7 @@
 /* eslint-disable node/prefer-global/process */
 import type { DrizzleD1Database } from 'drizzle-orm/d1'
 import type { BaseSQLiteDatabase } from 'drizzle-orm/sqlite-core'
-import Database from 'better-sqlite3'
-import { drizzle as drizzleLite } from 'drizzle-orm/better-sqlite3'
+import { createRequire } from 'node:module'
 import { drizzle } from 'drizzle-orm/d1'
 import * as schema from '../../db/schema'
 
@@ -85,7 +84,10 @@ function createDrizzle(): AnyDb {
     return drizzle(d1, { schema })
   }
 
-  // Node：better-sqlite3 本地文件
+  // Node：better-sqlite3 本地文件（createRequire 同步加载，ESM/tsx 兼容）
+  const require = createRequire(import.meta.url)
+  const Database = require('better-sqlite3')
+  const { drizzle: drizzleLite } = require('drizzle-orm/better-sqlite3')
   const sqlite = new Database('.data/resume.db')
   sqlite.pragma('journal_mode = WAL')
   globalForDb.__resumeConn = sqlite

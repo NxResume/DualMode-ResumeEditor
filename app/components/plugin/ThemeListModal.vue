@@ -72,7 +72,7 @@ function handleThemeSelect(theme: ThemeName) {
             <img :src="theme.image" :alt="theme.label" srcset="">
           </div>
           <div class="theme-label">
-            <div v-if="theme.isSelected" class="theme-selected-icon i-ri-checkbox-circle-line" />
+            <div v-if="theme.isSelected" class="i-ri-checkbox-circle-line theme-selected-icon" />
           </div>
         </div>
       </div>

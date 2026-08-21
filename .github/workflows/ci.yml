@@ -39,12 +39,5 @@ jobs:
       - name: Install
         run: pnpm install
 
-      - name: prisma generate
-        # CI 没有 .env；generate 只需 schema 解析通过，不需要真实连库，
-        # 给个占位 DATABASE_URL 即可（Prisma 6 要求 env 存在）
-        run: npx prisma generate
-        env:
-          DATABASE_URL: 'mysql://user:pass@localhost:3306/dummy'
-
       - name: Typecheck
         run: pnpm run typecheck
