@@ -39,8 +39,6 @@ export const pwa: ModuleOptions = {
   },
   workbox: {
     globPatterns: ['**/*.{js,css,html,txt,png,ico,svg}'],
-    navigateFallbackDenylist: [/^\/api\//],
-    navigateFallback: '/',
     cleanupOutdatedCaches: true,
     runtimeCaching: [
       {
@@ -68,6 +66,21 @@ export const pwa: ModuleOptions = {
           },
           cacheableResponse: {
             statuses: [0, 200],
+          },
+        },
+      },
+      {
+        // SSR 应用没有静态 index.html 可 precache，不能用 navigateFallback('/')
+        // （会报 non-precached-url）。改为对导航请求 NetworkFirst：走 Functions 渲染，
+        // 成功后缓存，离线时回退到缓存。
+        urlPattern: ({ request }) => request.mode === 'navigate',
+        handler: 'NetworkFirst',
+        options: {
+          cacheName: 'pages-cache',
+          networkTimeoutSeconds: 3,
+          expiration: {
+            maxEntries: 50,
+            maxAgeSeconds: 60 * 60 * 24,
           },
         },
       },

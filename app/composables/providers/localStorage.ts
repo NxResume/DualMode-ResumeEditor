@@ -129,7 +129,14 @@ export class LocalStorageProvider implements IStorageProvider {
     if (!import.meta.client)
       return undefined
     const resumes = await this.getResumes()
-    return resumes.find(r => r.id === id)
+    const resume = resumes.find(r => r.id === id)
+    if (!resume)
+      return undefined
+    // 本地模式下 settings 存于独立 key，需手动合并，
+    // 与 database 模式的返回结构保持一致。
+    // 否则 useResumeData 会把缺失的 settings 重置为默认值，导致顶部功能切换刷新后丢失
+    const settings = await this.getSettings(id)
+    return { ...resume, settings }
   }
 
   async copySettings(originId: string, resumeId: string): Promise<ResumeSettings> {

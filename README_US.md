@@ -13,7 +13,7 @@
 
 # DualMode-ResumeEditor Resume Editor
 
-A modern, feature-rich resume editor built with Nuxt 3 & Vue 3, supporting Markdown/WYSIWYG dual mode, GitHub/Google/Gitee login, dual local/cloud storage, theme switching, PDF/image/ZIP export, PWA offline, and i18n.
+A modern, feature-rich resume editor built with Nuxt 4 & Vue 3, supporting Markdown/WYSIWYG dual mode, GitHub/Google/Gitee login, dual local/cloud storage, theme switching, PDF/image/ZIP export, PWA offline, and i18n.
 
 ## 🌟 Features
 
@@ -32,21 +32,22 @@ A modern, feature-rich resume editor built with Nuxt 3 & Vue 3, supporting Markd
 
 Create a `.env` file based on your deployment environment.
 
-| Variable             | Description                                          |
-| -------------------- | ---------------------------------------------------- |
-| AUTH_SECRET          | Session encryption secret (use openssl)              |
-| AUTH_ORIGIN          | Allowed frontend origin (e.g. http://localhost:3000) |
-| GITHUB_CLIENT_ID     | GitHub OAuth App Client ID                           |
-| GITHUB_CLIENT_SECRET | GitHub OAuth App Client Secret                       |
-| GOOGLE_CLIENT_ID     | Google OAuth App Client ID                           |
-| GOOGLE_CLIENT_SECRET | Google OAuth App Client Secret                       |
-| GITEE_CLIENT_ID      | Gitee OAuth App Client ID                            |
-| GITEE_CLIENT_SECRET  | Gitee OAuth App Client Secret                        |
-| DATABASE_URL         | Database connection string (local/cloud)             |
-| MAIL_USER            | Mail service user (for email features)               |
-| MAIL_PASS            | Mail service password/app token                      |
-| HTTPS_PROXY          | HTTPS proxy (optional)                               |
-| HTTP_PROXY           | HTTP proxy (optional)                                |
+| Variable              | Description                                          |
+| --------------------- | ---------------------------------------------------- |
+| AUTH_SECRET           | Session encryption secret (use openssl)              |
+| AUTH_ORIGIN           | Allowed frontend origin (e.g. http://localhost:3000) |
+| GITHUB_CLIENT_ID      | GitHub OAuth App Client ID                           |
+| GITHUB_CLIENT_SECRET  | GitHub OAuth App Client Secret                       |
+| GOOGLE_CLIENT_ID      | Google OAuth App Client ID                           |
+| GOOGLE_CLIENT_SECRET  | Google OAuth App Client Secret                       |
+| GITEE_CLIENT_ID       | Gitee OAuth App Client ID                            |
+| GITEE_CLIENT_SECRET   | Gitee OAuth App Client Secret                        |
+| LINUXDO_CLIENT_ID     | Linux.do OAuth App Client ID                         |
+| LINUXDO_CLIENT_SECRET | Linux.do OAuth App Client Secret                     |
+| MAIL_USER             | Mail service user (for email features)               |
+| MAIL_PASS             | Mail service password/app token                      |
+| HTTPS_PROXY           | HTTPS proxy (optional)                               |
+| HTTP_PROXY            | HTTP proxy (optional)                                |
 
 **Local development template:**
 
@@ -59,7 +60,8 @@ GOOGLE_CLIENT_ID=
 GOOGLE_CLIENT_SECRET=
 GITEE_CLIENT_ID=
 GITEE_CLIENT_SECRET=
-DATABASE_URL="file:./prisma/dev.db"
+LINUXDO_CLIENT_ID=
+LINUXDO_CLIENT_SECRET=
 MAIL_USER=
 MAIL_PASS=
 ```
@@ -75,7 +77,8 @@ GOOGLE_CLIENT_ID=
 GOOGLE_CLIENT_SECRET=
 GITEE_CLIENT_ID=
 GITEE_CLIENT_SECRET=
-DATABASE_URL=postgresql://user:password@host:port/dbname
+LINUXDO_CLIENT_ID=
+LINUXDO_CLIENT_SECRET=
 MAIL_USER=
 MAIL_PASS=
 HTTPS_PROXY=
@@ -88,20 +91,33 @@ HTTP_PROXY=
    ```bash
    pnpm install
    ```
-2. Configure environment variables (see above)
+2. Configure environment variables (see above; just create a `.env` file)
+3. Initialize local database (SQLite, creates `.data/resume.db`)
    ```bash
-   copy .env.example .env
-   ```
-3. Initialize database
-   ```bash
-   npx prisma generate
-   npx prisma migrate dev --name init
+   pnpm db:push
    ```
 4. Start development server
    ```bash
    pnpm dev
    ```
    Visit [http://localhost:3000](http://localhost:3000)
+
+## ☁️ Deployment (Cloudflare Pages + D1)
+
+Production runs on Cloudflare Pages (Functions) with Cloudflare D1 as the database.
+
+```bash
+# 1. Create the D1 database (first time only; already created: resume)
+wrangler d1 create resume
+
+# 2. Apply the schema to remote D1
+pnpm db:d1:apply
+
+# 3. Build and deploy
+pnpm deploy:cf
+```
+
+Secrets (AUTH_SECRET, OAuth Client ID/Secret, SMTP, etc.) are configured in Pages Dashboard → Settings → Environment variables, not committed to git.
 
 ## 📖 Usage Guide
 
@@ -113,8 +129,8 @@ HTTP_PROXY=
 
 ## 🏗️ Tech Stack
 
-- **Frontend**: Nuxt 3, Vue 3, Pinia, CodeMirror, Markdown-it, UnoCSS
-- **Backend/Storage**: Prisma ORM, SQLite/PostgreSQL, LocalStorage
+- **Frontend**: Nuxt 4, Vue 3, Pinia, CodeMirror, Markdown-it, UnoCSS
+- **Backend/Storage**: Drizzle ORM, SQLite (local better-sqlite3 / Cloudflare D1 in production), LocalStorage
 - **Auth**: @sidebase/nuxt-auth, GitHub/Google/Gitee OAuth
 - **Export**: jsPDF, html-to-image, jszip
 - **PWA**: @vite-pwa/nuxt

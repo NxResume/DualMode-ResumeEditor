@@ -6,7 +6,7 @@
   "scripts": {
     "build": "nuxt build",
     "dev:pwa": "VITE_PLUGIN_PWA=true nuxt dev",
-    "dev": "nuxt dev & pnpm run db:ui",
+    "dev": "nuxt dev",
     "generate": "nuxt generate",
     "prepare": "nuxt prepare",
     "preview": "nuxt preview",
@@ -14,13 +14,13 @@
     "start:generate": "npx serve .output/public",
     "lint": "eslint .",
     "typecheck": "nuxt typecheck",
-    "db:ui": "echo 'Drizzle 无 studio；用 mysql 客户端或 TablePlus 查看'",
     "db:generate": "drizzle-kit generate",
     "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio",
+    "db:d1:apply": "wrangler d1 execute resume --remote --file=./drizzle/0000_brown_blur.sql",
     "build:cf": "NITRO_PRESET=cloudflare_pages pnpm build",
-    "wrangler": "pnpm exec wrangler 2>/dev/null || pnpm dlx wrangler@3",
-    "dev:cf": "pnpm build:cf && pnpm wrangler pages dev dist --compatibility-flags=nodejs_compat --ip=0.0.0.0 --port=8788",
-    "deploy:cf": "pnpm build:cf && pnpm wrangler pages deploy dist",
+    "dev:cf": "pnpm build:cf && wrangler pages dev dist --compatibility-flags=nodejs_compat --ip=0.0.0.0 --port=8788",
+    "deploy:cf": "pnpm build:cf && wrangler pages deploy dist",
     "fix": "pnpm exec eslint . --fix"
   },
   "devDependencies": {

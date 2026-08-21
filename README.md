@@ -12,7 +12,7 @@
 <a href="https://deepwiki.com/NxResume/DualMode-ResumeEditor"><img src="https://deepwiki.com/badge.svg" alt="Ask DeepWiki"></a>
 </p>
 
-一个基于 Nuxt 3 & Vue 3 的现代化、功能丰富的简历编辑器，支持 Markdown/WYSIWYG 双模式、GitHub 登录、本地与云端双存储、主题切换、PDF/图片/ZIP 导出、PWA 离线、国际化等特性。
+一个基于 Nuxt 4 & Vue 3 的现代化、功能丰富的简历编辑器，支持 Markdown/WYSIWYG 双模式、GitHub 登录、本地与云端双存储、主题切换、PDF/图片/ZIP 导出、PWA 离线、国际化等特性。
 
 ## 🌟 主要特性
 
@@ -31,21 +31,22 @@
 
 请根据实际部署环境，参考下方模板创建 `.env` 文件。
 
-| 变量名               | 说明                                       |
-| -------------------- | ------------------------------------------ |
-| AUTH_SECRET          | Session 加密密钥，建议用 openssl 生成      |
-| AUTH_ORIGIN          | 允许的前端地址（如 http://localhost:3000） |
-| GITHUB_CLIENT_ID     | GitHub OAuth 应用 Client ID                |
-| GITHUB_CLIENT_SECRET | GitHub OAuth 应用 Client Secret            |
-| GOOGLE_CLIENT_ID     | Google OAuth 应用 Client ID                |
-| GOOGLE_CLIENT_SECRET | Google OAuth 应用 Client Secret            |
-| GITEE_CLIENT_ID      | Gitee OAuth 应用 Client ID                 |
-| GITEE_CLIENT_SECRET  | Gitee OAuth 应用 Client Secret             |
-| DATABASE_URL         | 数据库连接字符串（本地/云端均可）          |
-| MAIL_USER            | 邮箱账号（如需邮件功能）                   |
-| MAIL_PASS            | 邮箱密码/授权码                            |
-| HTTPS_PROXY          | HTTPS 代理（可选）                         |
-| HTTP_PROXY           | HTTP 代理（可选）                          |
+| 变量名                | 说明                                       |
+| --------------------- | ------------------------------------------ |
+| AUTH_SECRET           | Session 加密密钥，建议用 openssl 生成      |
+| AUTH_ORIGIN           | 允许的前端地址（如 http://localhost:3000） |
+| GITHUB_CLIENT_ID      | GitHub OAuth 应用 Client ID                |
+| GITHUB_CLIENT_SECRET  | GitHub OAuth 应用 Client Secret            |
+| GOOGLE_CLIENT_ID      | Google OAuth 应用 Client ID                |
+| GOOGLE_CLIENT_SECRET  | Google OAuth 应用 Client Secret            |
+| GITEE_CLIENT_ID       | Gitee OAuth 应用 Client ID                 |
+| GITEE_CLIENT_SECRET   | Gitee OAuth 应用 Client Secret             |
+| LINUXDO_CLIENT_ID     | Linux.do OAuth 应用 Client ID              |
+| LINUXDO_CLIENT_SECRET | Linux.do OAuth 应用 Client Secret          |
+| MAIL_USER             | 邮箱账号（如需邮件功能）                   |
+| MAIL_PASS             | 邮箱密码/授权码                            |
+| HTTPS_PROXY           | HTTPS 代理（可选）                         |
+| HTTP_PROXY            | HTTP 代理（可选）                          |
 
 ## 🚀 快速开始
 
@@ -55,20 +56,33 @@
    pnpm install
    ```
 
-2. 配置环境变量（见上文）
+2. 配置环境变量（见上文，直接创建 `.env` 即可）
+3. 初始化本地数据库（SQLite，生成 `.data/resume.db`）
    ```bash
-   copy .env.example .env
-   ```
-3. 初始化数据库
-   ```bash
-   npx prisma generate
-   npx prisma migrate dev --name init
+   pnpm db:push
    ```
 4. 启动开发服务器
    ```bash
    pnpm dev
    ```
    访问 [http://localhost:3000](http://localhost:3000)
+
+## ☁️ 部署（Cloudflare Pages + D1）
+
+生产环境部署在 Cloudflare Pages（Functions），数据库为 Cloudflare D1。
+
+```bash
+# 1. 创建 D1 数据库（仅首次，已创建：resume）
+wrangler d1 create resume
+
+# 2. 应用表结构到远程 D1
+pnpm db:d1:apply
+
+# 3. 构建并部署
+pnpm deploy:cf
+```
+
+Secrets（AUTH_SECRET、OAuth Client ID/Secret、SMTP 等）在 Pages Dashboard → Settings → Environment variables 配置，不进 git。
 
 ## 📖 使用指南
 
@@ -80,8 +94,8 @@
 
 ## 🏗️ 技术栈
 
-- **前端**：Nuxt 3, Vue 3, Pinia, CodeMirror, Markdown-it, UnoCSS
-- **后端/存储**：Prisma ORM, SQLite/PostgreSQL, LocalStorage
+- **前端**：Nuxt 4, Vue 3, Pinia, CodeMirror, Markdown-it, UnoCSS
+- **后端/存储**：Drizzle ORM, SQLite（本地 better-sqlite3 / 生产 Cloudflare D1）, LocalStorage
 - **认证**：@sidebase/nuxt-auth, GitHub/Google/Gitee OAuth
 - **导出**：jsPDF, html-to-image, jszip
 - **PWA**：@vite-pwa/nuxt
