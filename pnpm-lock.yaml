@@ -201,7 +201,7 @@ overrides:
   vite: ^6.3.5
 
 patchedDependencies:
-  openid-client@5.7.1:
+  openid-client:
     hash: 6ae144a858ab4551eb978d376bb80de9825e451f82eae6e3c782e2d68fec6758
     path: patches/openid-client.patch
 

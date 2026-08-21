@@ -8,6 +8,7 @@ import { createRequire } from 'node:module'
 // 生产 Cloudflare Pages（workerd）不注入代理环境变量、边缘直连无需代理，
 // 插件会直接 return，不影响部署态行为。
 export default defineNitroPlugin(() => {
+  // eslint-disable-next-line node/prefer-global/process
   const env = process.env
   const httpProxy = env.HTTP_PROXY || env.http_proxy
   const httpsProxy = env.HTTPS_PROXY || env.https_proxy
