@@ -16,7 +16,6 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/ui/dialog'
 import { useStorageManager } from '~/composables/useStorageManager'
 
@@ -30,6 +29,39 @@ const PENDING_KEY_MODE = '__pending_qs_mode__'
 const PENDING_KEY_ACTION = '__pending_qs_action__'
 
 const dialogOpen = ref(false)
+
+// 已登录：快速开始直接进简历列表，不弹存储选择（切模式走右上角设置）；未登录才弹引导
+// 会话恢复期间 status 为 loading，此时先等它就绪（上限 1.5s），避免已登录用户被误判为未登录
+function waitForAuthReady(timeoutMs = 1500) {
+  return new Promise<boolean>((resolve) => {
+    if (status.value !== 'loading') {
+      resolve(status.value === 'authenticated')
+      return
+    }
+    let timer: ReturnType<typeof setTimeout> | undefined
+    let stop: (() => void) | undefined
+    const finish = () => {
+      if (timer !== undefined)
+        clearTimeout(timer)
+      timer = undefined
+      stop?.()
+      resolve(status.value === 'authenticated')
+    }
+    timer = setTimeout(finish, timeoutMs)
+    stop = watch(status, (v) => {
+      if (v !== 'loading')
+        finish()
+    })
+  })
+}
+
+async function handleQuickStartClick() {
+  if (await waitForAuthReady()) {
+    goResumes()
+    return
+  }
+  dialogOpen.value = true
+}
 
 // ---------- 二次确认 ----------
 const pendingMode = ref<'local' | 'database' | null>(null)
@@ -137,14 +169,13 @@ async function confirmStart() {
 <template>
   <ClientOnly>
     <Dialog v-model:open="dialogOpen">
-      <DialogTrigger as-child>
-        <!-- 与原项目「快速开始」按钮完全一致的黑灰渐变主 CTA 色 —— 保持主题统一 -->
-        <div
-          class="text-lg text-white leading-[48px] font-semibold mx-auto mt-10 text-center rounded-4xl h-12 w-40 cursor-pointer select-none shadow-md transition-all duration-500 from-black to-gray-700 bg-linear-to-r hover:shadow-xl hover:scale-105"
-        >
-          {{ $t('app.startButton') }}
-        </div>
-      </DialogTrigger>
+      <!-- 手动控制开关：已登录直接跳转不弹窗（见 handleQuickStartClick），未登录才打开选择弹窗 -->
+      <div
+        class="text-lg text-white leading-[48px] font-semibold mx-auto mt-10 text-center rounded-4xl h-12 w-40 cursor-pointer select-none shadow-md transition-all duration-500 from-black to-gray-700 bg-linear-to-r hover:shadow-xl hover:scale-105"
+        @click="handleQuickStartClick"
+      >
+        {{ $t('app.startButton') }}
+      </div>
 
       <DialogContent class="sm:max-w-2xl">
         <DialogHeader>
