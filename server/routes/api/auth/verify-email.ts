@@ -1,7 +1,8 @@
 import { eq } from 'drizzle-orm'
-import { db, schema } from '~/utils/db'
+import { getDb, schema } from '~/utils/db'
 
 export default defineEventHandler(async (event) => {
+  const db = getDb()
   const body = await readBody(event)
   const { email, code } = body
 

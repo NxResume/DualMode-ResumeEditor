@@ -1,7 +1,8 @@
 import { randomUUID } from 'node:crypto'
-import { db, schema } from '~/utils/db'
+import { getDb, schema } from '~/utils/db'
 
 export default defineEventHandler(async (event) => {
+  const db = getDb()
   try {
     const user = await requireCurrentUser(event)
 

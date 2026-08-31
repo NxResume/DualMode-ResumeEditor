@@ -1,11 +1,12 @@
 import type { H3Event } from 'h3'
 import { getServerSession } from '#auth'
-import { db } from '~/utils/db'
+import { getDb } from '~/utils/db'
 
 /**
  * 获取当前登录用户，未登录或用户不存在时抛出 401
  */
 export async function requireCurrentUser(event: H3Event) {
+  const db = getDb()
   const session = await getServerSession(event)
   const email = session?.user?.email
 
@@ -47,6 +48,7 @@ export async function assertResumeOwnership(event: H3Event, id: string | undefin
 
   const user = await requireCurrentUser(event)
 
+  const db = getDb()
   const resume = await db.query.resumes.findFirst({
     where: (t, { eq }) => eq(t.id, id),
     columns: { id: true, userId: true },

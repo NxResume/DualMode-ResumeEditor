@@ -1,8 +1,9 @@
 import { randomUUID } from 'node:crypto'
 import { eq } from 'drizzle-orm'
-import { db, schema } from '~/utils/db'
+import { getDb, schema } from '~/utils/db'
 
 export default defineEventHandler(async (event) => {
+  const db = getDb()
   try {
     const id = getRouterParam(event, 'id')
 
@@ -34,7 +35,7 @@ export default defineEventHandler(async (event) => {
         isScrollable: body.isScrollable ? 1 : 0,
         editorMode: body.editorMode,
         updatedAt: new Date(),
-      }).where(eq(schema.resumeSettings.resumeId, id))
+      }).where(eq(schema.resumeSettings.resumeId, id)).returning()
       settings = updated
     }
     else {

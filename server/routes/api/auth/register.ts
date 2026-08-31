@@ -2,9 +2,10 @@ import { randomUUID } from 'node:crypto'
 import process from 'node:process'
 import bcrypt from 'bcryptjs'
 import { eq } from 'drizzle-orm'
-import { db, schema } from '~/utils/db'
+import { getDb, schema } from '~/utils/db'
 
 export default defineEventHandler(async (event) => {
+  const db = getDb()
   const body = await readBody(event)
   const { email, password } = body
 

@@ -1,8 +1,9 @@
 import { getServerSession } from '#auth'
 import { desc } from 'drizzle-orm'
-import { db, schema } from '~/utils/db'
+import { getDb, schema } from '~/utils/db'
 
 export default defineEventHandler(async (event) => {
+  const db = getDb()
   try {
     const session = await getServerSession(event)
     const userEmail = session?.user?.email

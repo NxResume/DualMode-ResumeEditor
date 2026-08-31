@@ -1,6 +1,7 @@
-import { db } from '~/utils/db'
+import { getDb } from '~/utils/db'
 
 export default defineEventHandler(async (event) => {
+  const db = getDb()
   try {
     const id = getRouterParam(event, 'id')
     await assertResumeOwnership(event, id)

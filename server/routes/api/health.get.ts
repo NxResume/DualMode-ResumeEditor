@@ -1,6 +1,7 @@
-import { db, schema } from '~/utils/db'
+import { getDb, schema } from '~/utils/db'
 
 export default defineEventHandler(async (_event) => {
+  const db = getDb()
   try {
     // 测试数据库连接：查 users 表计数
     const users = await db.select().from(schema.users).limit(1)

@@ -1,7 +1,8 @@
 import { eq } from 'drizzle-orm'
-import { db, schema } from '~/utils/db'
+import { getDb, schema } from '~/utils/db'
 
 export default defineEventHandler(async (event) => {
+  const db = getDb()
   try {
     const id = getRouterParam(event, 'id')
     await assertResumeOwnership(event, id)
@@ -14,7 +15,7 @@ export default defineEventHandler(async (event) => {
       theme: body.theme,
       plugins: JSON.stringify(body.plugins || []),
       updatedAt: new Date(),
-    }).where(eq(schema.resumes.id, id!))
+    }).where(eq(schema.resumes.id, id!)).returning()
 
     // 查询更新后的完整简历（带 settings）
     const updated = await db.query.resumes.findFirst({
