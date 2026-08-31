@@ -4,6 +4,8 @@ import resumeController from '~/composables/action/resume'
 
 export function useResumeData() {
   const route = useRoute()
+  const storageManager = useStorageManager()
+  const { currentMode } = storageManager
 
   const currentResume = ref<ResumeData>({
     content: '',
@@ -23,7 +25,12 @@ export function useResumeData() {
     if (!resumeId.value)
       return
 
-    const result = await resumeController.fetchResumeById(resumeId.value) as ResumeData
+    const result = await resumeController.fetchResumeById(resumeId.value) as ResumeData | undefined
+    // 远端无数据（例如首次 fetch 用了本地 provider 查云端简历）→ 不覆盖，留给 mode 变化后的重试
+    if (!result) {
+      console.warn('[useResumeData] fetchCurrentResume: 远端无数据，跳过（等待存储模式就绪后重试）')
+      return
+    }
     if (!result.settings) {
       result.settings = getDefaultSettings()
     }
@@ -33,6 +40,11 @@ export function useResumeData() {
 
   // 监听路由变化
   watch(resumeId, () => {
+    fetchCurrentResume()
+  })
+
+  // 存储模式变化后重新拉取（解决 initializeMode 晚于子组件 onMounted 的时序问题）
+  watch(currentMode, () => {
     fetchCurrentResume()
   })
 

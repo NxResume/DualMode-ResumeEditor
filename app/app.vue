@@ -7,10 +7,9 @@ useHead({
   title: appName,
 })
 
-// 应用启动时初始化存储模式（从 localStorage 恢复用户选择）
-onMounted(() => {
-  storageManager.initializeMode()
-})
+// 同步初始化存储模式（不能放 onMounted：子组件 onMounted 先于父组件跑，
+// 编辑页 fetchCurrentResume 会用了错误的 provider 查远端，导致数据为空）
+storageManager.initializeMode()
 </script>
 
 <template>
