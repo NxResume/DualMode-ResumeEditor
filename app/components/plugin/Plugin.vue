@@ -228,7 +228,7 @@ function setMode(mode: 'source' | 'wysiwyg') {
 }
 
 /* 图标统一到 16px：UnoCSS 图标是 1.2em，挂在 16px 的容器里会变成 19px，和按钮里的 16px 不一致 */
-.topbar :deep([class*="i-ri-"]) {
+.topbar :deep([class*='i-ri-']) {
   font-size: 13.5px;
 }
 
