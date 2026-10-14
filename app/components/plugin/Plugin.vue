@@ -129,6 +129,7 @@ function setMode(mode: 'source' | 'wysiwyg') {
   padding: 0 12px;
   background: hsl(var(--background));
   border-bottom: 1px solid hsl(var(--border));
+  box-shadow: 0 1px 3px rgb(15 23 42 / 5%);
   position: relative;
   z-index: 20;
 }

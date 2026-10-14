@@ -102,6 +102,29 @@ const centerOffset = computed(() => {
 const ZOOM_MIN = 40
 const ZOOM_MAX = 200
 
+// 编辑器信息条：模式 + 字数
+const isSource = computed(() => currentResume.value?.settings?.editorMode === 'source')
+const wordCount = computed(() => currentResume.value?.content?.length ?? 0)
+
+// 预览信息条：页数（分页在子组件里做，这里只数结果，用于显示）
+const pageCount = ref(0)
+let pageObserver: MutationObserver | null = null
+
+function countPages() {
+  pageCount.value = canvasRef.value?.querySelectorAll('.rs-page-item').length ?? 0
+}
+
+watch(canvasRef, (node) => {
+  pageObserver?.disconnect()
+  if (!node)
+    return
+  countPages()
+  pageObserver = new MutationObserver(countPages)
+  pageObserver.observe(node, { childList: true, subtree: true })
+}, { immediate: true })
+
+onUnmounted(() => pageObserver?.disconnect())
+
 function zoomStep(delta: number) {
   const next = Math.round(scalePre.value * 100) + delta
   zoomPercent.value = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, next))
@@ -116,11 +139,27 @@ function setActualSize() {
 /* ------------------------------------------------------------------ */
 /* 分栏：编辑器宽度可拖、可收（纯 UI 状态，与简历数据无关）              */
 /* ------------------------------------------------------------------ */
-const editorWidth = useLocalStorage('nuxt-resume-editor-width', 480)
-const editorCollapsed = useLocalStorage('nuxt-resume-editor-collapsed', false)
-const settingsOpen = useLocalStorage('nuxt-resume-editor-settings-open', true)
+const storedWidth = useLocalStorage('nuxt-resume-editor-width', 480)
+const storedCollapsed = useLocalStorage('nuxt-resume-editor-collapsed', false)
+const storedSettingsOpen = useLocalStorage('nuxt-resume-editor-settings-open', true)
 const dragging = ref(false)
 const dragWidth = ref(0)
+
+// 这三个 UI 状态来自 localStorage，SSR 时读不到 → 服务端与客户端首帧不一致会产生 hydration 警告。
+// 首帧统一用默认值，挂载后再切到存储值。
+const shellReady = ref(false)
+onMounted(() => {
+  shellReady.value = true
+})
+
+const editorCollapsed = computed({
+  get: () => shellReady.value && storedCollapsed.value,
+  set: (v: boolean) => { storedCollapsed.value = v },
+})
+const settingsOpen = computed({
+  get: () => shellReady.value ? storedSettingsOpen.value : true,
+  set: (v: boolean) => { storedSettingsOpen.value = v },
+})
 
 const EDITOR_MIN = 320
 const EDITOR_MAX = 720
@@ -136,7 +175,7 @@ function editorHardMax() {
 const editorVisibleWidth = computed(() => {
   if (editorCollapsed.value)
     return 0
-  const raw = dragging.value ? dragWidth.value : editorWidth.value
+  const raw = dragging.value ? dragWidth.value : (shellReady.value ? Number(storedWidth.value) || 480 : 480)
   const hardMax = Math.max(EDITOR_MIN, editorHardMax())
   return Math.min(hardMax, Math.max(EDITOR_MIN, Number(raw) || 480))
 })
@@ -154,7 +193,7 @@ function startResize(event: PointerEvent) {
   }
   const onUp = () => {
     // 拖动过程只改内存，松手才落盘（避免 pointermove 每帧写 localStorage）
-    editorWidth.value = dragWidth.value
+    storedWidth.value = dragWidth.value
     dragging.value = false
     window.removeEventListener('pointermove', onMove)
     window.removeEventListener('pointerup', onUp)
@@ -197,16 +236,21 @@ if (import.meta.client) {
       <!-- 左侧编辑器 -->
       <div
         v-show="!editorCollapsed"
-        ref="leftRef"
         class="editor-pane"
         :style="{ width: `${editorVisibleWidth}px` }"
       >
-        <ClientOnly>
-          <EditCodeMirror
-            :model-value="currentResume?.content" :mode="currentResume.settings?.editorMode"
-            @update:model-value="currentResume.content = $event"
-          />
-        </ClientOnly>
+        <div class="pane-strip">
+          <span class="strip-title">{{ isSource ? t('plugin.source') : t('plugin.wysiwyg') }}</span>
+          <span class="strip-meta">{{ t('plugin.words', { n: wordCount }) }}</span>
+        </div>
+        <div ref="leftRef" class="editor-body">
+          <ClientOnly>
+            <EditCodeMirror
+              :model-value="currentResume?.content" :mode="currentResume.settings?.editorMode"
+              @update:model-value="currentResume.content = $event"
+            />
+          </ClientOnly>
+        </div>
       </div>
 
       <!-- 分栏拖拽条（双击收起编辑器） -->
@@ -220,58 +264,64 @@ if (import.meta.client) {
       />
 
       <!-- 右侧预览 -->
-      <div ref="el" class="preview-pane">
-        <!-- 缩放控制：sticky 浮在画布右上角，不占布局高度，页面顶部不会再被压住 -->
-        <div class="zoom-bar">
-          <button class="zoom-btn" type="button" :title="t('plugin.zoomOut')" @click="zoomStep(-10)">
-            −
-          </button>
-          <span class="zoom-value">{{ zoomLabel }}</span>
-          <button class="zoom-btn" type="button" :title="t('plugin.zoomIn')" @click="zoomStep(10)">
-            +
-          </button>
-          <span class="zoom-sep" />
-          <button
-            class="zoom-btn" :class="{ 'is-on': zoomMode === 'fit-width' }" type="button"
-            @click="zoomMode = 'fit-width'"
-          >
-            {{ t('plugin.zoomFitWidth') }}
-          </button>
-          <button
-            class="zoom-btn" :class="{ 'is-on': zoomMode === 'fit-page' }" type="button"
-            @click="zoomMode = 'fit-page'"
-          >
-            {{ t('plugin.zoomFitPage') }}
-          </button>
-          <button
-            class="zoom-btn" :class="{ 'is-on': zoomMode === 'custom' && zoomPercent === 100 }" type="button"
-            @click="setActualSize"
-          >
-            100%
-          </button>
+      <div class="preview-pane">
+        <!-- 预览工具条：页数 + 缩放（原来是一个浮在画布上的小药丸，看着很孤立） -->
+        <div class="pane-strip">
+          <span class="strip-title">{{ t('plugin.preview') }}</span>
+          <span v-if="pageCount" class="strip-meta">{{ t('plugin.pageCount', { n: pageCount }) }}</span>
+          <div class="zoom-group">
+            <button class="zoom-btn" type="button" :title="t('plugin.zoomOut')" @click="zoomStep(-10)">
+              −
+            </button>
+            <span class="zoom-value">{{ zoomLabel }}</span>
+            <button class="zoom-btn" type="button" :title="t('plugin.zoomIn')" @click="zoomStep(10)">
+              +
+            </button>
+            <span class="zoom-sep" />
+            <button
+              class="zoom-btn" :class="{ 'is-on': zoomMode === 'fit-width' }" type="button"
+              @click="zoomMode = 'fit-width'"
+            >
+              {{ t('plugin.zoomFitWidth') }}
+            </button>
+            <button
+              class="zoom-btn" :class="{ 'is-on': zoomMode === 'fit-page' }" type="button"
+              @click="zoomMode = 'fit-page'"
+            >
+              {{ t('plugin.zoomFitPage') }}
+            </button>
+            <button
+              class="zoom-btn" :class="{ 'is-on': zoomMode === 'custom' && zoomPercent === 100 }" type="button"
+              @click="setActualSize"
+            >
+              100%
+            </button>
+          </div>
         </div>
 
-        <div ref="canvasRef" class="preview-canvas">
-          <div
-            class="preview-scaler"
-            :style="{
-              scale: scalePre || 1,
-              transformOrigin: 'top left',
-              marginLeft: `${centerOffset}px`,
-            }"
-          >
-            <ClientOnly>
-              <EditMarkdownPreview
-                ref="preRef" :content="currentResume?.content" :settings="currentResume?.settings"
-                :theme="currentResume?.theme" @update:image-position="(e) => {
-                  if (currentResume.settings)
-                    currentResume.settings.imagePosition = e
-                }" @update:content="(e) => {
-                  if (currentResume.content && e)
-                    currentResume.content = e
-                }"
-              />
-            </ClientOnly>
+        <div ref="el" class="preview-stage">
+          <div ref="canvasRef" class="preview-canvas">
+            <div
+              class="preview-scaler"
+              :style="{
+                scale: scalePre || 1,
+                transformOrigin: 'top left',
+                marginLeft: `${centerOffset}px`,
+              }"
+            >
+              <ClientOnly>
+                <EditMarkdownPreview
+                  ref="preRef" :content="currentResume?.content" :settings="currentResume?.settings"
+                  :theme="currentResume?.theme" @update:image-position="(e) => {
+                    if (currentResume.settings)
+                      currentResume.settings.imagePosition = e
+                  }" @update:content="(e) => {
+                    if (currentResume.content && e)
+                      currentResume.content = e
+                  }"
+                />
+              </ClientOnly>
+            </div>
           </div>
         </div>
       </div>
@@ -289,11 +339,22 @@ if (import.meta.client) {
 
 <style scoped>
 .edit-shell {
+  /* 层次靠明度差做出来：面板（白）/ 预览底板（灰）/ 纸张（白）三档。
+     原来的 --muted 是 95.9% 亮度，和白纸只有 1.1:1，纸张完全浮不起来。 */
+  --shell-panel: hsl(var(--background));
+  --shell-canvas: #e3e5ea;
+  --shell-strip-h: 40px;
+
   display: flex;
   flex-direction: column;
   height: 100%;
   min-height: 0;
-  background: hsl(var(--background));
+  background: var(--shell-panel);
+}
+
+/* 暗色下纸张仍是白的，底板要更深纸才浮得起来 */
+.dark .edit-shell {
+  --shell-canvas: #131316;
 }
 
 .shell-body {
@@ -303,13 +364,45 @@ if (import.meta.client) {
   position: relative;
 }
 
+/* 编辑器：信息条（定高） + 正文（滚动） */
 .editor-pane {
   flex: none;
   min-width: 0;
   height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--shell-panel);
+}
+
+.editor-body {
+  flex: 1;
+  min-height: 0;
   overflow-x: hidden;
   overflow-y: auto;
-  background: hsl(var(--background));
+}
+
+/* 编辑器 / 预览共用的信息条：给两侧内容一个明确的“头”，避免内容直接顶到边缘显得没做完 */
+.pane-strip {
+  height: var(--shell-strip-h);
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  border-bottom: 1px solid hsl(var(--border));
+  background: var(--shell-panel);
+}
+
+.strip-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: hsl(var(--foreground) / 0.8);
+}
+
+.strip-meta {
+  font-size: 11.5px;
+  font-variant-numeric: tabular-nums;
+  color: hsl(var(--muted-foreground));
 }
 
 .pane-divider {
@@ -334,28 +427,27 @@ if (import.meta.client) {
   background: hsl(var(--ring));
 }
 
+/* 预览：工具条（定高） + 画布（滚动） */
 .preview-pane {
   flex: 1;
   min-width: 0;
-  position: relative;
-  overflow: auto;
-  background: hsl(var(--muted));
+  display: flex;
+  flex-direction: column;
+  background: var(--shell-canvas);
 }
 
-.zoom-bar {
-  position: sticky;
-  top: 12px;
-  z-index: 10;
+.preview-stage {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  overflow: auto;
+}
+
+.zoom-group {
   display: flex;
   align-items: center;
   gap: 2px;
-  width: fit-content;
-  margin: 12px 16px -42px auto;
-  padding: 3px;
-  border: 1px solid hsl(var(--border));
-  border-radius: 8px;
-  background: hsl(var(--background));
-  box-shadow: 0 2px 8px rgb(15 23 42 / 8%);
+  margin-left: auto;
 }
 
 .zoom-btn {
@@ -395,7 +487,7 @@ if (import.meta.client) {
 }
 
 .preview-canvas {
-  padding: 20px 32px 48px;
+  padding: 24px 32px 56px;
 }
 
 .preview-scaler {

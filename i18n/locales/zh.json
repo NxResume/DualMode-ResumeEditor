@@ -111,6 +111,8 @@
     "pagePadding": "页边距",
     "lineHeight": "行高",
     "saving": "保存中…",
+    "words": "字数 {n}",
+    "pageCount": "共 {n} 页",
     "saved": "已保存",
     "unsaved": "未保存",
     "zoomIn": "放大",

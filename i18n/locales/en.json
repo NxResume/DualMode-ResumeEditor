@@ -111,6 +111,8 @@
     "pagePadding": "Page padding",
     "lineHeight": "Line height",
     "saving": "Saving…",
+    "words": "Chars {n}",
+    "pageCount": "{n} pages",
     "saved": "Saved",
     "unsaved": "Unsaved",
     "zoomIn": "Zoom in",
