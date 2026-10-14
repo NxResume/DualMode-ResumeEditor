@@ -19,6 +19,13 @@ function getMd(): MarkdownIt {
     breaks: true,
   })
 
+  // `::: left` 负责打开 .lr-container、`::: right` 负责关上它 —— 这一对必须**成对且相邻**。
+  // 只留一半（例如把 `::: right` 那块剪掉）时，容器会一直开着：它的 overflow:hidden 会把后面
+  // 整篇内容吞进去并裁掉（表现就是「后面的内容全不见了」）。所以这里用 token 相邻性判断是否配成对，
+  // 不成对时让每个容器各自闭合。
+  const isPairedWithRight = (tokens: any[], idx: number) =>
+    tokens[idx + 1]?.type === 'container_right_open'
+
   md.use(remarkContainer, 'left', {
     validate(params: string) {
       return params.trim() === 'left'
@@ -30,8 +37,8 @@ function getMd(): MarkdownIt {
         return '<div class="lr-container"><div class="left">'
       }
       else {
-        // 关闭 left 容器
-        return '</div>'
+        // 关闭 left 容器：后面紧跟 ::: right 时容器留给 right 关；否则自己把容器一起关掉
+        return isPairedWithRight(tokens, idx) ? '</div>' : '</div></div>'
       }
     },
   })
@@ -44,8 +51,10 @@ function getMd(): MarkdownIt {
     render(tokens: any[], idx: number) {
       // 判断容器是开始还是结束
       if (tokens[idx].nesting === 1) {
-        // 打开 right 容器
-        return '<div class="right">'
+        // 前一个 token 是 `::: left` 的关闭标记 → 复用它打开的容器；否则自己开一个
+        return tokens[idx - 1]?.type === 'container_left_close'
+          ? '<div class="right">'
+          : '<div class="lr-container"><div class="right">'
       }
       else {
         // 关闭 right 容器，并且关闭 lr-container
