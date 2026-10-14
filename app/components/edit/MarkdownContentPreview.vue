@@ -8,25 +8,55 @@ const props = defineProps<{
 const theme = 'markdown-body'
 const wrapperRef = ref<HTMLElement | null>(null)
 const md = computed(() => useMarkdown(props.content))
+// 图片就绪触发的补排每次内容变更只允许一次，避免「重排 → 又出现未加载图片 → 再重排」
+let imageRepaginateUsed = false
 
 async function paginateNow() {
   // 图标数据就绪后再渲染，保证首次分页不缺图标
   await ensureIconsLoaded()
   await nextTick()
+  // 字体未就绪时是按回退字体折行的，测得的高度与最终渲染不符，必须等
+  if (document.fonts)
+    await document.fonts.ready
   await new Promise(resolve => setTimeout(resolve, 0))
 
-  if (wrapperRef.value) {
-    autoPaginate(wrapperRef.value, md.value.html, {
-      ...DEFAULT_CONFIG,
-      themeClass: theme,
-      themeName: props.themeName,
-      padding: props.settings?.pagePadding,
-    })
-  }
+  if (!wrapperRef.value)
+    return
+
+  autoPaginate(wrapperRef.value, md.value.html, {
+    ...DEFAULT_CONFIG,
+    themeClass: theme,
+    themeName: props.themeName,
+    padding: props.settings?.pagePadding,
+  })
+
+  scheduleImageRepaginate()
 }
 
 // 输入防抖：200ms 内的连续变更合并为一次分页重排，减少打字时的全量 DOM 重建
 const paginateDebounced = useDebounceFn(paginateNow, 200)
+
+/** 内容图片（含证件照）加载完成后尺寸变化会让分页失效，只补一次重排 */
+function scheduleImageRepaginate() {
+  const wrapper = wrapperRef.value
+  if (!wrapper || imageRepaginateUsed)
+    return
+
+  const pending = Array.from(wrapper.querySelectorAll('img')).filter(img => !img.complete)
+  if (!pending.length)
+    return
+
+  imageRepaginateUsed = true
+  let left = pending.length
+  const onDone = () => {
+    if (--left === 0)
+      paginateDebounced()
+  }
+  for (const img of pending) {
+    img.addEventListener('load', onDone, { once: true })
+    img.addEventListener('error', onDone, { once: true })
+  }
+}
 
 watch(() => [
   props.content,
@@ -35,6 +65,7 @@ watch(() => [
   props.settings?.pageLineHeight,
   props.settings?.fontname,
 ], () => {
+  imageRepaginateUsed = false
   paginateDebounced()
 })
 
@@ -66,7 +97,7 @@ onMounted(() => {
   max-height: 1070px;
   background: white;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  padding: var(--resume-page-padding-size, '36px');
+  padding: var(--resume-page-padding-size, 36px);
   overflow: hidden;
   z-index: 1;
 }
@@ -112,21 +143,13 @@ onMounted(() => {
   background: linear-gradient(to right, transparent, #ccc, transparent);
 }
 
-/* 临时容器样式 */
-.temp-container {
-  position: absolute;
-  visibility: hidden;
-  pointer-events: none;
-  width: 794px;
-}
-
 #id-photo {
   position: absolute;
   z-index: 20;
   width: 140px;
   top: var(--id-photo-top, 66px);
   left: var(--id-photo-left, 391px);
-  transform: scale(var(--id-photo-scale, '0.8 0.8'));
+  transform: scale(var(--id-photo-scale, 0.8 0.8));
   border-radius: 6px;
 }
 </style>
