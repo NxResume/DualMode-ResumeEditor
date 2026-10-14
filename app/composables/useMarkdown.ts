@@ -1,5 +1,6 @@
 import MarkdownIt from 'markdown-it'
 import remarkContainer from 'markdown-it-container'
+import gapPlugin from '~/utils/markdown-it-gap'
 import iconPlugin from '~/utils/markdown-it-icon'
 
 // 模块级单例：MarkdownIt 实例与插件只创建一次。
@@ -56,6 +57,9 @@ function getMd(): MarkdownIt {
   md.use(iconPlugin, {
     type: 'svg',
   })
+
+  // 空行 → 真实留白（连续空行里第一个只作段落分隔，多出来的每个补一行空白）
+  md.use(gapPlugin)
 
   return md
 }

@@ -143,6 +143,11 @@ onMounted(() => {
   background: linear-gradient(to right, transparent, #ccc, transparent);
 }
 
+/* 空行渲染出的空白块：1 个块 = 1 个行盒的高度（跟随字号与行高设置） */
+.md-gap {
+  height: calc(var(--resume-line-height, 1.9) * 1em);
+}
+
 #id-photo {
   position: absolute;
   z-index: 20;
