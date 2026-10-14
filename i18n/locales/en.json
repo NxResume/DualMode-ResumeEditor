@@ -50,7 +50,14 @@
     "emptyTitle": "No resumes yet",
     "emptyDescription": "You haven't created any resumes. Click below to create your first one!",
     "limitTitle": "Resume Limit Reached",
-    "limitDescription": "You can create up to {max} resumes. Please delete some before creating new ones."
+    "limitDescription": "You can create up to {max} resumes. Please delete some before creating new ones.",
+    "rename": "Rename",
+    "atLimit": "Limit reached",
+    "deleteConfirmTitle": "Delete this resume?",
+    "deleteConfirmDescription": "“{name}” will be permanently deleted. This cannot be undone.",
+    "deleteConfirm": "Delete",
+    "deleteFailed": "Delete failed, please try again later.",
+    "loading": "Loading…"
   },
   "common": {
     "cancel": "Cancel",

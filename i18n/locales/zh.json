@@ -50,7 +50,14 @@
     "emptyTitle": "暂无简历",
     "emptyDescription": "你还没有创建任何简历，点击下方按钮新建一份吧！",
     "limitTitle": "简历数量已达上限",
-    "limitDescription": "最多只能创建{max}份简历，请先删除部分简历后再试。"
+    "limitDescription": "最多只能创建{max}份简历，请先删除部分简历后再试。",
+    "rename": "重命名",
+    "atLimit": "已达上限",
+    "deleteConfirmTitle": "删除这份简历？",
+    "deleteConfirmDescription": "「{name}」将被永久删除，此操作无法撤销。",
+    "deleteConfirm": "确认删除",
+    "deleteFailed": "删除失败，请稍后重试。",
+    "loading": "加载中…"
   },
   "common": {
     "cancel": "取消",
