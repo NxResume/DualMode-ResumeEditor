@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { ResumeData } from '~~/types/resume'
-import { Copy, Edit, Pencil, Plus, Trash2 } from 'lucide-vue-next'
+import { Copy, Edit, FileText, Pencil, Plus, Trash2 } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -25,6 +25,10 @@ const editingResumeName = ref('')
 const deletingResume = ref<ResumeData | null>(null)
 
 const resumes = ref<ResumeData[]>([])
+// 列表按最后修改倒序展示（不改动源数组，只影响展示）
+const sortedResumes = computed(() =>
+  [...resumes.value].sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()),
+)
 const loading = ref(false)
 const actionLoading = ref<string | null>(null)
 const creatingResume = ref(false)
@@ -191,7 +195,7 @@ definePageMeta({
 <template>
   <div class="resumes-page">
     <div class="page-inner">
-      <!-- 顶部：标题 + 数量 + 主操作 -->
+      <!-- 顶部：返回 + 标题 + 数量 + 主操作 -->
       <header class="page-head">
         <NuxtLink :to="localePath('index')" class="back-btn" :title="$t('back')">
           <span class="i-ri-arrow-left-line" />
@@ -200,11 +204,8 @@ definePageMeta({
         <div class="head-text">
           <h1 class="page-title">
             {{ $t('resumes.title') }}
-            <span class="count-chip">{{ resumes.length }}/{{ MAX_RESUMES }}</span>
           </h1>
-          <p class="page-desc">
-            {{ $t('resumes.description') }}
-          </p>
+          <span class="count-chip">{{ resumes.length }} / {{ MAX_RESUMES }}</span>
         </div>
 
         <div class="head-actions">
@@ -235,12 +236,13 @@ definePageMeta({
 
       <ClientOnly v-else>
         <!-- 骨架屏：首次加载时先占位，避免「暂无简历」一闪而过 -->
-        <div v-if="loading" class="card-grid">
-          <div v-for="i in 3" :key="i" class="resume-card is-skeleton">
-            <Skeleton class="h-5 w-32" />
-            <Skeleton class="mt-4 h-4 w-full" />
-            <Skeleton class="mt-2 h-4 w-2/3" />
-            <Skeleton class="mt-6 h-9 w-full" />
+        <div v-if="loading" class="resume-list">
+          <div v-for="i in 4" :key="i" class="resume-row is-skeleton">
+            <Skeleton class="rounded-[10px] h-9 w-9" />
+            <div class="row-body">
+              <Skeleton class="h-4 w-40" />
+              <Skeleton class="h-3 w-56" />
+            </div>
           </div>
         </div>
 
@@ -259,77 +261,76 @@ definePageMeta({
           </Button>
         </div>
 
-        <!-- 简历卡片 -->
-        <div v-else class="card-grid">
-          <article v-for="resume in resumes" :key="resume.id" class="resume-card">
-            <!-- 卡片级 loading 蒙版 -->
-            <div v-if="actionLoading === resume.id" class="card-mask">
-              <svg class="h-6 w-6 animate-spin" viewBox="0 0 24 24">
+        <!-- 简历列表：一行一份，紧凑的卡片式列表 -->
+        <div v-else class="resume-list">
+          <div v-for="resume in sortedResumes" :key="resume.id" class="resume-row">
+            <div v-if="actionLoading === resume.id" class="row-mask">
+              <svg class="h-5 w-5 animate-spin" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none" />
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
               </svg>
             </div>
 
-            <div class="card-head">
-              <h3 class="card-title">
+            <!-- 左侧文件图标 -->
+            <div class="row-icon">
+              <FileText class="h-[18px] w-[18px]" />
+            </div>
+
+            <!-- 中间：名称 + 时间 -->
+            <div class="row-body">
+              <div class="row-name">
                 <Input
                   v-if="editingResumeId === resume.id"
                   :id="`resume-name-input-${resume.id}`"
                   v-model="editingResumeName"
-                  class="text-base font-semibold px-1 h-8"
+                  class="text-[13px] font-semibold px-2 h-7 max-w-[280px]"
                   @blur="() => saveEditResumeName(resume)"
                   @keyup.enter="() => saveEditResumeName(resume)"
                   @keyup.esc="editingResumeId = null"
                 />
                 <template v-else>
-                  <span class="card-title-text" :title="resume.name" @dblclick="startEditResumeName(resume)">
+                  <span class="row-name-text" :title="resume.name" @dblclick="startEditResumeName(resume)">
                     {{ resume.name }}
                   </span>
                   <button
-                    class="icon-action"
+                    class="rename-btn"
                     :title="$t('resumes.rename')"
                     @click="startEditResumeName(resume)"
                   >
-                    <Pencil class="h-3.5 w-3.5" />
+                    <Pencil class="h-3 w-3" />
                   </button>
                 </template>
-              </h3>
+              </div>
 
-              <div class="card-actions">
-                <button
-                  class="icon-action"
-                  :title="$t('resumes.duplicate')"
-                  @click="handleDuplicateResume(resume.id)"
-                >
-                  <Copy class="h-4 w-4" />
-                </button>
-                <button
-                  class="icon-action is-danger"
-                  :title="$t('resumes.delete')"
-                  @click="askDeleteResume(resume)"
-                >
-                  <Trash2 class="h-4 w-4" />
-                </button>
+              <div class="row-meta">
+                <span>{{ $t('resumes.lastModified') }} {{ formatDate(resume.updatedAt) }}</span>
+                <span class="row-meta-dot">·</span>
+                <span>{{ $t('resumes.created') }} {{ formatDate(resume.createdAt) }}</span>
               </div>
             </div>
 
-            <!-- 标签 / 值左右两列对齐 -->
-            <dl class="card-meta">
-              <div class="meta-row">
-                <dt>{{ $t('resumes.lastModified') }}</dt>
-                <dd>{{ formatDate(resume.updatedAt) }}</dd>
-              </div>
-              <div class="meta-row">
-                <dt>{{ $t('resumes.created') }}</dt>
-                <dd>{{ formatDate(resume.createdAt) }}</dd>
-              </div>
-            </dl>
-
-            <Button variant="outline" class="card-primary text-[13px]" @click="handleEditResume(resume.id)">
-              <Edit class="h-4 w-4" />
-              {{ $t('resumes.edit') }}
-            </Button>
-          </article>
+            <!-- 右侧操作 -->
+            <div class="row-actions">
+              <button
+                class="icon-action"
+                :title="$t('resumes.duplicate')"
+                @click="handleDuplicateResume(resume.id)"
+              >
+                <Copy class="h-4 w-4" />
+              </button>
+              <button
+                class="icon-action is-danger"
+                :title="$t('resumes.delete')"
+                @click="askDeleteResume(resume)"
+              >
+                <Trash2 class="h-4 w-4" />
+              </button>
+              <Button variant="outline" class="row-open" @click="handleEditResume(resume.id)">
+                <Edit class="h-3.5 w-3.5" />
+                {{ $t('resumes.edit') }}
+              </Button>
+            </div>
+          </div>
         </div>
       </ClientOnly>
     </div>
@@ -398,8 +399,7 @@ definePageMeta({
 
 <style scoped>
 .resumes-page {
-  /* 页面用浅灰底、卡片纯白 —— 白卡贴白底会完全看不出边界（和编辑页同一类问题） */
-  --rl-page: #e3e5ea;
+  --rl-page: hsl(var(--muted) / 0.45);
   --rl-card: hsl(var(--card));
 
   min-height: 100vh;
@@ -408,63 +408,60 @@ definePageMeta({
 
 .dark .resumes-page {
   --rl-page: hsl(var(--background));
-  --rl-card: hsl(240 4% 13%);
+  --rl-card: hsl(var(--card));
 }
 
 .page-inner {
-  max-width: 1120px;
+  max-width: 960px;
   margin: 0 auto;
-  padding: 32px 24px 64px;
+  padding: 40px 24px 80px;
 }
 
-/* 顶部 */
+/* ---------- 顶部 ---------- */
 .page-head {
   display: flex;
-  align-items: flex-start;
-  gap: 16px;
-  margin-bottom: 28px;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
 }
 
 .back-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 34px;
+  width: 36px;
+  height: 36px;
   flex: none;
-  margin-top: 2px;
   border: 1px solid hsl(var(--border));
-  border-radius: 8px;
-  color: hsl(var(--foreground) / 0.75);
+  border-radius: 10px;
+  background: var(--rl-card);
+  color: hsl(var(--muted-foreground));
   cursor: pointer;
   transition:
-    background-color 150ms,
-    color 150ms;
+    color 150ms,
+    border-color 150ms,
+    background-color 150ms;
 }
 
 .back-btn:hover {
   background: hsl(var(--accent));
   color: hsl(var(--foreground));
+  border-color: hsl(var(--foreground) / 0.15);
 }
 
 .head-text {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   flex: 1;
   min-width: 0;
 }
 
 .page-title {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 700;
+  letter-spacing: -0.01em;
   color: hsl(var(--foreground));
-}
-
-.page-desc {
-  margin-top: 4px;
-  font-size: 13px;
-  color: hsl(var(--muted-foreground));
 }
 
 .count-chip {
@@ -473,9 +470,9 @@ definePageMeta({
   height: 22px;
   padding: 0 9px;
   border-radius: 999px;
-  background: hsl(var(--muted));
-  font-size: 12px;
-  font-weight: 500;
+  background: hsl(var(--foreground) / 0.06);
+  font-size: 11.5px;
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
   color: hsl(var(--muted-foreground));
 }
@@ -490,80 +487,160 @@ definePageMeta({
 .limit-chip {
   display: inline-flex;
   align-items: center;
-  height: 22px;
-  padding: 0 9px;
-  border-radius: 999px;
-  background: rgb(245 158 66 / 14%);
-  font-size: 11.5px;
-  color: hsl(var(--foreground) / 0.7);
+  height: 28px;
+  padding: 0 10px;
+  border-radius: 8px;
+  background: hsl(var(--foreground) / 0.05);
+  font-size: 12px;
+  color: hsl(var(--muted-foreground));
 }
 
-/* 卡片网格 */
-.card-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 16px;
-}
-
-.resume-card {
-  position: relative;
+/* ---------- 列表 ---------- */
+.resume-list {
   display: flex;
   flex-direction: column;
-  padding: 18px;
+  gap: 8px;
+}
+
+.resume-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
   border: 1px solid hsl(var(--border));
   border-radius: 12px;
   background: var(--rl-card);
-  box-shadow: 0 1px 2px rgb(15 23 42 / 4%);
   transition:
+    border-color 150ms,
     box-shadow 150ms,
-    border-color 150ms;
+    background-color 150ms;
 }
 
-.resume-card:hover {
-  border-color: hsl(var(--ring) / 0.4);
-  box-shadow: 0 4px 14px rgb(15 23 42 / 8%);
+.resume-row:not(.is-skeleton):hover {
+  border-color: hsl(var(--foreground) / 0.15);
+  box-shadow:
+    0 1px 2px hsl(240 10% 4% / 0.04),
+    0 6px 16px hsl(240 10% 4% / 0.05);
 }
 
-.card-head {
-  display: flex;
+/* 左侧图标块 */
+.row-icon {
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
-  min-height: 32px;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  flex: none;
+  border-radius: 10px;
+  background: hsl(var(--muted));
+  color: hsl(var(--muted-foreground));
+  transition:
+    background-color 150ms,
+    color 150ms;
 }
 
-.card-title {
+.resume-row:not(.is-skeleton):hover .row-icon {
+  background: hsl(var(--primary) / 0.1);
+  color: hsl(var(--primary));
+}
+
+/* 中间主体 */
+.row-body {
   display: flex;
-  align-items: center;
-  gap: 6px;
+  flex-direction: column;
+  gap: 3px;
   flex: 1;
   min-width: 0;
-  font-size: 15px;
-  font-weight: 600;
-  color: hsl(var(--foreground));
 }
 
-.card-title-text {
+.row-name {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+
+.row-name-text {
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  color: hsl(var(--foreground));
   cursor: text;
 }
 
-.card-actions {
+.rename-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  flex: none;
+  border-radius: 5px;
+  color: hsl(var(--muted-foreground));
+  opacity: 0;
+  cursor: pointer;
+  transition:
+    opacity 150ms,
+    background-color 150ms,
+    color 150ms;
+}
+
+.resume-row:hover .rename-btn {
+  opacity: 1;
+}
+
+.rename-btn:hover {
+  background: hsl(var(--accent));
+  color: hsl(var(--foreground));
+}
+
+.row-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: hsl(var(--muted-foreground));
+}
+
+.row-meta-dot {
+  opacity: 0.5;
+}
+
+/* 右侧操作 */
+.row-actions {
   display: flex;
   align-items: center;
   gap: 2px;
   flex: none;
+  opacity: 0.65;
+  transition: opacity 150ms;
+}
+
+.resume-row:hover .row-actions {
+  opacity: 1;
+}
+
+.row-open {
+  height: 32px;
+  margin-left: 6px;
+  padding: 0 12px;
+  font-size: 12.5px;
+  gap: 6px;
 }
 
 .icon-action {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
-  border-radius: 6px;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
   color: hsl(var(--muted-foreground));
   cursor: pointer;
   transition:
@@ -578,41 +655,11 @@ definePageMeta({
 
 .icon-action.is-danger:hover {
   background: rgb(239 68 68 / 10%);
-  color: #dc2626;
+  color: #ef4444;
 }
 
-/* 标签 / 值两列对齐 */
-.card-meta {
-  margin: 14px 0 16px;
-  padding-top: 12px;
-  border-top: 1px solid hsl(var(--border));
-}
-
-.meta-row {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 3px 0;
-  font-size: 12px;
-}
-
-.meta-row dt {
-  color: hsl(var(--muted-foreground));
-  white-space: nowrap;
-}
-
-.meta-row dd {
-  color: hsl(var(--foreground) / 0.85);
-  font-variant-numeric: tabular-nums;
-  text-align: right;
-}
-
-.card-primary {
-  width: 100%;
-}
-
-.card-mask {
+/* 行内加载遮罩 */
+.row-mask {
   position: absolute;
   inset: 0;
   z-index: 10;
@@ -621,39 +668,53 @@ definePageMeta({
   justify-content: center;
   border-radius: 12px;
   background: var(--rl-card);
-  opacity: 0.7;
+  opacity: 0.8;
   color: hsl(var(--muted-foreground));
 }
 
-/* 空状态 / 登录引导 */
+/* ---------- 空状态 / 登录引导 ---------- */
 .empty-block,
 .signin-block {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 88px 24px;
+  padding: 80px 24px;
+  border: 1px dashed hsl(var(--border));
+  border-radius: 16px;
+  background: var(--rl-card);
   text-align: center;
 }
 
 .empty-icon,
 .signin-icon {
-  font-size: 56px;
-  color: hsl(var(--muted-foreground) / 0.5);
-  margin-bottom: 16px;
+  font-size: 48px;
+  color: hsl(var(--muted-foreground) / 0.4);
+  margin-bottom: 14px;
 }
 
 .empty-title,
 .signin-title {
   margin-bottom: 6px;
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 600;
   color: hsl(var(--foreground));
 }
 
 .empty-desc,
 .signin-desc {
-  margin-bottom: 24px;
+  margin-bottom: 22px;
   font-size: 13.5px;
   color: hsl(var(--muted-foreground));
+}
+
+/* 窄窗口：先收掉时间，保留名称与操作 */
+@media (max-width: 767px) {
+  .row-meta {
+    display: none;
+  }
+
+  .page-inner {
+    padding: 24px 16px 64px;
+  }
 }
 </style>
