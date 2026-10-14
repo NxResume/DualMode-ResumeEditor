@@ -52,30 +52,50 @@ export function canSplitElement(element: HTMLElement, config: PaginationConfig):
   return !config.noSplitTags.includes(element.tagName.toLowerCase())
 }
 
+/** 测量哨兵：零高度的块级元素，标出内容真实的上下边界 */
+const SENTINEL_ATTR = 'data-pg-sentinel'
+
+function createSentinel(): HTMLElement {
+  const sentinel = document.createElement('div')
+  sentinel.setAttribute(SENTINEL_ATTR, '')
+  sentinel.style.cssText = 'height:0;margin:0;padding:0;border:0'
+  return sentinel
+}
+
 /**
- * 一次性量出每个元素的「推进高度」。
- * 前提：所有元素都挂在**同一个真实页面容器**里（autoPaginate 的测量阶段保证这一点）。
- * 相邻元素取 offsetTop 差值 → margin 折叠只算一次（旧实现上下 margin 都累加，系统性高估）；
- * 最后一个元素用自身 offsetHeight（页底不需要再留 margin）。
+ * 该元素能否用自己的盒子量高度。
+ * `<br>`（markdown 里的空行）、裸 `<span>` 这类行内元素在 Chrome 里 offsetTop / offsetHeight
+ * 全都是 0，但它们的行盒是真实占位的 —— 必须由相邻块级元素的推进量吸收，
+ * 否则空行前面的段落会被算成负高度、空行本身被算成后面元素的绝对位置（页数会暴涨）。
  */
-function measureFlowHeights(elements: HTMLElement[]): number[] {
+function isMeasurable(element: HTMLElement): boolean {
+  return !isOutOfFlow(element) && window.getComputedStyle(element).display !== 'inline'
+}
+
+/**
+ * 一次性量出每个元素的「推进高度」= 自身顶边到下一个可量元素顶边的距离。
+ * 首尾各插一个零高度哨兵，于是：
+ * - 行内元素的空行（`<br>`）被相邻块级元素的推进量吸收；
+ * - 末尾的行盒与 margin 也算得进来（不再用「最后一个只取 offsetHeight」的近似）；
+ * - margin 折叠只算一次（浏览器怎么排就怎么算）。
+ * 前提：所有元素都挂在**同一个真实页面容器**里（autoPaginate 的测量阶段保证这一点）。
+ */
+function measureFlowHeights(start: HTMLElement, elements: HTMLElement[], end: HTMLElement): number[] {
+  const measurable = elements.filter(isMeasurable)
   const heights: number[] = elements.map(() => 0)
-  let prevIndex = -1
-  let prevTop = 0
+  const startTop = start.offsetTop
 
-  for (let i = 0; i < elements.length; i++) {
-    const element = elements[i]!
-    if (isOutOfFlow(element))
-      continue
-    const top = element.offsetTop
-    if (prevIndex >= 0)
-      heights[prevIndex] = top - prevTop
-    prevIndex = i
-    prevTop = top
+  // 推进量 = 「下一个可量元素顶边」−「本元素顶边」：
+  // 元素自身高度 + 它后面的间距都在里面（夹在中间的行内空行因其顶边被推后而自动算入）。
+  // 第一个元素改用起始哨兵顶边当基准（把它上方的空间也算进来），
+  // 最后一个元素用结束哨兵收尾（末尾的行盒与 margin 不再被漏掉）。
+  // 于是所有推进量之和 = 结束哨兵顶边 − 起始哨兵顶边 = 内容真实总高。
+  for (let i = 0; i < measurable.length; i++) {
+    const element = measurable[i]!
+    const nextTop = i + 1 < measurable.length ? measurable[i + 1]!.offsetTop : end.offsetTop
+    const ownTop = i === 0 ? startTop : element.offsetTop
+    heights[elements.indexOf(element)] = nextTop - ownTop
   }
-
-  if (prevIndex >= 0)
-    heights[prevIndex] = elements[prevIndex]!.offsetHeight
 
   return heights
 }
@@ -229,12 +249,21 @@ export function autoPaginate(
   wrapper.appendChild(measurementPage)
   measurementPage.innerHTML = content
 
+  // 首尾哨兵：给出内容真实的上下边界。末尾的行盒/外边距、以及行内空行（<br>）
+  // 都靠它们被算进来 —— 少了这两个，空行会算成负高度或让页数暴涨。
+  const startSentinel = createSentinel()
+  const endSentinel = createSentinel()
+  measurementPage.prepend(startSentinel)
+  measurementPage.appendChild(endSentinel)
+
   try {
-    const elements = Array.from(measurementPage.children) as HTMLElement[]
+    const elements = (Array.from(measurementPage.children) as HTMLElement[]).filter(
+      element => !element.hasAttribute(SENTINEL_ATTR),
+    )
 
     // 阶段 2：一次性预读高度，装配循环内不再触发同步 layout
-    // 列表子项要在这里量：装配阶段会先清空测量页，节点脱离文档后 offsetHeight 全为 0
-    const elementHeights = measureFlowHeights(elements)
+    // 列表子项也要在这里量：装配阶段会先清空测量页，节点脱离文档后 offsetHeight 全为 0
+    const elementHeights = measureFlowHeights(startSentinel, elements, endSentinel)
     const listMetrics = new Map<HTMLElement, ListMetrics>()
     for (const element of elements) {
       const tag = element.tagName.toLowerCase()
@@ -245,6 +274,10 @@ export function autoPaginate(
         shellMargin: cssMargin(element, 'marginTop') + cssMargin(element, 'marginBottom'),
       })
     }
+
+    // 哨兵已完成使命，移除后再装配（它们不能出现在输出里）
+    startSentinel.remove()
+    endSentinel.remove()
 
     // 阶段 3：清空后逐页装配（节点引用仍然有效）
     measurementPage.innerHTML = ''
