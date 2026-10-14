@@ -53,7 +53,7 @@ function onScale(event: any) {
     :target="['.preview-content #id-photo']"
     :draggable="true"
     :scalable="true"
-    :keep-ratio="true"
+    :keep-ratio="false"
     :title="t('imageMoveable.dragTooltip')"
     @drag="onDrag"
     @scale="onScale"

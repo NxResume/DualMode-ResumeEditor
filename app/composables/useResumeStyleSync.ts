@@ -37,7 +37,9 @@ export function useResumeStyleSync(
       return
     ele.setProperty('--id-photo-top', `${imagePositionToCSSVars.top}px`)
     ele.setProperty('--id-photo-left', `${imagePositionToCSSVars.left}px`)
-    ele.setProperty('--id-photo-scale', imagePositionToCSSVars.scale.toString())
+    // 两个方向的值必须用逗号分隔：`transform: scale(0.8 0.8)` 是非法语法，整条声明会被丢掉
+    // （默认设置里就是空格分隔的 '0.8 0.8'，所以不归一化的话默认缩放根本不生效）
+    ele.setProperty('--id-photo-scale', String(imagePositionToCSSVars.scale).split(/[,\s]+/).filter(Boolean).join(', '))
   }
 
   // 字体处理
