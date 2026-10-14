@@ -15,3 +15,6 @@ prisma/prisma/
 # 本地 SQLite（dev 数据）与 D1 数据迁移文件（含真实用户数据，禁止提交）
 .data/
 migrations/data*.sql
+
+# Hermes 本地计划/草稿（不入库）
+.hermes/
