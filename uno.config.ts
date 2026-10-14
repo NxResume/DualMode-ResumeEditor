@@ -16,6 +16,11 @@ export default defineConfig({
   shortcuts: [
     ['btn', 'px-4 py-1 rounded inline-block bg-teal-600 text-white cursor-pointer hover:bg-teal-700 disabled:cursor-default disabled:bg-gray-600 disabled:opacity-50'],
     ['icon-btn', 'inline-block cursor-pointer select-none opacity-75 transition duration-200 ease-in-out hover:opacity-100 hover:text-teal-600'],
+    // 编辑页外壳里所有工具项的统一外观。定义在全局（而不是某个组件的 style 里），
+    // 这样插件组件搬到顶栏 / 设置面板任意位置都能自适应主题色（原来的 text-white 只适合深色顶栏）。
+    ['plugin-item', 'flex items-center gap-2 px-2.5 h-8 rounded-md cursor-pointer select-none text-[13px] text-foreground/80 transition-colors duration-150 hover:bg-accent hover:text-foreground'],
+    ['plugin-label', 'text-[13px] font-normal whitespace-nowrap cursor-pointer'],
+    ['shell-btn', 'inline-flex items-center justify-center gap-1.5 h-8 px-2.5 rounded-md text-[13px] text-foreground/80 whitespace-nowrap cursor-pointer select-none transition-colors duration-150 hover:bg-accent hover:text-foreground'],
   ],
   theme: {
     colors: {

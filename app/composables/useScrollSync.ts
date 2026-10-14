@@ -66,9 +66,15 @@ export function useScrollSync(leftRef: MaybeElRef, rightRef: MaybeElRef) {
     // 幂等：isScrollable 反复切换时不会挂上重复监听
     if (started)
       return
+    // 容器还没挂载时（setup 阶段 immediate watch）不要置位，否则后续调用会被幂等判断挡掉、
+    // 监听永远挂不上 —— 由调用方在 onMounted 后再调一次。
+    const left = leftRef.value
+    const right = rightRef.value
+    if (!left || !right)
+      return
     started = true
-    leftRef.value?.addEventListener('scroll', onLeftScroll, listenOptions)
-    rightRef.value?.addEventListener('scroll', onRightScroll, listenOptions)
+    left.addEventListener('scroll', onLeftScroll, listenOptions)
+    right.addEventListener('scroll', onRightScroll, listenOptions)
   }
 
   function stop() {
