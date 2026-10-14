@@ -52,9 +52,11 @@ const MM_TO_INCH_FACTOR = 1 / 25.4 // 毫米转换为英寸的系数
 const INCH_TO_PT_FACTOR = 72 // 英寸转换为 Points 的系数
 const A4_WIDTH_MM = 210 // A4 纸张宽度 (mm)
 const A4_HEIGHT_MM = 297 // A4 纸张高度 (mm)
-// 动态计算 A4 宽度 (pt)
+// 动态计算 A4 尺寸 (pt)。页高必须用真实 A4（841.89pt）：
+// 页面图按宽度换算后高 802.20pt（1070 × 595.28/794），旧实现 -50 后页高只有 791.89pt，
+// 每页底部 10.3pt 会落在页面之外。
 const A4_WIDTH_PT = A4_WIDTH_MM * MM_TO_INCH_FACTOR * INCH_TO_PT_FACTOR
-const A4_HEIGHT_PT = A4_HEIGHT_MM * MM_TO_INCH_FACTOR * INCH_TO_PT_FACTOR - 50
+const A4_HEIGHT_PT = A4_HEIGHT_MM * MM_TO_INCH_FACTOR * INCH_TO_PT_FACTOR
 /**
  * 导出为 PDF
  */
@@ -77,6 +79,7 @@ export async function exportToPDF(previewRef: HTMLElement | null, filename = 're
       const page = pages[i]!
       const dataUrl = await renderPageToJpeg(page)
 
+      // 图片尺寸用未受预览缩放影响的 offsetWidth/offsetHeight
       const scale = A4_WIDTH_PT / page.offsetWidth
       const imgHeight = page.offsetHeight * scale
 
@@ -85,15 +88,18 @@ export async function exportToPDF(previewRef: HTMLElement | null, filename = 're
       pdf.addImage(dataUrl, 'JPEG', 0, 0, A4_WIDTH_PT, imgHeight)
 
       // 计算链接位置并添加可点击区域
+      // getBoundingClientRect 含祖先 transform: scale（编辑页预览缩放），分母必须用缩放后的宽度，
+      // 否则 scalePre ≠ 1 时链接热区会整体偏移
       const pageRect = page.getBoundingClientRect()
+      const rectScale = pageRect.width ? A4_WIDTH_PT / pageRect.width : scale
       const links = page.querySelectorAll('a')
 
       links.forEach((link) => {
         const rect = link.getBoundingClientRect()
-        const x = (rect.left - pageRect.left) * scale
-        const y = (rect.top - pageRect.top) * scale
-        const w = rect.width * scale
-        const h = rect.height * scale
+        const x = (rect.left - pageRect.left) * rectScale
+        const y = (rect.top - pageRect.top) * rectScale
+        const w = rect.width * rectScale
+        const h = rect.height * rectScale
 
         if (link.href) {
           pdf.link(x, y, w, h, { url: link.href })
