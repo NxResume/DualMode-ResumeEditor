@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { defaultKeymap } from '@codemirror/commands'
+import { defaultKeymap, history, historyKeymap, redo, undo } from '@codemirror/commands'
 import { markdown } from '@codemirror/lang-markdown'
-import { EditorState } from '@codemirror/state'
+import { EditorState, Prec } from '@codemirror/state'
 import { EditorView, keymap } from '@codemirror/view'
 import { useWysiwyg } from '~/composables/useWysiwyg'
 import { WysiwygTags } from '~/constants'
@@ -102,7 +102,21 @@ function initEditor() {
   const state = EditorState.create({
     doc: props.modelValue,
     extensions: [
+      // history() 是撤销栈本身，historyKeymap 里才有 Mod-z / Mod-y 这些绑定；
+      // 只注册 defaultKeymap 的话，Ctrl+Z 既没有绑定也没有历史状态，按下去毫无反应。
+      history(),
+      // historyKeymap 里的 Mod-z / Mod-y 在 macOS 上是 Cmd+Z / Cmd+Y；这里再把 Ctrl 组合显式绑一遍，
+      // 让习惯 Windows 键位的人按 Ctrl+Z 也能撤销（Windows/Linux 上 Mod 本来就是 Ctrl，重复绑定无害）。
+      // Prec.highest：让这几条优先于 historyKeymap 的 Mod-z（否则 Cmd+Shift+Z 会被它当成 Cmd+Z）
+      Prec.highest(keymap.of([
+        // 单字符键在 CM6 里会抑制 Shift（Ctrl+Shift+z 不会变成另一个键名），
+        // 所以 Shift 变体必须用 KeyBinding 的 shift 字段写，而不是 'Ctrl-Shift-z'
+        { key: 'Mod-z', run: undo, shift: redo },
+        { key: 'Ctrl-z', run: undo, shift: redo }, // macOS 上 Mod 是 Cmd，这条让 Ctrl+Z 也能撤销
+        { key: 'Ctrl-y', run: redo },
+      ])),
       keymap.of(defaultKeymap as any),
+      keymap.of(historyKeymap),
       markdown(),
       EditorView.lineWrapping,
       // 编辑器高度受限于容器、由 .cm-scroller 内部滚动。
