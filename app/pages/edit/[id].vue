@@ -67,7 +67,8 @@ const PAGE_WIDTH = A4_WIDTH_PX
 const PAGE_HEIGHT = 1070
 
 type ZoomMode = 'fit-width' | 'fit-page' | 'custom'
-const zoomMode = ref<ZoomMode>('fit-width')
+// 进页面默认 100%（真实 A4 尺寸）；想铺满宽度可以点「适应宽度」
+const zoomMode = ref<ZoomMode>('custom')
 const zoomPercent = ref(100)
 
 const { width: canvasWidth } = useElementSize(canvasRef)
