@@ -1,5 +1,6 @@
 import { relations, sql } from 'drizzle-orm'
 import {
+  customType,
   index,
   integer,
   primaryKey,
@@ -8,6 +9,31 @@ import {
   text,
   uniqueIndex,
 } from 'drizzle-orm/sqlite-core'
+
+/**
+ * 容错时间戳列（毫秒/秒都认）。
+ *
+ * 背景：这张表有过一次单位不一致 —— 列默认值是 `unixepoch() * 1000`（毫秒），
+ * 但 Drizzle 的 `integer(..., { mode: 'timestamp' })` 读写都按**秒**（读时 ×1000），
+ * 于是毫秒值被再乘 1000 → 显示成公元 57521 年。
+ *
+ * 这里不再依赖单位的"假设"，而是按数量级判断：小于 1e11 的是秒，其余是毫秒。
+ * 写入统一用毫秒（与表默认值一致），所以新老数据都自洽，不需要数据迁移。
+ */
+const stamp = customType<{ data: Date, driverData: number }>({
+  dataType() {
+    return 'integer'
+  },
+  fromDriver(value) {
+    const n = Number(value)
+    if (!Number.isFinite(n))
+      return new Date(Number.NaN)
+    return new Date(n < 1e11 ? n * 1000 : n)
+  },
+  toDriver(value) {
+    return value.getTime()
+  },
+})
 
 // Auth.js DrizzleAdapter 插入 session/account 时不传 id，依赖列的
 // $defaultFn 自动生成（与 Prisma 的 @default(cuid()) 等价）
@@ -94,8 +120,8 @@ export const resumes = sqliteTable(
     content: text('content').notNull(),
     theme: text('theme').notNull().default('default'),
     plugins: text('plugins').notNull(),
-    createdAt: integer('createdAt', { mode: 'timestamp' }).notNull().default(sql`(unixepoch() * 1000)`),
-    updatedAt: integer('updatedAt', { mode: 'timestamp' }).notNull(),
+    createdAt: stamp('createdAt').notNull().default(sql`(unixepoch() * 1000)`),
+    updatedAt: stamp('updatedAt').notNull(),
     isDefault: integer('isDefault').notNull().default(0),
     userId: text('userId'),
   },
@@ -117,8 +143,8 @@ export const resumeSettings = sqliteTable(
     imagePosition: text('imagePosition').notNull(),
     isScrollable: integer('isScrollable').notNull().default(0),
     editorMode: text('editorMode').notNull().default('source'),
-    createdAt: integer('createdAt', { mode: 'timestamp' }).notNull().default(sql`(unixepoch() * 1000)`),
-    updatedAt: integer('updatedAt', { mode: 'timestamp' }).notNull(),
+    createdAt: stamp('createdAt').notNull().default(sql`(unixepoch() * 1000)`),
+    updatedAt: stamp('updatedAt').notNull(),
   },
   t => [
     uniqueIndex('ResumeSettings_resumeId_key').on(t.resumeId),
