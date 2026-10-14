@@ -111,7 +111,7 @@ async function save() {
   height: 22px;
   padding: 0 9px;
   border-radius: 999px;
-  font-size: 11.5px;
+  font-size: 12px;
   white-space: nowrap;
   /* 颜色只落在小圆点上，文字保持可读 —— 状态不能只靠颜色传达 */
   color: hsl(var(--foreground) / 0.7);

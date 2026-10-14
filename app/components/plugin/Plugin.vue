@@ -90,7 +90,9 @@ function setMode(mode: 'source' | 'wysiwyg') {
         </template>
       </LabelLoading>
 
-      <PluginExportButton :on-export="downloadPdf" />
+      <div class="tb-export">
+        <PluginExportButton :on-export="downloadPdf" />
+      </div>
 
       <NuxtLink
         :to="localePath({ name: 'preview-id', params: { id: reId } })"
@@ -134,17 +136,17 @@ function setMode(mode: 'source' | 'wysiwyg') {
   z-index: 20;
 }
 
+/* 左右两组用同一个间距，原来左 8 / 右 4 不对称 */
 .tb-left,
 .tb-right {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   min-width: 0;
 }
 
 .tb-right {
   justify-content: flex-end;
-  gap: 4px;
 }
 
 .tb-center {
@@ -174,7 +176,7 @@ function setMode(mode: 'source' | 'wysiwyg') {
 .tb-name {
   max-width: 200px;
   overflow: hidden;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   color: hsl(var(--foreground));
   text-overflow: ellipsis;
@@ -188,10 +190,12 @@ function setMode(mode: 'source' | 'wysiwyg') {
   border-radius: 8px;
 }
 
+/* 分段控件总高 = 26 + 3*2 = 32，与左右两侧按钮同高 */
 .tb-seg-btn {
-  padding: 5px 14px;
+  height: 26px;
+  padding: 0 14px;
   border-radius: 6px;
-  font-size: 12.5px;
+  font-size: 13px;
   color: hsl(var(--muted-foreground));
   cursor: pointer;
   white-space: nowrap;
@@ -209,6 +213,23 @@ function setMode(mode: 'source' | 'wysiwyg') {
 .shell-btn.is-on {
   background: hsl(var(--accent));
   color: hsl(var(--foreground));
+}
+
+/* 导出 PDF 是"产出"动作：加一道描边，和一堆 ghost 按钮区分开，但不跟保存抢主次 */
+.tb-export :deep(.plugin-item) {
+  height: 32px;
+  padding: 0 12px;
+  border: 1px solid hsl(var(--border));
+  border-radius: 8px;
+}
+
+.tb-export :deep(.plugin-item:hover) {
+  border-color: hsl(var(--ring) / 0.5);
+}
+
+/* 图标统一到 16px：UnoCSS 图标是 1.2em，挂在 16px 的容器里会变成 19px，和按钮里的 16px 不一致 */
+.topbar :deep([class*="i-ri-"]) {
+  font-size: 13.5px;
 }
 
 /* 窄窗口下右侧动作只留图标，避免顶栏溢出 */

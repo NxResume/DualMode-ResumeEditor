@@ -13,7 +13,7 @@ const { t } = useI18n()
     <div
       class="plugin-item transition-opacity duration-200 relative"
     >
-      <div class="i-ri-download-2-line icon-btn" />
+      <div class="i-ri-download-2-line text-[13.5px] icon-btn" />
       <Label class="plugin-label">{{ t('export.exportPdf') }}</Label>
     </div>
     <template #loading>
