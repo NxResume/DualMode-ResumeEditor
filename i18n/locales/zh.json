@@ -94,6 +94,7 @@
   "plugin": {
     "correctcase": "大小写修正",
     "save": "保存",
+    "export": "导出",
     "preview": "预览",
     "resumeTemplate": "简历模板",
     "idPhoto": "证件照",

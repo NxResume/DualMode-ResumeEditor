@@ -209,11 +209,15 @@ if (import.meta.client) {
     const root = document.documentElement
     root.style.setProperty('--editor-width', `${editorVisibleWidth.value}px`)
     root.style.setProperty('--topbar-h', '56px')
+    // 左侧主题色面板按编辑器的实际占位来定宽，这样它像"编辑器那一条被换成面板"，
+    // 不会露出半截编辑器内容（原来固定 400 会露出 60px）
+    root.style.setProperty('--theme-panel-w', `${Math.max(editorVisibleWidth.value || 0, 360)}px`)
   })
 
   onUnmounted(() => {
     document.documentElement.style.removeProperty('--editor-width')
     document.documentElement.style.removeProperty('--topbar-h')
+    document.documentElement.style.removeProperty('--theme-panel-w')
   })
 }
 </script>

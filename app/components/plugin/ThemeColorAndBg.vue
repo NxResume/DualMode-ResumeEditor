@@ -81,7 +81,7 @@ watch(color, (newColor) => {
 
     <DialogContent
       overlay-class="bg-transparent"
-      class="accordionContent p-2 border rounded-l-0 bg-background gap-0 h-[calc(100vh-var(--topbar-h,56px))] max-w-[400px] w-[400px] shadow-lg translate-x-0 translate-y-0 left-0 top-[var(--topbar-h,56px)] fixed z-50 sm:rounded-l-0"
+      class="accordionContent p-0 border-0 border-r bg-background gap-0 h-[calc(100vh-var(--topbar-h,56px))] max-w-[var(--theme-panel-w,480px)] w-[var(--theme-panel-w,480px)] shadow-none translate-x-0 translate-y-0 left-0 top-[var(--topbar-h,56px)] fixed z-50"
     >
       <DialogHeader class="dialogHeader">
         <DialogTitle class="text-lg font-semibold">
@@ -196,6 +196,10 @@ watch(color, (newColor) => {
 <style>
 .dialogHeader {
   @apply sticky top-0 z-10 bg-white pb-2 p-4;
+}
+
+.accordionContent[data-state] {
+  border-radius: 0;
 }
 
 .accordionContent {

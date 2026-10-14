@@ -94,6 +94,7 @@
   "plugin": {
     "correctcase": "Correct Case",
     "save": "Save",
+    "export": "Export",
     "preview": "Preview",
     "resumeTemplate": "Resume Template",
     "idPhoto": "ID Photo",

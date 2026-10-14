@@ -1,11 +1,11 @@
 <script lang="ts" setup>
 import type { ResumeData } from '~~/types/resume'
 import { isClient } from '@vueuse/core'
-import { LabelLoading } from '@/components/ui/label'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 
 const props = defineProps<{
-  downloadImg: () => void
-  downloadPdf: () => void
+  downloadImg: () => unknown
+  downloadPdf: () => unknown
   data: ResumeData
   editorCollapsed?: boolean
 }>()
@@ -33,6 +33,21 @@ function setMode(mode: 'source' | 'wysiwyg') {
     return
   updateData('settings.editorMode', mode)
 }
+
+// 导出（PDF / 截图）合并成一个下拉，避免右侧堆两个并列动作
+const isExporting = ref(false)
+
+async function runExport(action: () => unknown) {
+  if (isExporting.value)
+    return
+  isExporting.value = true
+  try {
+    await action()
+  }
+  finally {
+    isExporting.value = false
+  }
+}
 </script>
 
 <template>
@@ -45,7 +60,6 @@ function setMode(mode: 'source' | 'wysiwyg') {
       <span class="tb-name" :title="data.name || t('editor.title')">
         {{ data.name || t('editor.title') }}
       </span>
-      <PluginSaveInfo :data="data" />
     </div>
 
     <!-- 中：编辑模式 -->
@@ -66,46 +80,50 @@ function setMode(mode: 'source' | 'wysiwyg') {
       </div>
     </div>
 
-    <!-- 右：动作 -->
+    <!-- 右：动作（只保留「导出 / 页面设置」两处文字，其余纯图标 + tooltip） -->
     <div class="tb-right">
       <button
-        class="shell-btn" :class="{ 'is-on': !editorCollapsed }" type="button"
+        class="is-icon shell-btn" :class="{ 'is-on': !editorCollapsed }" type="button"
         :title="editorCollapsed ? t('plugin.expandEditor') : t('plugin.collapseEditor')"
+        :aria-label="editorCollapsed ? t('plugin.expandEditor') : t('plugin.collapseEditor')"
         @click="emit('toggleEditor')"
       >
         <span class="i-ri-layout-left-line" />
-        <span class="tb-hide-sm">{{ t('plugin.editor') }}</span>
       </button>
-
-      <LabelLoading :action="downloadImg">
-        <span class="shell-btn">
-          <span class="i-ri-image-line" />
-          <span class="tb-hide-sm">{{ t('plugin.screenshot') }}</span>
-        </span>
-        <template #loading>
-          <span class="shell-btn">
-            <span class="i-ri-image-line" />
-            <span class="tb-hide-sm">{{ t('export.exporting') }}</span>
-          </span>
-        </template>
-      </LabelLoading>
-
-      <div class="tb-export">
-        <PluginExportButton :on-export="downloadPdf" />
-      </div>
 
       <NuxtLink
         :to="localePath({ name: 'preview-id', params: { id: reId } })"
-        class="shell-btn"
+        class="is-icon shell-btn" :title="t('plugin.preview')" :aria-label="t('plugin.preview')"
       >
         <span class="i-ri-eye-line" />
-        <span class="tb-hide-sm">{{ t('plugin.preview') }}</span>
       </NuxtLink>
 
-      <button class="shell-btn" type="button" @click="toggle">
+      <button
+        class="is-icon shell-btn" type="button" :title="t('plugin.fullscreen')"
+        :aria-label="t('plugin.fullscreen')" @click="toggle"
+      >
         <span class="i-ri-fullscreen-line" />
-        <span class="tb-hide-sm">{{ t('plugin.fullscreen') }}</span>
       </button>
+
+      <DropdownMenu>
+        <DropdownMenuTrigger as-child>
+          <button class="tb-export-btn shell-btn" type="button" :aria-label="t('plugin.export')">
+            <span :class="isExporting ? 'i-ri-loader-4-line animate-spin' : 'i-ri-download-2-line'" />
+            <span class="tb-hide-sm">{{ t('plugin.export') }}</span>
+            <span class="tb-caret i-ri-arrow-down-s-line" />
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" class="w-44">
+          <DropdownMenuItem class="text-[13px] gap-2 cursor-pointer" @select="runExport(downloadPdf)">
+            <span class="i-ri-file-pdf-2-line" />
+            {{ t('export.exportPdf') }}
+          </DropdownMenuItem>
+          <DropdownMenuItem class="text-[13px] gap-2 cursor-pointer" @select="runExport(downloadImg)">
+            <span class="i-ri-image-line" />
+            {{ t('export.exportImage') }}
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
 
       <button
         class="is-settings shell-btn" :class="{ 'is-on': settingsOpen }" type="button"
@@ -114,6 +132,10 @@ function setMode(mode: 'source' | 'wysiwyg') {
         <span class="i-ri-settings-3-line" />
         <span class="tb-hide-sm">{{ t('plugin.settings') }}</span>
       </button>
+
+      <span class="tb-sep" />
+
+      <PluginSaveInfo :data="data" />
     </div>
   </header>
 </template>
@@ -215,16 +237,34 @@ function setMode(mode: 'source' | 'wysiwyg') {
   color: hsl(var(--foreground));
 }
 
-/* 导出 PDF 是"产出"动作：加一道描边，和一堆 ghost 按钮区分开，但不跟保存抢主次 */
-.tb-export :deep(.plugin-item) {
-  height: 32px;
-  padding: 0 12px;
-  border: 1px solid hsl(var(--border));
-  border-radius: 8px;
+/* 纯图标按钮：32×32 方块，靠 tooltip 说明 */
+.shell-btn.is-icon {
+  width: 32px;
+  padding: 0;
 }
 
-.tb-export :deep(.plugin-item:hover) {
+/* 导出是"产出"动作：加一道描边，和一堆 ghost 图标区分开，但不跟保存抢主次 */
+.tb-export-btn {
+  border: 1px solid hsl(var(--border));
+  padding: 0 10px;
+}
+
+.tb-export-btn:hover {
   border-color: hsl(var(--ring) / 0.5);
+}
+
+.tb-caret {
+  font-size: 12px;
+  opacity: 0.6;
+}
+
+/* 把保存从工具组里隔开（它是主操作，位于最右） */
+.tb-sep {
+  width: 1px;
+  height: 18px;
+  margin: 0 2px;
+  flex: none;
+  background: hsl(var(--border));
 }
 
 /* 图标统一到 16px：UnoCSS 图标是 1.2em，挂在 16px 的容器里会变成 19px，和按钮里的 16px 不一致 */
