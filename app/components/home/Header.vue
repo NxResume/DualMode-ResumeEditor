@@ -44,8 +44,16 @@ const navLinks = [
           </a>
         </li>
         <li v-if="showSettings" class="nuxt-btn-link">
-          <!-- 设置弹窗：仅首页可见，编辑中禁止切存储模式避免上下文错乱 -->
-          <SettingsDialog />
+          <!-- 存储模式开关：仅首页可见（编辑中禁止切存储模式避免上下文错乱）
+               必须包 ClientOnly：开关状态依赖 localStorage（仅客户端存在），
+               SSR 渲染会得到默认 local 状态，hydrate 时与客户端真实状态不一致，
+               Vue 会跳过属性 patch，导致刷新后视图停留在 SSR 渲染的位置 -->
+          <ClientOnly>
+            <HomeStorageModeSwitch />
+            <template #fallback>
+              <span class="rounded-full bg-muted h-7 w-32 inline-block" />
+            </template>
+          </ClientOnly>
         </li>
         <li class="nuxt-btn-link">
           <HomeLanguageSwitcher />

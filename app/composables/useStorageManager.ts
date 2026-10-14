@@ -6,7 +6,7 @@ import { LocalStorageProvider } from './providers/localStorage'
 const STORAGE_MODE_KEY = 'nuxt-resume-editor-storage-mode'
 
 export function useStorageManager() {
-  // 默认值改为 local，优先保证匿名用户可用；initializeMode 会根据登录状态做二次修正
+  // 默认值改为 local，优先保证匿名用户可用
   const currentMode = useStorage<StorageMode>(STORAGE_MODE_KEY, 'local')
   const isLoading = ref(false)
   const error = ref<string | null>(null)
@@ -29,7 +29,7 @@ export function useStorageManager() {
 
   // 初始化存储模式：
   // 1. 若用户之前手动选过 → 保持用户选择
-  // 2. 若从未选过 → 已登录默认 database，未登录默认 local
+  // 2. 从未选过 → 默认 local（不再按登录状态推断，云端需用户主动开开关）
   const initializeMode = () => {
     if (!import.meta.client)
       return
@@ -40,20 +40,8 @@ export function useStorageManager() {
       return
     }
 
-    // 首次访问，按登录状态推断默认值
-    try {
-      const { status } = useAuth()
-      if (status.value === 'authenticated') {
-        currentMode.value = 'database'
-      }
-      else {
-        currentMode.value = 'local'
-      }
-    }
-    catch {
-      // 某些 SSR/边缘场景下 useAuth 可能不可用，安全回退到 local
-      currentMode.value = 'local'
-    }
+    // 首次访问：默认本地存储
+    currentMode.value = 'local'
   }
 
   const switchMode = async (mode: StorageMode) => {

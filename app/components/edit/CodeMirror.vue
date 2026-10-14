@@ -105,6 +105,13 @@ function initEditor() {
       keymap.of(defaultKeymap as any),
       markdown(),
       EditorView.lineWrapping,
+      // 编辑器高度受限于容器、由 .cm-scroller 内部滚动。
+      // 否则文档整体撑开溢出外层左侧面板，每次输入后 CodeMirror/浏览器
+      // 的“光标滚入视野”会去滚动外层容器，导致视图跳回顶部、光标丢失。
+      EditorView.theme({
+        '&': { height: '100%' },
+        '.cm-scroller': { overflow: 'auto' },
+      }),
       EditorView.updateListener.of((update) => {
         if (update.docChanged) {
           emit('update:modelValue', update.state.doc.toString())
