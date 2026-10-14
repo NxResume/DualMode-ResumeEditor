@@ -53,15 +53,13 @@ async function save() {
     snapshot.value = serialize(props.data)
 
     toast({
-      title: 'Saved',
-      description: 'Your changes have been saved.',
+      title: t('toast.saved'),
       variant: 'success',
     })
   }
   catch (error) {
     toast({
-      title: 'Save Failed',
-      description: 'An error occurred while saving your changes.',
+      title: t('toast.saveFailed'),
       variant: 'destructive',
     })
     console.error('Save error:', error)
@@ -82,15 +80,9 @@ async function save() {
     </span>
 
     <LabelLoading :action="save" class="save-btn">
-      <span class="save-btn-inner">
-        <span class="i-ri-save-3-line" />
-        {{ t('plugin.save') }}
-      </span>
+      <span class="save-btn-inner">{{ t('plugin.save') }}</span>
       <template #loading>
-        <span class="save-btn-inner">
-          <span class="i-ri-save-3-line" />
-          {{ t('plugin.saving') }}
-        </span>
+        <span class="save-btn-inner">{{ t('plugin.saving') }}</span>
       </template>
     </LabelLoading>
   </div>
@@ -108,8 +100,8 @@ async function save() {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  height: 22px;
-  padding: 0 9px;
+  height: 20px;
+  padding: 0 8px;
   border-radius: 999px;
   font-size: 12px;
   white-space: nowrap;
@@ -137,7 +129,7 @@ async function save() {
 }
 
 .save-btn {
-  padding: 0 14px;
+  padding: 0 12px;
   height: 32px;
   border-radius: 8px;
   background: hsl(var(--primary));

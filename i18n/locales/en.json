@@ -87,6 +87,10 @@
     "exportPdf": "Export PDF",
     "exportImage": "Export Image"
   },
+  "toast": {
+    "saved": "Saved",
+    "saveFailed": "Save failed, please try again later"
+  },
   "plugin": {
     "correctcase": "Correct Case",
     "save": "Save",

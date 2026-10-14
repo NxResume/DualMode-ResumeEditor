@@ -81,7 +81,7 @@ watch(color, (newColor) => {
 
     <DialogContent
       overlay-class="bg-transparent"
-      class="accordionContent p-2 border rounded-l-0 bg-background h-[calc(100vh-var(--topbar-h,56px))] w-400px shadow-lg left-(--editor-width,480px) top-(--topbar-h,56px) fixed z-50"
+      class="accordionContent p-2 border rounded-l-0 bg-background gap-0 h-[calc(100vh-var(--topbar-h,56px))] max-w-[400px] w-[400px] shadow-lg translate-x-0 translate-y-0 left-0 top-[var(--topbar-h,56px)] fixed z-50 sm:rounded-l-0"
     >
       <DialogHeader class="dialogHeader">
         <DialogTitle class="text-lg font-semibold">

@@ -15,19 +15,18 @@ export { default as ToastViewport } from './ToastViewport.vue'
 export { toast, useToast } from './use-toast'
 
 export const toastVariants = cva(
-  'group pointer-events-auto relative flex w-full items-center justify-between space-x-2 overflow-hidden rounded-md border p-4 pr-6 shadow-lg transition-all data-[swipe=cancel]:translate-x-0 data-[swipe=end]:translate-x-[var(--reka-toast-swipe-end-x)] data-[swipe=move]:translate-x-[var(--reka-toast-swipe-move-x)] data-[swipe=move]:transition-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out data-[state=closed]:fade-out-80 data-[state=closed]:slide-out-to-right-full data-[state=open]:slide-in-from-top-full data-[state=open]:sm:slide-in-from-bottom-full',
+  // 顶部居中的小胶囊：单行消息用 rounded-full，带描述时由 Toaster 换成 rounded-xl；
+  // 边框一律中性（状态靠左侧图标 + 文案表达，不靠边框色）；
+  // 入场从上方滑入 + 淡入，出场反向；尊重 prefers-reduced-motion。
+  'group pointer-events-auto relative flex max-w-full items-center gap-2 overflow-hidden rounded-full border border-transparent bg-background py-2.5 pl-4 pr-9 text-foreground shadow-lg transition-all data-[swipe=cancel]:translate-x-0 data-[swipe=end]:translate-x-[var(--reka-toast-swipe-end-x)] data-[swipe=move]:translate-x-[var(--reka-toast-swipe-move-x)] data-[swipe=move]:transition-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out data-[state=closed]:fade-out-80 data-[state=closed]:slide-out-to-top-full data-[state=open]:slide-in-from-top-full motion-reduce:animate-none motion-reduce:duration-0',
   {
     variants: {
       variant: {
-        default: 'border bg-background text-foreground',
-        destructive:
-          'destructive group border-destructive bg-background text-foreground',
-        success:
-          'border-success bg-background text-foreground',
-        info:
-          'border-info bg-background text-foreground',
-        warning:
-          'border-warning bg-background text-foreground',
+        default: '',
+        destructive: 'destructive group',
+        success: '',
+        info: '',
+        warning: '',
       },
     },
     defaultVariants: {
