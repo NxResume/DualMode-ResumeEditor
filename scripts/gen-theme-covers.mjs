@@ -13,10 +13,13 @@
  *   pnpm covers --all               # 所有主题（已存在的仍会跳过，除非加 --force）
  *   pnpm covers --theme=techIndigo  # 指定主题（逗号分隔）
  *   pnpm covers --force             # 允许覆盖已有图
+ *   pnpm covers --with-photo        # 保留样本里的证件照（默认去掉）
  *   APP_URL=http://localhost:3000 pnpm covers   # 复用已启动的 dev server
  *
  * 样本内容固定用 app/constants/templates/tm1.md（新建简历的模板），
  * 并用独立 Chrome profile + 独立 localStorage，绝不读取/写入真实简历数据。
+ * 默认会去掉样本首行的 `<img id="id-photo">`：封面只是主题样式示意，
+ * 不该出现示例证件照（否则 10 张封面都挂着一张假头像）。
  */
 import { Buffer } from 'node:buffer'
 import { execFileSync, spawn } from 'node:child_process'
@@ -59,9 +62,17 @@ function argValue(name) {
   return hit ? hit.slice(name.length + 3) : ''
 }
 const FORCE = hasFlag('force')
+const WITH_PHOTO = hasFlag('with-photo')
 const DRY_RUN = hasFlag('dry-run')
 const ALL = hasFlag('all')
 const ONLY = argValue('theme').split(',').map(s => s.trim()).filter(Boolean)
+
+// 样本里的证件照（tm1.md 首行）：封面默认去掉，`--with-photo` 才保留
+const SAMPLE_PHOTO_RE = /<img[^>]*id=["']id-photo["'][^>]*>\s*/g
+
+function sampleContent(template) {
+  return WITH_PHOTO ? template : template.replace(SAMPLE_PHOTO_RE, '')
+}
 
 // ---------- 主题清单：与 UI 同源（reTheme.getThemeList） ----------
 function themeList() {
@@ -289,6 +300,10 @@ async function captureTheme(c, appUrl, theme, template) {
   if (geo.w !== PAGE_W || geo.h !== PAGE_H)
     throw new Error(`第一页尺寸异常：${geo.w}×${geo.h}（期望 ${PAGE_W}×${PAGE_H}，缩放或几何变了；页面几何常量见 app/utils/index.ts）`)
 
+  const photoCount = await evaluate('document.querySelectorAll(".rs-page-item #id-photo").length')
+  if (!WITH_PHOTO && photoCount)
+    throw new Error(`封面里仍出现证件照（${photoCount} 个），检查样本清洗逻辑`)
+
   const shot = await c.send('Page.captureScreenshot', {
     format: 'png',
     captureBeyondViewport: true,
@@ -333,7 +348,8 @@ if (DRY_RUN) {
 }
 
 mkdirSync(OUT_DIR, { recursive: true })
-const template = readFileSync(TEMPLATE, 'utf8')
+const template = sampleContent(readFileSync(TEMPLATE, 'utf8'))
+console.log(WITH_PHOTO ? '样本：保留证件照' : '样本：已去掉证件照（默认）')
 const server = await ensureServer()
 console.log(`→ dev server: ${server.url}`)
 const chrome = await launchChrome()
