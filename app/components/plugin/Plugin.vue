@@ -8,6 +8,7 @@ const props = defineProps<{
   downloadPdf: () => unknown
   data: ResumeData
   editorCollapsed?: boolean
+  autoSave?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -135,7 +136,7 @@ async function runExport(action: () => unknown) {
 
       <span class="tb-sep" />
 
-      <PluginSaveInfo :data="data" />
+      <PluginSaveInfo :data="data" :auto-save="autoSave" />
     </div>
   </header>
 </template>

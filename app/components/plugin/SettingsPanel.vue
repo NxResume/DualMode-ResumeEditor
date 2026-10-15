@@ -4,10 +4,12 @@ import { Switch } from '@/components/ui/switch'
 
 const props = defineProps<{
   data: ResumeData
+  autoSave?: boolean
 }>()
 
 const emit = defineEmits<{
   (e: 'update:data', data: ResumeData): void
+  (e: 'update:autoSave', value: boolean): void
   (e: 'close'): void
 }>()
 
@@ -88,6 +90,22 @@ const { t } = useI18n()
             <span class="panel-row-arrow i-ri-arrow-right-s-line" />
           </button>
         </PluginThemeListModal>
+      </section>
+
+      <section class="panel-section">
+        <h4 class="section-title">
+          {{ t('plugin.groupSave') }}
+        </h4>
+        <div class="field">
+          <span class="field-label">{{ t('plugin.autoSave') }}</span>
+          <Switch
+            id="settings-auto-save" :model-value="!!props.autoSave"
+            @update:model-value="(val: any) => emit('update:autoSave', !!val)"
+          />
+        </div>
+        <p class="field-hint">
+          {{ t('plugin.autoSaveHint') }}
+        </p>
       </section>
 
       <section class="panel-section">
@@ -207,6 +225,13 @@ const { t } = useI18n()
   font-size: 13px;
   color: hsl(var(--foreground) / 0.8);
   white-space: nowrap;
+}
+
+.field-hint {
+  margin: -2px 0 4px;
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: hsl(var(--muted-foreground));
 }
 
 .panel-row {

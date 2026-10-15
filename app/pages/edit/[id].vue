@@ -143,6 +143,7 @@ function setActualSize() {
 const storedWidth = useLocalStorage('nuxt-resume-editor-width', 480)
 const storedCollapsed = useLocalStorage('nuxt-resume-editor-collapsed', false)
 const storedSettingsOpen = useLocalStorage('nuxt-resume-editor-settings-open', true)
+const storedAutoSave = useLocalStorage('nuxt-resume-editor-autosave', false)
 const dragging = ref(false)
 const dragWidth = ref(0)
 
@@ -160,6 +161,12 @@ const editorCollapsed = computed({
 const settingsOpen = computed({
   get: () => shellReady.value ? storedSettingsOpen.value : true,
   set: (v: boolean) => { storedSettingsOpen.value = v },
+})
+
+// 自动保存开关：存 localStorage（编辑器偏好，不进简历数据、不动 DB schema），状态由页面独占
+const autoSave = computed({
+  get: () => shellReady.value && storedAutoSave.value,
+  set: (v: boolean) => { storedAutoSave.value = v },
 })
 
 const EDITOR_MIN = 320
@@ -232,6 +239,7 @@ if (import.meta.client) {
       :download-pdf="() => handleExport('pdf')"
       :editor-collapsed="editorCollapsed"
       :settings-open="settingsOpen"
+      :auto-save="autoSave"
       @update:data="updateResumeData"
       @toggle-settings="settingsOpen = !settingsOpen"
       @toggle-editor="editorCollapsed = !editorCollapsed"
@@ -335,7 +343,9 @@ if (import.meta.client) {
       <PluginSettingsPanel
         v-show="settingsOpen"
         :data="currentResume"
+        :auto-save="autoSave"
         @update:data="updateResumeData"
+        @update:auto-save="autoSave = $event"
         @close="settingsOpen = false"
       />
     </div>

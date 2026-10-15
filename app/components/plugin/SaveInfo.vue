@@ -6,6 +6,7 @@ import resumeController from '~/composables/action/resume'
 
 const props = defineProps<{
   data: ResumeData
+  autoSave?: boolean
 }>()
 const { toast } = useToast()
 const { t } = useI18n()
@@ -39,7 +40,22 @@ watch(
 
 const isDirty = computed(() => hasSnapshot.value && serialize(props.data) !== snapshot.value)
 
-async function save() {
+// 手动保存（LabelLoading 点按钮，无参 → 弹提示）与自动保存（silent）共用同一个 save
+const AUTO_SAVE_DELAY = 1500
+const saving = ref(false)
+let autoSaveTimer: ReturnType<typeof setTimeout> | null = null
+
+function clearAutoSaveTimer() {
+  if (autoSaveTimer) {
+    clearTimeout(autoSaveTimer)
+    autoSaveTimer = null
+  }
+}
+
+async function save(options: { silent?: boolean } = {}) {
+  if (saving.value)
+    return
+  saving.value = true
   try {
     if (!props.data.settings)
       return
@@ -52,10 +68,13 @@ async function save() {
     // 保存成功 → 当前数据就是新的基线
     snapshot.value = serialize(props.data)
 
-    toast({
-      title: t('toast.saved'),
-      variant: 'success',
-    })
+    // 自动保存成功不弹提示（否则打字时会刷屏）；失败一律弹
+    if (!options.silent) {
+      toast({
+        title: t('toast.saved'),
+        variant: 'success',
+      })
+    }
   }
   catch (error) {
     toast({
@@ -64,7 +83,25 @@ async function save() {
     })
     console.error('Save error:', error)
   }
+  finally {
+    saving.value = false
+  }
 }
+
+// ---- 自动保存 ----
+// 只由「未保存状态」驱动：停下来 1.5 秒才落一次盘，避免打字过程中反复写库。
+// 落盘逻辑与手动保存完全共用（同一个 save / 同一个基线快照），所以未保存胶囊会自动翻成"已保存"。
+watch([() => props.autoSave, isDirty], ([enabled, dirty]) => {
+  clearAutoSaveTimer()
+  if (!enabled || !dirty)
+    return
+  autoSaveTimer = setTimeout(() => {
+    autoSaveTimer = null
+    void save({ silent: true })
+  }, AUTO_SAVE_DELAY)
+})
+
+onUnmounted(clearAutoSaveTimer)
 </script>
 
 <template>
