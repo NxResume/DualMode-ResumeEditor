@@ -31,6 +31,31 @@ function getPages(previewRef: HTMLElement | null): HTMLElement[] {
   return Array.from(wrapper.querySelectorAll('.rs-page-item')) as HTMLElement[]
 }
 
+// ---- 下载文件名：优先「一级标题 + 下载时间」，没有一级标题就只用时间 ----
+const STAMP_PAD = 2 // 月/日/时/分/秒 都补零到 2 位
+
+function formatStamp(date = new Date()): string {
+  const pad = (n: number) => String(n).padStart(STAMP_PAD, '0')
+  return `${date.getFullYear()}${pad(date.getMonth() + 1)}${pad(date.getDate())}-${pad(date.getHours())}${pad(date.getMinutes())}${pad(date.getSeconds())}`
+}
+
+// 文件名清洗：去掉文件系统不允许的字符、压掉连续空白、限长（防超长标题）
+function sanitizeFileName(name: string): string {
+  return name
+    .replace(/[\\/:*?"<>|]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, 60)
+    .trim()
+}
+
+function resolveDownloadName(pages: HTMLElement[], ext?: string): string {
+  const heading = pages[0]?.querySelector('h1')?.textContent?.trim() ?? ''
+  const stamp = formatStamp()
+  const base = sanitizeFileName(heading ? `${heading}-${stamp}` : stamp) || stamp
+  return ext ? `${base}.${ext}` : base
+}
+
 // 下载文件
 function downloadBlob(blob: Blob, filename: string) {
   const link = document.createElement('a')
@@ -60,7 +85,7 @@ const A4_HEIGHT_PT = A4_HEIGHT_MM * MM_TO_INCH_FACTOR * INCH_TO_PT_FACTOR
 /**
  * 导出为 PDF
  */
-export async function exportToPDF(previewRef: HTMLElement | null, filename = 'resume.pdf') {
+export async function exportToPDF(previewRef: HTMLElement | null, filename?: string) {
   const pages = getPages(previewRef)
   if (!pages.length)
     return
@@ -107,7 +132,7 @@ export async function exportToPDF(previewRef: HTMLElement | null, filename = 're
       })
     }
 
-    pdf.save(filename)
+    pdf.save(filename || resolveDownloadName(pages, 'pdf'))
   }
   finally {
     // 无论成功失败都清理注入的背景节点
@@ -118,16 +143,17 @@ export async function exportToPDF(previewRef: HTMLElement | null, filename = 're
 /**
  * 导出为图片（单页 PNG 或多页 ZIP）
  */
-export async function exportToImage(previewRef: HTMLElement | null, baseName = 'resume') {
+export async function exportToImage(previewRef: HTMLElement | null, baseName?: string) {
   const pages = getPages(previewRef)
   if (!pages.length)
     return
+  const base = baseName || resolveDownloadName(pages)
   injectPageBackgrounds(pages)
 
   try {
     if (pages.length === 1) {
       const dataUrl = await renderPageToPng(pages[0] as HTMLElement)
-      downloadBase64Image(dataUrl, `${baseName}.png`)
+      downloadBase64Image(dataUrl, `${base}.png`)
       return
     }
 
@@ -139,11 +165,11 @@ export async function exportToImage(previewRef: HTMLElement | null, baseName = '
       const dataUrl = await renderPageToPng(page!)
       const base64 = dataUrl.split(',')[1]
       const blob = await fetch(`data:image/png;base64,${base64}`).then(res => res.blob())
-      zip.file(`${baseName}-page-${i + 1}.png`, blob)
+      zip.file(`${base}-page-${i + 1}.png`, blob)
     }
 
     const zipBlob = await zip.generateAsync({ type: 'blob' })
-    downloadBlob(zipBlob, `${baseName}-pages.zip`)
+    downloadBlob(zipBlob, `${base}-pages.zip`)
   }
   finally {
     // 无论成功失败都清理注入的背景节点（原实现单页导出会漏清理）
