@@ -1,3 +1,5 @@
+import { A4_HEIGHT_PX } from '~/utils'
+
 // 分页配置接口
 export interface PaginationConfig {
   pageHeight: number
@@ -10,7 +12,7 @@ export interface PaginationConfig {
 
 // 默认配置
 export const DEFAULT_CONFIG: PaginationConfig = {
-  pageHeight: 1070,
+  pageHeight: A4_HEIGHT_PX,
   padding: 36,
   noSplitTags: ['img', 'table', 'pre', 'code'],
   themeClass: 'markdown-body',

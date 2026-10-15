@@ -7,8 +7,15 @@ import 'resume-theme/themes'
 
 export { reTheme, ThemeName }
 
-/** A4 纸张像素宽度 (96dpi) */
+/**
+ * A4 纸张像素尺寸（96dpi）。
+ *
+ * 页面几何必须是 A4 比例：导出 PDF 时页面图按 A4 宽度缩放，
+ * 高度比例如有偏差，多出来的部分就会变成每页底部的空白
+ * （794×1070 比例 1.3476 → 底部空 14mm；794×1123 比例 1.4141 ≈ A4 的 1.4143 → 基本为零）。
+ */
 export const A4_WIDTH_PX = 794
+export const A4_HEIGHT_PX = 1123
 
 interface ResumeSettings {
   fontname: string

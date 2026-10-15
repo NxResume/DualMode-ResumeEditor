@@ -3,9 +3,9 @@
  * 主题封面图生成器（public/assets/themes/<theme>.png）
  *
  * 为什么这么写：封面就是「简历第一页的 2 倍图」——
- * 屏幕页 794×1070 × 2 = 1588×2140，与 app/utils/download.ts 里
- * toPng(page, { pixelRatio: 2 }) 的规格一致。所以这里直接驱动真实页面渲染后截图，
- * 不复制任何渲染逻辑，也不改应用代码。
+ * 屏幕页是 A4 比例的 794×1123（见 app/utils/index.ts 的 A4_*_PX），×2 = 1588×2246，
+ * 与 app/utils/download.ts 里 toPng(page, { pixelRatio: 2 }) 的规格一致。
+ * 所以这里直接驱动真实页面渲染后截图，不复制任何渲染逻辑，也不改应用代码。
  *
  * 用法：
  *   pnpm covers                     # 只补缺失的（默认，不覆盖已有图）
@@ -32,8 +32,17 @@ const TEMPLATE = join(ROOT, 'app/constants/templates/tm1.md')
 const SAMPLE_ID = '__theme-cover-sample__'
 const PROFILE_DIR = join(ROOT, 'node_modules/.cache/theme-cover-profile')
 const DEBUG_PORT = Number(process.env.CDP_PORT || 9391)
-const PAGE_W = 794
-const PAGE_H = 1070
+// 页面几何从 app/utils/index.ts 读（单一来源，避免页高改了脚本还在按老尺寸断言）
+function readPageSize() {
+  const src = readFileSync(join(ROOT, 'app/utils/index.ts'), 'utf8')
+  const w = /A4_WIDTH_PX\s*=\s*(\d+)/.exec(src)
+  const h = /A4_HEIGHT_PX\s*=\s*(\d+)/.exec(src)
+  if (!w || !h)
+    throw new Error('读不到 A4_WIDTH_PX / A4_HEIGHT_PX，请检查 app/utils/index.ts')
+  return { w: Number(w[1]), h: Number(h[1]) }
+}
+
+const { w: PAGE_W, h: PAGE_H } = readPageSize()
 // ---------- 参数 ----------
 const argv = process.argv.slice(2)
 
@@ -278,7 +287,7 @@ async function captureTheme(c, appUrl, theme, template) {
     return { pages: document.querySelectorAll('.rs-page-item').length, w: Math.round(r.width), h: Math.round(r.height), x: r.x, y: r.y, transform: getComputedStyle(page).transform }
   })()`)
   if (geo.w !== PAGE_W || geo.h !== PAGE_H)
-    throw new Error(`第一页尺寸异常：${geo.w}×${geo.h}（期望 ${PAGE_W}×${PAGE_H}，缩放或几何变了）`)
+    throw new Error(`第一页尺寸异常：${geo.w}×${geo.h}（期望 ${PAGE_W}×${PAGE_H}，缩放或几何变了；页面几何常量见 app/utils/index.ts）`)
 
   const shot = await c.send('Page.captureScreenshot', {
     format: 'png',

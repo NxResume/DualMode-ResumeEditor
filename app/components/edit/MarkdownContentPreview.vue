@@ -93,8 +93,10 @@ onMounted(() => {
   position: relative;
   width: 794px;
   max-width: 794px;
-  min-height: 1070px;
-  max-height: 1070px;
+  /* 与 app/utils/index.ts 的 A4_HEIGHT_PX 必须一致：导出 PDF 时按宽度等比缩放，
+     高度不是 A4 比例就会在每页底部多出空白 */
+  min-height: 1123px;
+  max-height: 1123px;
   background: white;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   padding: var(--resume-page-padding-size, 36px);

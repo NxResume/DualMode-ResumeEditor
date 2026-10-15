@@ -77,9 +77,9 @@ const MM_TO_INCH_FACTOR = 1 / 25.4 // 毫米转换为英寸的系数
 const INCH_TO_PT_FACTOR = 72 // 英寸转换为 Points 的系数
 const A4_WIDTH_MM = 210 // A4 纸张宽度 (mm)
 const A4_HEIGHT_MM = 297 // A4 纸张高度 (mm)
-// 动态计算 A4 尺寸 (pt)。页高必须用真实 A4（841.89pt）：
-// 页面图按宽度换算后高 802.20pt（1070 × 595.28/794），旧实现 -50 后页高只有 791.89pt，
-// 每页底部 10.3pt 会落在页面之外。
+// 动态计算 A4 尺寸 (pt)。页高用真实 A4（841.89pt）：
+// 页面几何是 A4 比例（794×1123），按宽度换算后页面图高 841.86pt，与 A4 只差 0.03pt，
+// 所以图片正好铺满整页，不会在底部留出空白。
 const A4_WIDTH_PT = A4_WIDTH_MM * MM_TO_INCH_FACTOR * INCH_TO_PT_FACTOR
 const A4_HEIGHT_PT = A4_HEIGHT_MM * MM_TO_INCH_FACTOR * INCH_TO_PT_FACTOR
 /**

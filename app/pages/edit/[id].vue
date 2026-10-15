@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { EditCodeMirror, EditMarkdownPreview } from '#components'
 import { useResumeData } from '~/composables/useResumeData'
-import { A4_WIDTH_PX } from '~/utils'
+import { A4_HEIGHT_PX, A4_WIDTH_PX } from '~/utils'
 
 const { currentResume, updateResumeData } = useResumeData()
 const { t } = useI18n()
@@ -61,10 +61,10 @@ async function handleExport(type: 'pdf' | 'png') {
 }
 
 /* ------------------------------------------------------------------ */
-/* 缩放：页面几何不变（仍是 794 × 1070），只改外面这层 transform 的倍数   */
+/* 缩放：页面几何不变（仍是 794 × 1123 = A4 比例），只改外面这层 transform 的倍数 */
 /* ------------------------------------------------------------------ */
 const PAGE_WIDTH = A4_WIDTH_PX
-const PAGE_HEIGHT = 1070
+const PAGE_HEIGHT = A4_HEIGHT_PX
 
 type ZoomMode = 'fit-width' | 'fit-page' | 'custom'
 // 进页面默认 100%（真实 A4 尺寸）；想铺满宽度可以点「适应宽度」
