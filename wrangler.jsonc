@@ -60,6 +60,20 @@
     "AUTH_ORIGIN": "https://resume.ryanuo.cc/api/auth"
   },
 
+  // ============================================================
+  // R2 存储桶绑定（证件照等用户上传图片）
+  //   binding 名 = "PHOTOS"   → runtime: env.PHOTOS
+  //   桶保持私有，读写都走 /api/upload 与 /api/photos/:key
+  //   （不要开 r2.dev 公开访问）
+  //   创建：wrangler r2 bucket create resume-photos（已创建）
+  // ============================================================
+  "r2_buckets": [
+    {
+      "binding": "PHOTOS",
+      "bucket_name": "resume-photos"
+    }
+  ],
+
   // Nitro preset=cloudflare_pages 构建后 Pages 静态 + Functions 打包产物根目录
   "pages_build_output_dir": "dist"
 }

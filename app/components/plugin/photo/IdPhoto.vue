@@ -9,6 +9,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
+import { useToast } from '@/components/ui/toast'
 
 const props = defineProps<{
   resumeContent: string
@@ -18,6 +19,7 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
+const { toast } = useToast()
 
 const { files, open, reset } = useFileDialog({
   accept: 'image/*', // Set to accept only image files
@@ -97,48 +99,42 @@ function handleReset() {
   dialogOpen.value = false // 关闭 Dialog
 }
 
-// 确认上传
-function handleConfirm() {
-  loading.value = true
-  const uploadUrl = process.env.NODE_ENV === 'production'
-    ? 'https://api.ryanuo.cc/api/meituan'
-    : '/flask-upload'
-  if (files.value && files.value.length > 0) {
-    const file = files.value[0]
-    if (file) {
-      const formData = new FormData()
-      formData.append('file', file)
-      useFetch(uploadUrl, {
-        method: 'POST',
-        body: formData,
-      }).then(({ data, error }) => {
-        loading.value = false
-        const result = data.value as {
-          Jobs: string
-        }
-        if (result && result.Jobs) {
-          const imgTag = `<img src="${result.Jobs}" id="id-photo" data-id-photo alt="" srcset="">`
-          const imgTagRegex = /<img[^>]*id\s*=\s*['"]id-photo['"][^>]*>/gi
-          let newContent = props.resumeContent.replace(imgTagRegex, '')
-          newContent = `${imgTag}\n\n${newContent.trim()}`
-          if (props?.resumeContent !== newContent)
-            emit('update:resumeContent', newContent)
+// 确认上传：走自家 /api/upload（R2 存储），大小 / 类型 / 频率限制由服务端校验
+async function handleConfirm() {
+  const file = files.value?.[0]
+  if (!file) {
+    return
+  }
 
-          dialogOpen.value = false // 上传成功后关闭 Dialog
-        }
-        else {
-          console.error('图片上传失败:', error.value || '未知错误')
-        }
-      }).catch((err) => {
-        loading.value = false
-        console.error('图片上传异常:', err)
-      })
-    }
-    else {
-      loading.value = false
+  loading.value = true
+  try {
+    const formData = new FormData()
+    formData.append('file', file)
+
+    const result = await $fetch<{ url: string }>('/api/upload', {
+      method: 'POST',
+      body: formData,
+    })
+
+    if (result?.url) {
+      const imgTag = `<img src="${result.url}" id="id-photo" data-id-photo alt="" srcset="">`
+      const imgTagRegex = /<img[^>]*id\s*=\s*['"]id-photo['"][^>]*>/gi
+      let newContent = props.resumeContent.replace(imgTagRegex, '')
+      newContent = `${imgTag}\n\n${newContent.trim()}`
+      if (props?.resumeContent !== newContent)
+        emit('update:resumeContent', newContent)
+
+      dialogOpen.value = false // 上传成功后关闭 Dialog
     }
   }
-  else {
+  catch (err: any) {
+    toast({
+      title: t('idPhoto.uploadFailed'),
+      description: err?.data?.message || err?.message || t('idPhoto.uploadRetryLater'),
+      variant: 'destructive',
+    })
+  }
+  finally {
     loading.value = false
   }
 }

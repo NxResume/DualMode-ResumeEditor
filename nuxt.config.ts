@@ -1,8 +1,6 @@
 import { fileURLToPath } from 'node:url'
 import { pwa } from './app/config/pwa'
 
-const devApi = 'http://localhost:7777/api/meituan'
-
 export default defineNuxtConfig({
   modules: [
     '@unocss/nuxt',
@@ -15,23 +13,6 @@ export default defineNuxtConfig({
     'shadcn-nuxt',
     '@sidebase/nuxt-auth',
   ],
-  // /flask-upload 本地代理仅开发环境生效（生产由客户端直连线上接口，见 IdPhoto.vue）
-  $development: {
-    nitro: {
-      routeRules: {
-        '/flask-upload': {
-          proxy: devApi,
-          cors: true,
-        },
-      },
-      devProxy: {
-        '/flask-upload': {
-          target: devApi,
-          changeOrigin: true,
-        },
-      },
-    },
-  },
   devtools: { enabled: true },
   app: {
     head: {

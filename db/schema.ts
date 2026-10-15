@@ -151,6 +151,24 @@ export const resumeSettings = sqliteTable(
   ],
 )
 
+// 证件照上传日志：既是防滥用的速率限制依据（按 actor 计数），
+// 也是审计表（谁/哪个 IP 在什么时候传了什么图）
+export const photoUploads = sqliteTable(
+  'photoupload',
+  {
+    id: text('id').primaryKey().$defaultFn(idDefault),
+    // R2 object key（uuid + 扩展名）
+    objectKey: text('objectKey').notNull(),
+    // 登录用户 = email；匿名 = ip:xxx
+    actor: text('actor').notNull(),
+    bytes: integer('bytes').notNull(),
+    createdAt: stamp('createdAt').notNull().default(sql`(unixepoch() * 1000)`),
+  },
+  t => [
+    index('PhotoUpload_actor_createdAt_idx').on(t.actor, t.createdAt),
+  ],
+)
+
 // ---------- relations ----------
 
 export const usersRelations = relations(users, ({ many }) => ({

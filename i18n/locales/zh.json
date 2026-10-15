@@ -158,7 +158,7 @@
   },
   "idPhoto": {
     "title": "上传证件照",
-    "description": "请上传您的证件照，支持 JPG、PNG 格式，文件大小不超过 5MB",
+    "description": "请上传您的证件照，支持 JPG、PNG、WebP 格式，文件大小不超过 5MB",
     "uploadPhoto": "点击上传证件照",
     "changePhoto": "点击更换证件照",
     "dragDropHint": "或将文件拖拽到此处",
@@ -167,7 +167,9 @@
     "resetPhoto": "重置头像",
     "confirmUpload": "确认上传",
     "photoPreview": "证件照预览",
-    "uploading": "上传中..."
+    "uploading": "上传中...",
+    "uploadFailed": "图片上传失败",
+    "uploadRetryLater": "请稍后重试"
   },
   "home": {
     "templates": {
