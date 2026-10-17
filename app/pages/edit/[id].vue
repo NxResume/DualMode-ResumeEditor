@@ -143,7 +143,7 @@ function setActualSize() {
 const storedWidth = useLocalStorage('nuxt-resume-editor-width', 480)
 const storedCollapsed = useLocalStorage('nuxt-resume-editor-collapsed', false)
 const storedSettingsOpen = useLocalStorage('nuxt-resume-editor-settings-open', true)
-const storedAutoSave = useLocalStorage('nuxt-resume-editor-autosave', false)
+const storedAutoSave = useLocalStorage('nuxt-resume-editor-autosave', true)
 const dragging = ref(false)
 const dragWidth = ref(0)
 

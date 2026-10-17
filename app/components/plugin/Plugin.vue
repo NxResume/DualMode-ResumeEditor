@@ -107,6 +107,8 @@ async function runExport(action: () => unknown) {
         <span class="i-ri-fullscreen-line" />
       </button>
 
+      <PluginUsageGuide />
+
       <DropdownMenu>
         <DropdownMenuTrigger as-child>
           <button class="tb-export-btn shell-btn" type="button" :aria-label="t('plugin.export')">

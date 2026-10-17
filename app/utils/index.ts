@@ -56,8 +56,8 @@ function getDefaultSettings(): ResumeSettings {
     pageLineHeight: 1.9,
     pageBackground: 'default',
     pageThemeColor: 'default',
-    imagePosition: { top: 66, left: 391, scale: '0.8 0.8' },
-    isScrollable: false,
+    imagePosition: { top: 37, left: 581, scale: '0.8 0.8' },
+    isScrollable: true,
     editorMode: 'source',
   }
 }
