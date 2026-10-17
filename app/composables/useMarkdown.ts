@@ -8,6 +8,21 @@ import iconPlugin from '~/utils/markdown-it-icon'
 // 避免每次内容变化（每个按键）都重建实例并重新注册插件。
 let md: MarkdownIt | null = null
 
+/**
+ * 给块级 token 打上 data-source-line（1-based），供编辑/预览滚动按内容对齐。
+ * markdown-it 的 map 是 0-based 源码行区间；与 CodeMirror .cm-line 下标+1 一致。
+ * 自定义 container 的 render 直接写死 HTML，不会带上 attrs —— 标题/段落/列表项足够做锚点。
+ */
+function sourceLinePlugin(instance: MarkdownIt) {
+  instance.core.ruler.push('source_line_attr', (state) => {
+    for (const token of state.tokens) {
+      if (!token.map || token.nesting === -1)
+        continue
+      token.attrSet('data-source-line', String(token.map[0] + 1))
+    }
+  })
+}
+
 function getMd(): MarkdownIt {
   if (md)
     return md
@@ -69,6 +84,8 @@ function getMd(): MarkdownIt {
 
   // 空行 → 真实留白（连续空行里第一个只作段落分隔，多出来的每个补一行空白）
   md.use(gapPlugin)
+
+  md.use(sourceLinePlugin)
 
   return md
 }
