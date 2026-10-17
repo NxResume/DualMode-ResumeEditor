@@ -1,20 +1,17 @@
-<img src="/assets/id-photo-sample.jpg" id="id-photo" data-id-photo alt="" srcset="">
+<img src="/api/photos/2b1cd170-657f-4988-b597-4c13d7c7da58.png" id="id-photo" data-id-photo alt="" srcset="">
 
 # 李四 - 全栈开发工程师
 
 ::: left
 
-上海| 群众| 上海交通大学 | 软件工程
+上海 | 群众 | 上海交通大学 | 软件工程 | 四年工作经验
 
 [icon:ri/home-office-line https://ryanuo.cc](https://ryanuo.cc)
 [icon:ri/github-line https://github.com/ryanuo](https://github.com/ryanuo) (**star>200+**)
+[icon:ri/mail-send-line test@test.com](mailto:test@test.com) icon:ri/wechat-2-line 13900**\*\***(微信同号)
 :::
 
 ::: right
-
-[icon:ri/mail-send-line test@test.com](mailto:test@test.com)
-icon:ri/wechat-2-line 13900139000(微信同号)
-icon:ri/time-zone-line 四年(工作经验)
 :::
 
 ## 个人技能

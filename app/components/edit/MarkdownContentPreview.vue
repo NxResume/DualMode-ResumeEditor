@@ -154,8 +154,8 @@ onMounted(() => {
   position: absolute;
   z-index: 20;
   width: 140px;
-  top: var(--id-photo-top, 66px);
-  left: var(--id-photo-left, 391px);
+  top: var(--id-photo-top, 37px);
+  left: var(--id-photo-left, 581px);
   transform: scale(var(--id-photo-scale, 0.8 0.8));
   border-radius: 6px;
 }
