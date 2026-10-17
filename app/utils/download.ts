@@ -144,7 +144,6 @@ export async function exportToPDF(previewRef: HTMLElement | null, filename?: str
   }
 }
 
-
 /**
  * 浏览器「打印为 PDF」：把已分页预览克隆到隐藏 iframe，用系统打印对话框另存。
  * 版式与预览一比一（同一套 .rs-page-item DOM + 主题样式），文字可选。
@@ -156,10 +155,10 @@ export async function printToPDF(previewRef: HTMLElement | null) {
   if (!pages.length)
     return
 
-  // 与 exportToPDF 同一文件名（含 .pdf）；系统「另存为 PDF」默认名一般跟 <title>
+  // 与 exportToPDF 同一文件名（含 .pdf）
   const title = resolveDownloadName(pages, 'pdf')
   const html = buildPrintDocumentHtml(pages, title, previewRef)
-  await printViaIframe(html)
+  await printViaIframe(html, title)
 }
 
 function buildPrintDocumentHtml(
@@ -410,7 +409,11 @@ async function waitForPrintReady(win: Window) {
   await new Promise(resolve => setTimeout(resolve, 50))
 }
 
-async function printViaIframe(html: string) {
+/**
+ * Chrome 打印 iframe 时，「另存为 PDF」默认文件名取顶层页面 title 而非 iframe 的
+ * <title>（crbug.com/382394786），所以打印期间临时改写顶层 document.title，结束后恢复。
+ */
+async function printViaIframe(html: string, title?: string) {
   const iframe = document.createElement('iframe')
   iframe.setAttribute('aria-hidden', 'true')
   // 给足可视尺寸，避免 width:0 时排版崩掉；不可见即可
@@ -428,14 +431,21 @@ async function printViaIframe(html: string) {
   doc.write(html)
   doc.close()
 
+  const originalTitle = document.title
   try {
     await waitForPrintReady(win)
+    if (title)
+      document.title = title
     win.focus()
     win.print()
   }
   finally {
     const cleanup = () => {
-      try { iframe.remove() } catch { /* ignore */ }
+      try {
+        iframe.remove()
+      }
+      catch { /* ignore */ }
+      document.title = originalTitle
     }
     win.addEventListener('afterprint', cleanup)
     // 部分浏览器不派发 afterprint，超时兜底
