@@ -20,7 +20,7 @@ A modern, feature-rich resume editor built with Nuxt 4 & Vue 3, supporting Markd
 - **GitHub/Google/Gitee OAuth login** for multi-device sync
 - **Markdown editing & real-time preview** (WYSIWYG/source switch)
 - **Multiple theme switching**, built-in beautiful themes, customizable
-- **One-click export to PDF/Image/ZIP**, preview-consistent, multi-page support
+- **One-click export to PDF/Image/ZIP**, preview-consistent, multi-page support (client raster PDF; vector PDF via the service below)
 - **ID photo upload & edit**, drag/scale/reset
 - **Font selection & custom upload**, font preserved on export
 - **One-click switch between English/Chinese**, auto-detect browser language
@@ -119,6 +119,19 @@ pnpm deploy:cf
 
 Secrets (AUTH_SECRET, OAuth Client ID/Secret, SMTP, etc.) are configured in Pages Dashboard → Settings → Environment variables, not committed to git.
 
+## 📄 PDF Export
+
+Two export paths:
+
+| Mode | Implementation | Notes |
+|------|----------------|-------|
+| **Raster PDF** (client, current) | `html-to-image` → JPEG → `jsPDF` | WYSIWYG-stable, but large files / non-selectable text |
+| **Vector PDF** (server, recommended default) | Playwright `page.pdf` | Embedded fonts, selectable text, better for Google / ATS |
+
+Vector service lives in [`services/pdf-export`](./services/pdf-export). Deploy separately on **Render Free** (Docker Web Service, Root Directory `services/pdf-export`, set `API_SECRET`). See that folder's README for local run and deploy steps.
+
+> Dual-mode UI wiring (default vector) is not connected yet.
+
 ## 📖 Usage Guide
 
 - Home `/`: Feature intro, theme preview
@@ -132,7 +145,7 @@ Secrets (AUTH_SECRET, OAuth Client ID/Secret, SMTP, etc.) are configured in Page
 - **Frontend**: Nuxt 4, Vue 3, Pinia, CodeMirror, Markdown-it, UnoCSS
 - **Backend/Storage**: Drizzle ORM, SQLite (local better-sqlite3 / Cloudflare D1 in production), LocalStorage
 - **Auth**: @sidebase/nuxt-auth, GitHub/Google/Gitee OAuth
-- **Export**: jsPDF, html-to-image, jszip
+- **Export**: jsPDF, html-to-image, jszip (client); Playwright vector PDF service in `services/pdf-export`
 - **PWA**: @vite-pwa/nuxt
 - **i18n**: vue-i18n
 
