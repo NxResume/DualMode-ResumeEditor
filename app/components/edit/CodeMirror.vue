@@ -1,8 +1,9 @@
 <script setup lang="ts">
+import type { ViewUpdate } from '@codemirror/view'
 import { defaultKeymap, history, historyKeymap, redo, undo } from '@codemirror/commands'
 import { markdown } from '@codemirror/lang-markdown'
 import { EditorState, Prec } from '@codemirror/state'
-import { EditorView, keymap } from '@codemirror/view'
+import { EditorView, keymap, ViewPlugin } from '@codemirror/view'
 import { useWysiwyg } from '~/composables/useWysiwyg'
 import { WysiwygTags } from '~/constants'
 
@@ -14,6 +15,34 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'update:modelValue', value: string): void
 }>()
+
+/**
+ * 给每个已渲染的 .cm-line 标注真实文档行号（data-cm-line）。
+ * CM6 虚拟渲染只画视口窗口内的行：滚动后 DOM 里缺上方/下方的行，
+ * NodeList 下标 ≠ 文档行号（滚动同步曾因此整体错位）。
+ * 只标可见范围内的行，未渲染的行自然没有属性，读方据此跳过。
+ */
+const markLineNumbers = ViewPlugin.fromClass(class {
+  constructor(view: EditorView) {
+    this.mark(view)
+  }
+
+  update(update: ViewUpdate) {
+    if (update.docChanged || update.viewportChanged || update.geometryChanged)
+      this.mark(update.view)
+  }
+
+  mark(view: EditorView) {
+    const doc = view.state.doc
+    const lines = view.contentDOM.querySelectorAll<HTMLElement>('.cm-line')
+    for (const el of lines) {
+      // posAtDOM 对行元素返回该行内的文档位置，lineAt 即得真实行号；
+      // 只处理已渲染的行，天然跳过虚拟渲染缺席的行
+      const line = doc.lineAt(view.posAtDOM(el))
+      el.setAttribute('data-cm-line', String(line.number))
+    }
+  }
+})
 
 const editorRef = ref<HTMLElement>()
 let view: EditorView | undefined
@@ -119,6 +148,7 @@ function initEditor() {
       keymap.of(historyKeymap),
       markdown(),
       EditorView.lineWrapping,
+      markLineNumbers,
       // 编辑器高度受限于容器、由 .cm-scroller 内部滚动。
       // 否则文档整体撑开溢出外层左侧面板，每次输入后 CodeMirror/浏览器
       // 的“光标滚入视野”会去滚动外层容器，导致视图跳回顶部、光标丢失。
@@ -164,27 +194,17 @@ onUnmounted(() => {
 
 <template>
   <div
-    class="h-full"
-    :class="{
+    class="h-full" :class="{
       'wysiwyg-mode': mode === 'wysiwyg',
     }"
   >
     <div v-if="mode === 'source'" ref="editorRef" class="h-full" />
     <div
-      v-else
-      ref="previewRef"
-      class="p-4 h-full prose overflow-visible!"
-      contenteditable="true"
-      @input="handleWysiwygEdit"
-      @paste="handlePaste"
-      @mousemove="onMouseMove"
-      @mouseleave="onMouseLeave"
+      v-else ref="previewRef" class="p-4 h-full prose overflow-visible!" contenteditable="true"
+      @input="handleWysiwygEdit" @paste="handlePaste" @mousemove="onMouseMove" @mouseleave="onMouseLeave"
     />
     <EditHoverToolbar
-      :visible="showToolbar"
-      :current-type="hoverType"
-      :types="WysiwygTags"
-      :style="hoverToolbarStyle"
+      :visible="showToolbar" :current-type="hoverType" :types="WysiwygTags" :style="hoverToolbarStyle"
       @format="handleFormat"
     />
   </div>

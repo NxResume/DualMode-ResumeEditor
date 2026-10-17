@@ -51,21 +51,44 @@ function getContentScale(scroller: HTMLElement): number {
   return 1
 }
 
+/**
+ * 一趟锚点收集的公共只读上下文：scale 与容器 rect 在同一趟内不变，
+ * 提前算一次而不是每个锚点算一次（getComputedStyle / gBCR 都会强制布局，
+ * 乘上锚点数 × 每帧滚动事件就是肉眼可见的卡顿）。
+ */
+interface PassContext {
+  scroller: HTMLElement
+  scale: number
+  baseTop: number
+  scrollTop: number
+}
+
+function makePassContext(scroller: HTMLElement): PassContext {
+  return {
+    scroller,
+    scale: getContentScale(scroller),
+    baseTop: scroller.getBoundingClientRect().top,
+    scrollTop: scroller.scrollTop,
+  }
+}
+
 /** 元素顶边相对滚动容器内容顶的布局 Y */
-function contentY(el: HTMLElement, scroller: HTMLElement): number {
-  const scale = getContentScale(scroller)
-  return (el.getBoundingClientRect().top - scroller.getBoundingClientRect().top) / scale + scroller.scrollTop
+function contentY(el: HTMLElement, ctx: PassContext): number {
+  return (el.getBoundingClientRect().top - ctx.baseTop) / ctx.scale + ctx.scrollTop
 }
 
 /** 预览侧：markdown 渲染写入的 data-source-line */
 function collectPreviewAnchors(scroller: HTMLElement): Anchor[] {
   const nodes = scroller.querySelectorAll<HTMLElement>('[data-source-line]')
+  if (!nodes.length)
+    return []
+  const ctx = makePassContext(scroller)
   const byLine = new Map<number, number>()
   for (const el of nodes) {
     const line = Number(el.getAttribute('data-source-line'))
     if (!Number.isFinite(line) || line < 1)
       continue
-    const y = contentY(el, scroller)
+    const y = contentY(el, ctx)
     // 同一行可能因列表跨页拆成多块：取最靠上的一块
     const prev = byLine.get(line)
     if (prev === undefined || y < prev)
@@ -76,51 +99,50 @@ function collectPreviewAnchors(scroller: HTMLElement): Anchor[] {
     .sort((a, b) => a.line - b.line || a.y - b.y)
 }
 
-/** 编辑器侧：用与预览相同的行号去取 .cm-line */
+/**
+ * 编辑器侧：读 CodeMirror 扩展标注的 data-cm-line（真实文档行号）。
+ * 不能用 NodeList 下标推行号：CM6 虚拟渲染下 DOM 只含视口窗口内的行，
+ * 滚动后下标与行号整体错位（未渲染的行没有该属性，自然被跳过）。
+ */
 function collectEditorAnchors(scroller: HTMLElement, lines: Iterable<number>): Anchor[] {
-  const cmLines = scroller.querySelectorAll<HTMLElement>('.cm-line')
+  const wanted = new Set(lines)
+  const cmLines = scroller.querySelectorAll<HTMLElement>('.cm-line[data-cm-line]')
   if (!cmLines.length)
     return []
+  const ctx = makePassContext(scroller)
   const anchors: Anchor[] = []
-  for (const line of lines) {
-    const el = cmLines[line - 1]
-    if (!el)
+  for (const el of cmLines) {
+    const line = Number(el.getAttribute('data-cm-line'))
+    if (!wanted.has(line))
       continue
-    anchors.push({ line, y: contentY(el, scroller) })
+    anchors.push({ line, y: contentY(el, ctx) })
   }
   return anchors.sort((a, b) => a.line - b.line || a.y - b.y)
 }
 
-function syncByRatio(from: HTMLElement, to: HTMLElement) {
+function targetByRatio(from: HTMLElement, to: HTMLElement): number {
   const fromMax = scrollRange(from)
   const ratio = fromMax > 0 ? from.scrollTop / fromMax : 0
-  to.scrollTop = ratio * scrollRange(to)
+  return ratio * scrollRange(to)
 }
 
 /**
  * 在两侧共有的源码行锚点之间做局部插值。
  * 预览有分页间隙 / 页边距 / 缩放，编辑器是匀密行高 —— 全局 scrollTop 比例会对不齐，
  * 按「同一段 markdown 行」对齐后，分页空白自然被吸收进锚点间距。
+ * 返回 to 侧的目标 scrollTop（不写入）。
  */
-function syncByAnchors(from: HTMLElement, to: HTMLElement, fromIsEditor: boolean) {
+function targetByAnchors(from: HTMLElement, to: HTMLElement, fromIsEditor: boolean): number {
   const editor = fromIsEditor ? from : to
   const preview = fromIsEditor ? to : from
 
   const previewAnchors = collectPreviewAnchors(preview)
-  if (previewAnchors.length === 0) {
-    syncByRatio(from, to)
-    return
-  }
-
-  const editorAnchors = collectEditorAnchors(
-    editor,
-    previewAnchors.map(a => a.line),
-  )
-  if (editorAnchors.length === 0) {
-    // wysiwyg 或尚无 .cm-line：退回比例
-    syncByRatio(from, to)
-    return
-  }
+  const editorAnchors = previewAnchors.length
+    ? collectEditorAnchors(editor, previewAnchors.map(a => a.line))
+    : []
+  // wysiwyg 或尚无 .cm-line / 预览无锚点：退回比例
+  if (!previewAnchors.length || !editorAnchors.length)
+    return targetByRatio(from, to)
 
   const toByLine = new Map(
     (fromIsEditor ? previewAnchors : editorAnchors).map(a => [a.line, a.y]),
@@ -135,10 +157,8 @@ function syncByAnchors(from: HTMLElement, to: HTMLElement, fromIsEditor: boolean
     pairs.push({ fromY: a.y, toY })
   }
 
-  if (pairs.length === 0) {
-    syncByRatio(from, to)
-    return
-  }
+  if (pairs.length === 0)
+    return targetByRatio(from, to)
 
   // 视口上方约 20% 处作为对齐参考点（避开顶栏抖动）
   const focusOffset = from.clientHeight * 0.2
@@ -161,17 +181,37 @@ function syncByAnchors(from: HTMLElement, to: HTMLElement, fromIsEditor: boolean
     targetY = a.toY + t * (b.toY - a.toY)
   }
 
-  const max = scrollRange(to)
-  to.scrollTop = Math.min(max, Math.max(0, targetY - to.clientHeight * 0.2))
+  return targetY - to.clientHeight * 0.2
 }
 
+/** 回声判定窗口：程序写入后这段时间内、对侧 scrollTop 仍停在期望值附近的事件视为回声 */
+const ECHO_WINDOW_MS = 150
+const ECHO_TOLERANCE_PX = 2
+/** 小于该值的位移不值得写 scrollTop（也避免亚像素抖动再派发 scroll 事件） */
+const APPLY_EPSILON_PX = 0.5
+
 export function useScrollSync(leftRef: MaybeElRef, rightRef: MaybeElRef) {
-  let isSyncing = false
   let started = false
+  /** 待执行的同步（一帧最多跑一次，最新发起的方向胜出） */
+  let pending: (() => void) | null = null
+  let rafId: number | null = null
+  /**
+   * 最近一次程序写入的期望值。scrollTop 赋值触发的对侧 scroll 事件是异步派发的，
+   * 布尔标志在事件到达前就被清掉、挡不住回声；按「元素 + 期望值 + 时间窗」识别，
+   * 用户在窗口内真的滚了对侧（值偏离期望）则照常处理，不会被误吞。
+   */
+  let programmatic: { el: HTMLElement, top: number, at: number } | null = null
+
+  function isEcho(scroller: HTMLElement): boolean {
+    return !!programmatic
+      && programmatic.el === scroller
+      && performance.now() - programmatic.at < ECHO_WINDOW_MS
+      && Math.abs(scroller.scrollTop - programmatic.top) <= ECHO_TOLERANCE_PX
+  }
 
   /** 把 fromRoot 的滚动位置同步给 toRoot（优先锚点，否则比例） */
   function syncFrom(fromRoot: HTMLElement | null, toRoot: HTMLElement | null, fromIsEditor: boolean) {
-    if (isSyncing || !fromRoot || !toRoot)
+    if (!fromRoot || !toRoot)
       return
 
     const from = findScroller(fromRoot)
@@ -179,14 +219,25 @@ export function useScrollSync(leftRef: MaybeElRef, rightRef: MaybeElRef) {
     if (!from || !to)
       return
 
-    isSyncing = true
-    try {
-      syncByAnchors(from, to, fromIsEditor)
-    }
-    finally {
-      // scrollTop 赋值会同步触发对侧 scroll；保持标志直到本轮结束即可挡住回声
-      isSyncing = false
-    }
+    const target = targetByAnchors(from, to, fromIsEditor)
+    const clamped = Math.min(scrollRange(to), Math.max(0, target))
+    if (Math.abs(to.scrollTop - clamped) <= APPLY_EPSILON_PX)
+      return
+    to.scrollTop = clamped
+    programmatic = { el: to, top: clamped, at: performance.now() }
+  }
+
+  /** 滚动事件按帧合并：快速滚动时一帧只做一次锚点收集，而不是每个事件都做 */
+  function schedule(fn: () => void) {
+    pending = fn
+    if (rafId !== null)
+      return
+    rafId = requestAnimationFrame(() => {
+      rafId = null
+      const task = pending
+      pending = null
+      task?.()
+    })
   }
 
   // scroll 事件不冒泡，但会在**捕获阶段**经过祖先元素：挂在列容器上用捕获，
@@ -194,16 +245,22 @@ export function useScrollSync(leftRef: MaybeElRef, rightRef: MaybeElRef) {
   // 只响应「真正在滚的那个元素」发出的事件，避免内容里的横向滚动（表格/代码块）误触发。
   const onLeftScroll = (e: Event) => {
     const root = leftRef.value
-    if (!root || e.target !== findScroller(root))
+    if (!root)
       return
-    syncFrom(root, rightRef.value, true)
+    const scroller = findScroller(root)
+    if (!scroller || e.target !== scroller || isEcho(scroller))
+      return
+    schedule(() => syncFrom(root, rightRef.value, true))
   }
 
   const onRightScroll = (e: Event) => {
     const root = rightRef.value
-    if (!root || e.target !== findScroller(root))
+    if (!root)
       return
-    syncFrom(root, leftRef.value, false)
+    const scroller = findScroller(root)
+    if (!scroller || e.target !== scroller || isEcho(scroller))
+      return
+    schedule(() => syncFrom(root, leftRef.value, false))
   }
 
   const listenOptions: AddEventListenerOptions = { capture: true }
@@ -224,6 +281,11 @@ export function useScrollSync(leftRef: MaybeElRef, rightRef: MaybeElRef) {
   }
 
   function stop() {
+    if (rafId !== null) {
+      cancelAnimationFrame(rafId)
+      rafId = null
+    }
+    pending = null
     if (!started)
       return
     started = false
