@@ -139,6 +139,7 @@
     "title": "主题与背景设置",
     "description": "自定义主题颜色和背景，打造专属的简历风格",
     "currentColor": "当前颜色",
+    "followTheme": "跟随主题",
     "presetColors": "预设颜色",
     "customColor": "自定义颜色",
     "openColorPicker": "打开颜色选择器",

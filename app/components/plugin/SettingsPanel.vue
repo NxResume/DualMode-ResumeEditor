@@ -70,6 +70,7 @@ const { t } = useI18n()
         <PluginThemeColorAndBg
           :page-theme-color="data.settings?.pageThemeColor"
           :page-background="data.settings?.pageBackground"
+          :resume-theme="data.theme"
           @update:page-theme-color="(val: string) => updateData('settings.pageThemeColor', val)"
           @update:page-background="(val: string) => updateData('settings.pageBackground', val)"
         >

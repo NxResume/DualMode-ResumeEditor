@@ -139,6 +139,7 @@ export const resumeSettings = sqliteTable(
     pagePadding: integer('pagePadding').notNull().default(36),
     pageLineHeight: real('pageLineHeight').notNull().default(1.9),
     pageBackground: text('pageBackground').notNull().default('default'),
+    // '0,0,0' 是历史默认值，语义等同 isFollowingThemeColor 的「跟随主题」（与主题包兜底色一致）
     pageThemeColor: text('pageThemeColor').notNull().default('0,0,0'),
     imagePosition: text('imagePosition').notNull(),
     isScrollable: integer('isScrollable').notNull().default(0),

@@ -29,13 +29,33 @@ interface ResumeSettings {
   // 可扩展其它字段
 }
 
+/**
+ * 判断主题色是否「跟随主题」。
+ *
+ * 主题包（resume-theme）里每套主题都有自己的签名色：
+ * `--resume-page-theme: var(--resume-theme-color, 142, 36, 42)` —— 用户色从继承下来的
+ * `--resume-theme-color` 取，没设过就回退到主题签名色。
+ * 所以「没选过色」必须表达成「不写变量」，而不是写一个具体颜色，否则永远盖掉主题签名色。
+ *
+ * 'default' / 空 / 纯黑（历史默认值 '0,0,0'，与主题包的兜底色一致）都按跟随主题处理。
+ */
+export function isFollowingThemeColor(color?: string): boolean {
+  if (!color)
+    return true
+  const value = color.trim().toLowerCase()
+  if (value === 'default')
+    return true
+  const rgb = value.match(/^(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})$/)
+  return !!rgb && Number(rgb[1]) === 0 && Number(rgb[2]) === 0 && Number(rgb[3]) === 0
+}
+
 function getDefaultSettings(): ResumeSettings {
   return {
     fontname: 'default',
     pagePadding: 36,
     pageLineHeight: 1.9,
     pageBackground: 'default',
-    pageThemeColor: '0,0,0',
+    pageThemeColor: 'default',
     imagePosition: { top: 66, left: 391, scale: '0.8 0.8' },
     isScrollable: false,
     editorMode: 'source',

@@ -12,11 +12,14 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { pageBgList, presetColors } from '~/constants'
+import { isFollowingThemeColor } from '~/utils'
 import 'vue-color/style.css'
 
 const props = defineProps<{
   pageBackground?: string
   pageThemeColor?: string
+  /** 当前主题名：切主题后「跟随主题」下的签名色会变，用它当依赖让展示色跟着刷新 */
+  resumeTheme?: string
 }>()
 const emit = defineEmits<{
   (e: 'update:pageBackground', value: string): void
@@ -26,10 +29,6 @@ const emit = defineEmits<{
 const isColorPickerOpen = ref(false)
 const { t } = useI18n()
 
-const color = defineModel<string>({
-  default: 'rgb(0,0,0)',
-})
-
 const backgroundList = computed(() => {
   return pageBgList?.map(item => ({
     ...item,
@@ -37,20 +36,47 @@ const backgroundList = computed(() => {
   })) ?? []
 })
 
+/** 是否跟随主题签名色（没选过 / 'default' / 纯黑都算） */
+const followTheme = computed(() => isFollowingThemeColor(props.pageThemeColor))
+
+/** 读主题当前实际生效的签名色（主题包 --resume-page-theme 的最终值） */
+function readThemeColor(): string {
+  if (typeof document === 'undefined')
+    return 'rgb(0, 0, 0)'
+  const target = document.querySelector('.markdown-body') ?? document.documentElement
+  const raw = getComputedStyle(target).getPropertyValue('--resume-page-theme').trim()
+  return raw ? `rgb(${raw})` : 'rgb(0, 0, 0)'
+}
+
 const currentColorValue = computed(() => {
-  return props.pageThemeColor === 'default' || !props.pageThemeColor
-    ? 'rgb(0,0,0)'
-    : `rgb(${props.pageThemeColor})`
+  void props.resumeTheme
+  if (followTheme.value)
+    return readThemeColor()
+  // settings 里存的是 'r,g,b'，显示时统一成 'rgb(r, g, b)'
+  const [r, g, b] = (props.pageThemeColor ?? '').split(',').map(v => v.trim())
+  return `rgb(${r}, ${g}, ${b})`
 })
 
-// 立即同步 props 初始值，避免 onMounted 前的颜色闪烁
-color.value = currentColorValue.value
+function toRgbString(value: string) {
+  const rgb = tinycolor(value).toRgb()
+  return `${rgb.r},${rgb.g},${rgb.b}`
+}
+
+// 只有明确选色才写具体颜色；跟随主题时写 'default'，让主题签名色生效
+const color = computed({
+  get: () => currentColorValue.value,
+  set: (value: string) => {
+    if (value)
+      emit('update:pageThemeColor', toRgbString(value))
+  },
+})
 
 function selectPresetColor(colorValue: string) {
-  const rgb = tinycolor(colorValue).toRgb()
-  const rgbString = `${rgb.r},${rgb.g},${rgb.b}`
-  emit('update:pageThemeColor', rgbString)
-  color.value = colorValue
+  emit('update:pageThemeColor', toRgbString(colorValue))
+}
+
+function selectThemeColor() {
+  emit('update:pageThemeColor', 'default')
 }
 
 function handleBackgroundSelect(backgroundValue: string) {
@@ -64,13 +90,6 @@ function toggleColorPicker() {
 function closeColorPicker() {
   isColorPickerOpen.value = false
 }
-
-watch(color, (newColor) => {
-  if (newColor && newColor !== currentColorValue.value) {
-    const rgb = tinycolor(newColor).toRgb()
-    emit('update:pageThemeColor', `${rgb.r},${rgb.g},${rgb.b}`)
-  }
-}, { immediate: false })
 </script>
 
 <template>
@@ -107,18 +126,31 @@ watch(color, (newColor) => {
           <div class="flex items-center space-x-3">
             <div
               class="border-2 border-gray-200 rounded-lg h-10 w-10 cursor-pointer shadow-sm transition-all hover:scale-105"
-              :style="{ backgroundColor: `rgb(${pageThemeColor})` }"
+              :style="{ backgroundColor: currentColorValue }"
               @click.stop="toggleColorPicker"
             />
-            <span class="text-sm text-gray-600 font-mono">{{ pageThemeColor }}</span>
+            <span class="text-sm text-gray-600 font-mono">{{ currentColorValue }}</span>
+            <span v-if="followTheme" class="text-xs text-gray-400">
+              {{ t('themeColorAndBg.followTheme') }}
+            </span>
           </div>
         </div>
 
         <!-- 预设颜色 -->
         <div class="space-y-3">
-          <h3 class="text-sm text-gray-700 font-medium">
-            {{ t('themeColorAndBg.presetColors') }}
-          </h3>
+          <div class="flex items-center justify-between">
+            <h3 class="text-sm text-gray-700 font-medium">
+              {{ t('themeColorAndBg.presetColors') }}
+            </h3>
+            <button
+              class="text-xs text-gray-600 px-2 py-1 border border-gray-300 rounded-md transition-colors hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+              type="button"
+              :disabled="followTheme"
+              @click.stop="selectThemeColor"
+            >
+              {{ t('themeColorAndBg.followTheme') }}
+            </button>
+          </div>
           <div class="gap-2 grid grid-cols-6">
             <div
               v-for="preset in presetColors"
