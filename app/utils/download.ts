@@ -156,7 +156,8 @@ export async function printToPDF(previewRef: HTMLElement | null) {
   if (!pages.length)
     return
 
-  const title = resolveDownloadName(pages)
+  // 与 exportToPDF 同一文件名（含 .pdf）；系统「另存为 PDF」默认名一般跟 <title>
+  const title = resolveDownloadName(pages, 'pdf')
   const html = buildPrintDocumentHtml(pages, title, previewRef)
   await printViaIframe(html)
 }
