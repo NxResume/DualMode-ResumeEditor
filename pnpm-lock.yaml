@@ -171,8 +171,8 @@ catalogs:
       specifier: ^3.0.3
       version: 3.0.3
     resume-theme:
-      specifier: ^0.4.0
-      version: 0.4.0
+      specifier: ^0.4.1
+      version: 0.4.1
     turndown:
       specifier: ^7.2.0
       version: 7.2.0
@@ -361,7 +361,7 @@ importers:
         version: 2.3.2(typescript@5.8.3)(vue@3.5.17(typescript@5.8.3))
       resume-theme:
         specifier: catalog:frontend
-        version: 0.4.0
+        version: 0.4.1
       shadcn-nuxt:
         specifier: catalog:dev
         version: 2.2.0(magicast@0.3.5)
@@ -6302,8 +6302,8 @@ packages:
     resolution: {integrity: sha512-U7WjGVG9sH8tvjW5SmGbQuui75FiyjAX72HX15DwBBwF9dNiQZRQAg9nnPhYy+TUnE0+VcrttuvNI8oSxZcocA==}
     hasBin: true
 
-  resume-theme@0.4.0:
-    resolution: {integrity: sha512-LXUdDv5ltffSc/T2Xa2J5jcEz3tRYSbX89JmDhOe7jZMKtroTSoheI2V0HjuIMfz7L+oMyKJponI4LB2OEWxPw==}
+  resume-theme@0.4.1:
+    resolution: {integrity: sha512-QxpiTN5q8+bryjB7A+59voqkOsfI0qBL+PZRfvuYVrwqbDKu10NlbShSroKJ2favf+LsEyorhHcOi06CnmeQKg==}
 
   reusify@1.1.0:
     resolution: {integrity: sha512-g6QUff04oZpHs0eG5p83rFLhHeV00ug/Yf9nZM6fLeUrPguBTkTQOdpAWWspMh55TZfVQDPaN3NQJfbVRAxdIw==}
@@ -14418,7 +14418,7 @@ snapshots:
       path-parse: 1.0.7
       supports-preserve-symlinks-flag: 1.0.0
 
-  resume-theme@0.4.0: {}
+  resume-theme@0.4.1: {}
 
   reusify@1.1.0: {}
 

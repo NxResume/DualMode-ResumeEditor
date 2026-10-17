@@ -182,8 +182,16 @@ function handleListPagination(
   const itemHeights = metrics.itemHeights
   const shellMargin = metrics.shellMargin
 
+  // 空列表（`- ` 后面没有内容）直接原样放回去，别丢节点
+  if (items.length === 0) {
+    state.page.appendChild(element)
+    state.height += shellMargin
+    return state
+  }
+
   let current = state
   let cursor = 0
+  let emitted = 0
 
   while (cursor < items.length) {
     const budget = maxContentHeight(config, isSpecialTheme, current.index) - current.height - shellMargin
@@ -211,16 +219,25 @@ function handleListPagination(
       current.height = itemHeights[cursor]! + shellMargin
       markOverflow(current.page, item, current.height, maxContentHeight(config, isSpecialTheme, current.index))
       cursor++
+      emitted++
       if (cursor < items.length)
         current = startNewPage(wrapper, current)
       continue
     }
 
-    const list = createListShell(element)
-    for (const node of chunk)
-      list.appendChild(node)
-    current.page.appendChild(list)
+    // 一次装完整个列表时沿用原节点（保留它的 class/属性）；被切开时才用新壳
+    const whole = emitted === 0 && cursor === items.length
+    if (whole) {
+      current.page.appendChild(element)
+    }
+    else {
+      const list = createListShell(element)
+      for (const node of chunk)
+        list.appendChild(node)
+      current.page.appendChild(list)
+    }
     current.height += chunkHeight + shellMargin
+    emitted++
 
     if (cursor < items.length)
       current = startNewPage(wrapper, current)
@@ -293,16 +310,20 @@ export function autoPaginate(
       const element = elements[i]!
       const height = elementHeights[i]!
       const maxHeight = maxContentHeight(config, isSpecialTheme, state.index)
+      const tag = element.tagName.toLowerCase()
+
+      // 列表一律走分页装配（不只是「比整页还高」时）：
+      // 列表整块放不下当前页剩余空间时，也要按项切开把当前页填满，
+      // 否则会在上一页底部白白空出一两百像素再换页。
+      if (canSplitElement(element, config) && (tag === 'ul' || tag === 'ol')) {
+        state = handleListPagination(element, state, wrapper, config, isSpecialTheme, listMetrics.get(element) ?? {
+          itemHeights: [],
+          shellMargin: 0,
+        })
+        continue
+      }
 
       if (height > maxHeight) {
-        const tag = element.tagName.toLowerCase()
-        if (canSplitElement(element, config) && (tag === 'ul' || tag === 'ol')) {
-          state = handleListPagination(element, state, wrapper, config, isSpecialTheme, listMetrics.get(element) ?? {
-            itemHeights: [],
-            shellMargin: 0,
-          })
-          continue
-        }
         // 不可拆分且超过整页：独占一页；当前页为空时不再另开一页（旧实现会留下空白首页）
         if (state.height > 0)
           state = startNewPage(wrapper, state)
