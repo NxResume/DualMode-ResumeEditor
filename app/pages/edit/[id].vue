@@ -52,11 +52,11 @@ watch(() => currentResume.value?.settings?.isScrollable, (newValue) => {
   }
 })
 
-async function handleExport(type: 'pdf' | 'png') {
-  if (type === 'png') {
+async function handleExport(type: 'pdf' | 'print' | 'png') {
+  if (type === 'png')
     return preRef.value?.exportToImage()
-  }
-
+  if (type === 'print')
+    return preRef.value?.printToPDF()
   return preRef.value?.exportToPDF()
 }
 
@@ -237,6 +237,7 @@ if (import.meta.client) {
       :data="currentResume"
       :download-img="() => handleExport('png')"
       :download-pdf="() => handleExport('pdf')"
+      :download-print-pdf="() => handleExport('print')"
       :editor-collapsed="editorCollapsed"
       :settings-open="settingsOpen"
       :auto-save="autoSave"

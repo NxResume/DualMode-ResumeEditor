@@ -9,6 +9,7 @@ const { t } = useI18n()
 
 const preRef = ref<InstanceType<typeof EditMarkdownPreview>>()
 const pdfLoading = ref(false)
+const printLoading = ref(false)
 const imageLoading = ref(false)
 
 definePageMeta({
@@ -44,6 +45,18 @@ async function handleExportPDF() {
   }
 }
 
+async function handlePrintPDF() {
+  if (printLoading.value)
+    return
+  printLoading.value = true
+  try {
+    await preRef.value?.printToPDF()
+  }
+  finally {
+    printLoading.value = false
+  }
+}
+
 async function handleExportImage() {
   if (imageLoading.value)
     return
@@ -68,8 +81,79 @@ async function handleExportImage() {
       />
     </ClientOnly>
 
-    <!-- 导出按钮 -->
+    <!-- 导出按钮：打印为 PDF（矢量）/ 图片式 PDF / 图片 -->
     <div class="flex gap-3 bottom-6 right-6 fixed z-50">
+      <Button
+        size="sm"
+        :disabled="printLoading"
+        class="cursor-pointer shadow-lg disabled:opacity-70 disabled:cursor-not-allowed"
+        @click="handlePrintPDF"
+      >
+        <svg
+          v-if="printLoading"
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          class="mr-2 animate-spin"
+        >
+          <path
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-width="2"
+            d="M12 6.99998C9.1747 6.99987 6.99997 9.24998 7 12C7.00003 14.55 9.02119 17 12 17C14.7712 17 17 14.75 17 12"
+          >
+            <animateTransform
+              attributeName="transform"
+              attributeType="XML"
+              dur="560ms"
+              from="0,12,12"
+              repeatCount="indefinite"
+              to="360,12,12"
+              type="rotate"
+            />
+          </path>
+        </svg>
+        <Download v-else class="mr-2 h-4 w-4" />
+        {{ printLoading ? t('export.exporting') : t('export.exportPdfPrint') }}
+      </Button>
+      <Button
+        variant="outline"
+        size="sm"
+        :disabled="pdfLoading"
+        class="bg-white/90 cursor-pointer shadow-lg backdrop-blur-sm hover:bg-white disabled:opacity-70 disabled:cursor-not-allowed"
+        @click="handleExportPDF"
+      >
+        <svg
+          v-if="pdfLoading"
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          class="mr-2 animate-spin"
+        >
+          <path
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-width="2"
+            d="M12 6.99998C9.1747 6.99987 6.99997 9.24998 7 12C7.00003 14.55 9.02119 17 12 17C14.7712 17 17 14.75 17 12"
+          >
+            <animateTransform
+              attributeName="transform"
+              attributeType="XML"
+              dur="560ms"
+              from="0,12,12"
+              repeatCount="indefinite"
+              to="360,12,12"
+              type="rotate"
+            />
+          </path>
+        </svg>
+        <Download v-else class="mr-2 h-4 w-4" />
+        {{ pdfLoading ? t('export.exporting') : t('export.exportPdf') }}
+      </Button>
       <Button
         variant="outline"
         size="sm"
@@ -105,41 +189,6 @@ async function handleExportImage() {
         </svg>
         <FileImage v-else class="mr-2 h-4 w-4" />
         {{ imageLoading ? t('export.exporting') : t('export.exportImage') }}
-      </Button>
-      <Button
-        size="sm"
-        :disabled="pdfLoading"
-        class="cursor-pointer shadow-lg disabled:opacity-70 disabled:cursor-not-allowed"
-        @click="handleExportPDF"
-      >
-        <svg
-          v-if="pdfLoading"
-          xmlns="http://www.w3.org/2000/svg"
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          class="mr-2 animate-spin"
-        >
-          <path
-            fill="none"
-            stroke="currentColor"
-            stroke-linecap="round"
-            stroke-width="2"
-            d="M12 6.99998C9.1747 6.99987 6.99997 9.24998 7 12C7.00003 14.55 9.02119 17 12 17C14.7712 17 17 14.75 17 12"
-          >
-            <animateTransform
-              attributeName="transform"
-              attributeType="XML"
-              dur="560ms"
-              from="0,12,12"
-              repeatCount="indefinite"
-              to="360,12,12"
-              type="rotate"
-            />
-          </path>
-        </svg>
-        <Download v-else class="mr-2 h-4 w-4" />
-        {{ pdfLoading ? t('export.exporting') : t('export.exportPdf') }}
       </Button>
     </div>
   </div>

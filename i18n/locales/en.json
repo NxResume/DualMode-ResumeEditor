@@ -84,8 +84,12 @@
   },
   "export": {
     "exporting": "Exporting...",
-    "exportPdf": "Export PDF",
-    "exportImage": "Export Image"
+    "exportPdf": "Export PDF (Image)",
+    "exportPdfPrint": "Print as PDF (Recommended)",
+    "exportImage": "Export Image",
+    "printTipTitle": "Before you print",
+    "printTipDescription": "In the print dialog, uncheck “Headers and footers” and set margins to “None”. Choose “Save as PDF” as the destination.",
+    "printTipContinue": "Continue to print"
   },
   "toast": {
     "saved": "Saved",

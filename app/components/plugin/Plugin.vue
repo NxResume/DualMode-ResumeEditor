@@ -6,6 +6,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 const props = defineProps<{
   downloadImg: () => unknown
   downloadPdf: () => unknown
+  downloadPrintPdf: () => unknown
   data: ResumeData
   editorCollapsed?: boolean
   autoSave?: boolean
@@ -114,7 +115,11 @@ async function runExport(action: () => unknown) {
             <span class="tb-caret i-ri-arrow-down-s-line" />
           </button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" class="w-44">
+        <DropdownMenuContent align="end" class="w-52">
+          <DropdownMenuItem class="text-[13px] gap-2 cursor-pointer" @select="runExport(downloadPrintPdf)">
+            <span class="i-ri-printer-line" />
+            {{ t('export.exportPdfPrint') }}
+          </DropdownMenuItem>
           <DropdownMenuItem class="text-[13px] gap-2 cursor-pointer" @select="runExport(downloadPdf)">
             <span class="i-ri-file-pdf-2-line" />
             {{ t('export.exportPdf') }}

@@ -19,7 +19,7 @@
 - **GitHub/Google/Gitee 第三方登录**，多端同步
 - **Markdown 编辑 & 实时预览**，支持所见即所得与源码切换
 - **多主题切换**，内置多款美观主题，支持自定义
-- **一键导出 PDF/图片/ZIP**，内容与预览一致，适配多页（客户端图片式 PDF；矢量 PDF 见下方独立服务）
+- **一键导出 PDF/图片/ZIP**，内容与预览一致，适配多页（图片式 PDF；亦可「打印为 PDF」由浏览器另存）
 - **证件照上传与编辑**，支持拖拽、缩放、重置
 - **字体选择与自定义上传**，导出时字体无损还原
 - **中英文界面一键切换**，自动检测浏览器语言
@@ -86,16 +86,10 @@ Secrets（AUTH_SECRET、OAuth Client ID/Secret、SMTP 等）在 Pages Dashboard 
 
 ## 📄 PDF 导出
 
-当前有两条导出路径：
-
 | 模式 | 实现 | 特点 |
 |------|------|------|
-| **图片式 PDF**（客户端，现用） | `html-to-image` → JPEG → `jsPDF` | 所见即所得稳，但文件大、文字不可选，部分预览会卡 |
-| **矢量 PDF**（服务端，推荐默认） | Playwright `page.pdf` | 真字体嵌入、文字可选，Google / ATS 更友好 |
-
-矢量服务代码在 [`services/pdf-export`](./services/pdf-export)，可单独部署到 **Render Free**（Docker Web Service，Root Directory 设为 `services/pdf-export`，环境变量配置 `API_SECRET`）。本地与部署说明见该目录 README。
-
-> 编辑器导出按钮的双模式切换 / 默认矢量尚未接线，下一步再接主站调用。
+| **导出 PDF（图片）** | `html-to-image` → JPEG → `jsPDF` | 所见即所得稳，文件较大，文字不可选 |
+| **打印为 PDF** | 浏览器打印对话框（另存为 PDF） | 版式一比一、文字可选，需在打印框中选「另存为 PDF」且边距为无 |
 
 ## 📖 使用指南
 
@@ -110,7 +104,7 @@ Secrets（AUTH_SECRET、OAuth Client ID/Secret、SMTP 等）在 Pages Dashboard 
 - **前端**：Nuxt 4, Vue 3, Pinia, CodeMirror, Markdown-it, UnoCSS
 - **后端/存储**：Drizzle ORM, SQLite（本地 better-sqlite3 / 生产 Cloudflare D1）, LocalStorage
 - **认证**：@sidebase/nuxt-auth, GitHub/Google/Gitee OAuth
-- **导出**：jsPDF, html-to-image, jszip（客户端）；Playwright 矢量 PDF 服务见 `services/pdf-export`
+- **导出**：jsPDF, html-to-image, jszip
 - **PWA**：@vite-pwa/nuxt
 - **国际化**：vue-i18n
 

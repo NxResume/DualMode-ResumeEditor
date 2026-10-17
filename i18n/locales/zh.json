@@ -84,8 +84,12 @@
   },
   "export": {
     "exporting": "导出中...",
-    "exportPdf": "导出 PDF",
-    "exportImage": "导出图片"
+    "exportPdf": "导出 PDF（图片）",
+    "exportPdfPrint": "打印为 PDF（推荐）",
+    "exportImage": "导出图片",
+    "printTipTitle": "打印前提示",
+    "printTipDescription": "在打印对话框中请取消勾选「页眉和页脚」，边距选「无」。目标打印机选「另存为 PDF」或「Save as PDF」。",
+    "printTipContinue": "继续打印"
   },
   "toast": {
     "saved": "已保存",
