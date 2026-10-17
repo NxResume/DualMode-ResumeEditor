@@ -31,22 +31,22 @@ A modern, feature-rich resume editor built with Nuxt 4 & Vue 3, supporting Markd
 
 Create a `.env` file based on your deployment environment (see also `.env-example` in the repo root).
 
-| Variable              | Description                                                      |
-| --------------------- | ---------------------------------------------------------------- |
-| AUTH_SECRET           | Session encryption secret (use openssl)                          |
-| AUTH_ORIGIN           | Auth callback root (e.g. `http://localhost:3000/api/auth`)       |
-| GITHUB_CLIENT_ID      | GitHub OAuth App Client ID                                       |
-| GITHUB_CLIENT_SECRET  | GitHub OAuth App Client Secret                                   |
-| GOOGLE_CLIENT_ID      | Google OAuth App Client ID                                       |
-| GOOGLE_CLIENT_SECRET  | Google OAuth App Client Secret                                   |
-| GITEE_CLIENT_ID       | Gitee OAuth App Client ID                                        |
-| GITEE_CLIENT_SECRET   | Gitee OAuth App Client Secret                                    |
-| LINUXDO_CLIENT_ID     | Linux.do OAuth App Client ID                                     |
-| LINUXDO_CLIENT_SECRET | Linux.do OAuth App Client Secret                                 |
-| MAIL_USER             | Mail account (registration verification email, optional)         |
-| MAIL_PASS             | Mail password / app token                                        |
-| HTTPS_PROXY           | HTTPS proxy (optional; useful for blocked OAuth endpoints)       |
-| HTTP_PROXY            | HTTP proxy (optional)                                            |
+| Variable              | Description                                                |
+| --------------------- | ---------------------------------------------------------- |
+| AUTH_SECRET           | Session encryption secret (use openssl)                    |
+| AUTH_ORIGIN           | Auth callback root (e.g. `http://localhost:3000/api/auth`) |
+| GITHUB_CLIENT_ID      | GitHub OAuth App Client ID                                 |
+| GITHUB_CLIENT_SECRET  | GitHub OAuth App Client Secret                             |
+| GOOGLE_CLIENT_ID      | Google OAuth App Client ID                                 |
+| GOOGLE_CLIENT_SECRET  | Google OAuth App Client Secret                             |
+| GITEE_CLIENT_ID       | Gitee OAuth App Client ID                                  |
+| GITEE_CLIENT_SECRET   | Gitee OAuth App Client Secret                              |
+| LINUXDO_CLIENT_ID     | Linux.do OAuth App Client ID                               |
+| LINUXDO_CLIENT_SECRET | Linux.do OAuth App Client Secret                           |
+| MAIL_USER             | Mail account (registration verification email, optional)   |
+| MAIL_PASS             | Mail password / app token                                  |
+| HTTPS_PROXY           | HTTPS proxy (optional; useful for blocked OAuth endpoints) |
+| HTTP_PROXY            | HTTP proxy (optional)                                      |
 
 > Production D1 / R2 are injected via `wrangler.jsonc` bindings (`DB`, `PHOTOS`). No `DATABASE_URL` is required.
 
@@ -127,11 +127,11 @@ Secrets (`AUTH_SECRET`, OAuth Client ID/Secret, `MAIL_USER` / `MAIL_PASS`, etc.)
 
 All export runs in the browser. **There is no separate export microservice** (no Playwright / Render backend).
 
-| Mode | Implementation | Notes |
-|------|----------------|-------|
+| Mode                           | Implementation                                     | Notes                                                                      |
+| ------------------------------ | -------------------------------------------------- | -------------------------------------------------------------------------- |
 | **Print as PDF (Recommended)** | Hidden iframe + browser print dialog (Save as PDF) | 1:1 layout, selectable text; uncheck “Headers and footers”, margins “None” |
-| **Export PDF (Image)** | `html-to-image` → JPEG → `jsPDF` | WYSIWYG-stable; larger files; text not selectable |
-| **Export Image** | `html-to-image` → PNG; multi-page via `jszip` | Single-page PNG, multi-page ZIP |
+| **Export PDF (Image)**         | `html-to-image` → JPEG → `jsPDF`                   | WYSIWYG-stable; larger files; text not selectable                          |
+| **Export Image**               | `html-to-image` → PNG; multi-page via `jszip`      | Single-page PNG, multi-page ZIP                                            |
 
 ## 📖 Usage Guide
 

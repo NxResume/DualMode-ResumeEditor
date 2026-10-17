@@ -31,22 +31,22 @@
 
 请根据实际部署环境，参考下方模板创建 `.env` 文件（也可见仓库根目录 `.env-example`）。
 
-| 变量名                | 说明                                                         |
-| --------------------- | ------------------------------------------------------------ |
-| AUTH_SECRET           | Session 加密密钥，建议用 openssl 生成                        |
-| AUTH_ORIGIN           | Auth 回调根地址（如 `http://localhost:3000/api/auth`）       |
-| GITHUB_CLIENT_ID      | GitHub OAuth 应用 Client ID                                  |
-| GITHUB_CLIENT_SECRET  | GitHub OAuth 应用 Client Secret                              |
-| GOOGLE_CLIENT_ID      | Google OAuth 应用 Client ID                                  |
-| GOOGLE_CLIENT_SECRET  | Google OAuth 应用 Client Secret                              |
-| GITEE_CLIENT_ID       | Gitee OAuth 应用 Client ID                                   |
-| GITEE_CLIENT_SECRET   | Gitee OAuth 应用 Client Secret                               |
-| LINUXDO_CLIENT_ID     | Linux.do OAuth 应用 Client ID                                |
-| LINUXDO_CLIENT_SECRET | Linux.do OAuth 应用 Client Secret                            |
-| MAIL_USER             | 邮箱账号（注册验证码发信，可选）                             |
-| MAIL_PASS             | 邮箱密码 / 授权码                                            |
-| HTTPS_PROXY           | HTTPS 代理（可选，本地访问被墙 OAuth 时有用）                |
-| HTTP_PROXY            | HTTP 代理（可选）                                            |
+| 变量名                | 说明                                                   |
+| --------------------- | ------------------------------------------------------ |
+| AUTH_SECRET           | Session 加密密钥，建议用 openssl 生成                  |
+| AUTH_ORIGIN           | Auth 回调根地址（如 `http://localhost:3000/api/auth`） |
+| GITHUB_CLIENT_ID      | GitHub OAuth 应用 Client ID                            |
+| GITHUB_CLIENT_SECRET  | GitHub OAuth 应用 Client Secret                        |
+| GOOGLE_CLIENT_ID      | Google OAuth 应用 Client ID                            |
+| GOOGLE_CLIENT_SECRET  | Google OAuth 应用 Client Secret                        |
+| GITEE_CLIENT_ID       | Gitee OAuth 应用 Client ID                             |
+| GITEE_CLIENT_SECRET   | Gitee OAuth 应用 Client Secret                         |
+| LINUXDO_CLIENT_ID     | Linux.do OAuth 应用 Client ID                          |
+| LINUXDO_CLIENT_SECRET | Linux.do OAuth 应用 Client Secret                      |
+| MAIL_USER             | 邮箱账号（注册验证码发信，可选）                       |
+| MAIL_PASS             | 邮箱密码 / 授权码                                      |
+| HTTPS_PROXY           | HTTPS 代理（可选，本地访问被墙 OAuth 时有用）          |
+| HTTP_PROXY            | HTTP 代理（可选）                                      |
 
 > 生产环境 D1 / R2 通过 `wrangler.jsonc` 绑定注入（`DB`、`PHOTOS`），无需 `DATABASE_URL`。
 
@@ -93,11 +93,11 @@ Secrets（`AUTH_SECRET`、OAuth Client ID/Secret、`MAIL_USER` / `MAIL_PASS` 等
 
 全部在浏览器端完成，**无独立导出微服务**（无 Playwright / Render 等后端）。
 
-| 模式 | 实现 | 特点 |
-|------|------|------|
+| 模式                   | 实现                                         | 特点                                                     |
+| ---------------------- | -------------------------------------------- | -------------------------------------------------------- |
 | **打印为 PDF（推荐）** | 隐藏 iframe + 浏览器打印对话框（另存为 PDF） | 版式一比一、文字可选；请取消「页眉和页脚」，边距选「无」 |
-| **导出 PDF（图片）** | `html-to-image` → JPEG → `jsPDF` | 所见即所得稳，文件较大，文字不可选 |
-| **导出图片** | `html-to-image` → PNG；多页则 `jszip` 打包 | 单页 PNG，多页 ZIP |
+| **导出 PDF（图片）**   | `html-to-image` → JPEG → `jsPDF`             | 所见即所得稳，文件较大，文字不可选                       |
+| **导出图片**           | `html-to-image` → PNG；多页则 `jszip` 打包   | 单页 PNG，多页 ZIP                                       |
 
 ## 📖 使用指南
 
