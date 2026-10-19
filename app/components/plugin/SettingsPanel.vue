@@ -16,6 +16,9 @@ const emit = defineEmits<{
 // 与顶栏共用同一套字段更新逻辑（只改内存，落盘仍由保存按钮负责）
 const updateData = useResumeFieldUpdate(() => props.data, data => emit('update:data', data))
 const { t } = useI18n()
+
+// 证件照压缩开关：编辑器偏好，与 IdPhoto 弹窗共用同一个 localStorage key
+const idPhotoCompress = useIdPhotoCompressEnabled()
 </script>
 
 <template>
@@ -124,6 +127,14 @@ const { t } = useI18n()
             <span class="panel-row-arrow i-ri-arrow-right-s-line" />
           </button>
         </PluginPhotoIdPhoto>
+
+        <div class="field">
+          <span class="field-label">{{ t('plugin.idPhotoCompress') }}</span>
+          <Switch id="settings-idphoto-compress" v-model="idPhotoCompress" />
+        </div>
+        <p class="field-hint">
+          {{ t('plugin.idPhotoCompressHint') }}
+        </p>
 
         <!-- 自带 plugin-item 行样式，直接复用 -->
         <PluginCorrectCase

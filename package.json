@@ -54,6 +54,7 @@
     "@vueuse/nuxt": "catalog:build",
     "bcryptjs": "catalog:build",
     "better-sqlite3": "catalog:dev",
+    "browser-image-compression": "catalog:frontend",
     "case-police": "catalog:frontend",
     "class-variance-authority": "catalog:dev",
     "clsx": "catalog:dev",

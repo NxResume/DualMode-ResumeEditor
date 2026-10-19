@@ -144,6 +144,8 @@
     "groupTypography": "排版",
     "groupAppearance": "外观",
     "groupContent": "内容与工具",
+    "idPhotoCompress": "证件照压缩",
+    "idPhotoCompressHint": "上传前自动压到长边 800px 的 JPEG，显著减小导出的 PDF 体积",
     "editor": "编辑",
     "font": "字体",
     "pagePadding": "页边距",
@@ -202,6 +204,9 @@
     "confirmUpload": "确认上传",
     "photoPreview": "证件照预览",
     "uploading": "上传中...",
+    "compressing": "压缩中...",
+    "compressedTo": "已压缩：{from} → {to}",
+    "compressHint": "上传时将自动压缩",
     "uploadFailed": "图片上传失败",
     "uploadRetryLater": "请稍后重试"
   },

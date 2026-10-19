@@ -144,6 +144,8 @@
     "groupTypography": "Typography",
     "groupAppearance": "Appearance",
     "groupContent": "Content & tools",
+    "idPhotoCompress": "Compress ID photo",
+    "idPhotoCompressHint": "Shrink photos to an 800px JPEG on upload, greatly reducing exported PDF size",
     "editor": "Editor",
     "font": "Font",
     "pagePadding": "Page padding",
@@ -202,6 +204,9 @@
     "confirmUpload": "Confirm Upload",
     "photoPreview": "ID Photo Preview",
     "uploading": "uploading...",
+    "compressing": "compressing...",
+    "compressedTo": "Compressed: {from} → {to}",
+    "compressHint": "Will be compressed on upload",
     "uploadFailed": "Photo upload failed",
     "uploadRetryLater": "Please try again later"
   },

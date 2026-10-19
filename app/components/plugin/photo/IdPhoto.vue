@@ -10,6 +10,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { useToast } from '@/components/ui/toast'
+import { compressIdPhoto, formatBytes, useIdPhotoCompressEnabled } from '@/composables/useIdPhotoCompress'
 
 const props = defineProps<{
   resumeContent: string
@@ -21,6 +22,9 @@ const emit = defineEmits<{
 const { t } = useI18n()
 const { toast } = useToast()
 
+// 压缩开关与设置面板共用同一个 localStorage key，任一处改动两边同步
+const compressEnabled = useIdPhotoCompressEnabled()
+
 const { files, open, reset } = useFileDialog({
   accept: 'image/*', // Set to accept only image files
   multiple: false,
@@ -31,6 +35,10 @@ const imagePreviewUrl = ref<string | null>(null)
 
 const dialogOpen = ref(false)
 const loading = ref(false)
+// 加载态细分：压缩和上传是两件事，进度文案要能对上
+const compressing = ref(false)
+// 压缩结果，用于在上传前展示「原始 → 压缩后」的体积对比
+const compressResult = ref<{ originalSize: number, size: number } | null>(null)
 
 function getIdPhotoSrcFromContent() {
   const imgTagRegex = /<img\b[^>]*>/gi
@@ -75,6 +83,8 @@ function handleFileUpload() {
 
 // 处理文件变化
 function handleFileChange(newFiles: FileList | null) {
+  // 换了文件，之前的压缩结果就失效了
+  compressResult.value = null
   if (newFiles && newFiles.length > 0) {
     // 创建图片预览URL
     const file = newFiles[0]
@@ -108,8 +118,21 @@ async function handleConfirm() {
 
   loading.value = true
   try {
+    // 先压缩再上传：证件照在版面上只有 30×38mm 左右，
+    // 原图动辄 10MP，会被原样写进导出的 PDF 里（实测能占 85% 体积）
+    let uploadFile = file
+    if (compressEnabled.value) {
+      compressing.value = true
+      const compressed = await compressIdPhoto(file)
+      compressing.value = false
+      uploadFile = compressed.file
+      if (compressed.compressed) {
+        compressResult.value = { originalSize: compressed.originalSize, size: compressed.size }
+      }
+    }
+
     const formData = new FormData()
-    formData.append('file', file)
+    formData.append('file', uploadFile)
 
     const result = await $fetch<{ url: string }>('/api/upload', {
       method: 'POST',
@@ -136,6 +159,7 @@ async function handleConfirm() {
   }
   finally {
     loading.value = false
+    compressing.value = false
   }
 }
 
@@ -205,6 +229,16 @@ onUnmounted(() => {
               <p class="text-xs text-gray-500">
                 {{ t('idPhoto.fileSize') }} {{ (files[0].size / 1024 / 1024).toFixed(2) }} MB
               </p>
+              <!-- 压缩完成后的体积对比，让用户直接看到省了多少 -->
+              <p v-if="compressResult" class="text-xs text-emerald-600 mt-1">
+                {{ t('idPhoto.compressedTo', {
+                  from: formatBytes(compressResult.originalSize),
+                  to: formatBytes(compressResult.size),
+                }) }}
+              </p>
+              <p v-else-if="compressEnabled" class="text-xs text-gray-400 mt-1">
+                {{ t('idPhoto.compressHint') }}
+              </p>
             </div>
           </div>
         </div>
@@ -220,7 +254,7 @@ onUnmounted(() => {
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none" />
               <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
             </svg>
-            {{ t('idPhoto.uploading') }}
+            {{ compressing ? t('idPhoto.compressing') : t('idPhoto.uploading') }}
           </template>
           <template v-else>
             {{ t('idPhoto.confirmUpload') }}
