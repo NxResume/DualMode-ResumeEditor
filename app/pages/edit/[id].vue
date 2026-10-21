@@ -31,7 +31,7 @@ function requireAuthIfDatabase() {
 
 // 跟随滚动：监听必须挂在容器真正存在之后（settings.isScrollable 初始为 true 时，
 // immediate 的 watch 在 setup 阶段就会触发，此时 ref 还是 null，会静默挂不上监听）
-const { stop, start } = useScrollSync(leftRef, el)
+const { stop, start, resync } = useScrollSync(leftRef, el)
 
 onMounted(() => {
   requireAuthIfDatabase()
@@ -92,6 +92,11 @@ const scalePre = computed(() => {
 })
 
 const zoomLabel = computed(() => `${Math.round(scalePre.value * 100)}%`)
+
+// 缩放改变预览的视觉几何（scrollHeight 随 scale 成倍变化），但两侧都不会因此产生
+// scroll 事件、分页也不重建（scale 只是 transform，不触发 repaginated）——
+// 不主动回同步的话两栏就此错位：在底部缩放时右侧会停在旧位置、看不到文档结尾。
+watch(scalePre, () => resync())
 
 // transform-origin 是 top left：内容比画布窄时用 margin 居中。
 // 不动布局尺寸，避免影响分页测量与滚动同步。
@@ -332,7 +337,7 @@ if (import.meta.client) {
                   }" @update:content="(e) => {
                     if (currentResume.content && e)
                       currentResume.content = e
-                  }"
+                  }" @repaginated="resync"
                 />
               </ClientOnly>
             </div>

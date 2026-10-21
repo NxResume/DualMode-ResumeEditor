@@ -5,6 +5,10 @@ const props = defineProps<{
   truncateToOnePage?: boolean
   settings?: ResumeSettings
 }>()
+// 分页整棵重建后通知外部：预览每行的 y 都变了，跟随滚动需要以编辑器为基准回同步一次
+const emit = defineEmits<{
+  (e: 'repaginated'): void
+}>()
 const theme = 'markdown-body'
 const wrapperRef = ref<HTMLElement | null>(null)
 const md = computed(() => useMarkdown(props.content))
@@ -29,6 +33,9 @@ async function paginateNow() {
     themeName: props.themeName,
     padding: props.settings?.pagePadding,
   })
+
+  // 重建完成：通知外部回同步滚动（行高/字体/边距/内容变化都会走到这里）
+  emit('repaginated')
 
   scheduleImageRepaginate()
 }

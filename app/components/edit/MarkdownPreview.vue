@@ -13,6 +13,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'update:content', content?: string): void
   (e: 'update:image-position', imagePosition?: any): void
+  (e: 'repaginated'): void
 }>()
 
 const { t } = useI18n()
@@ -79,6 +80,7 @@ defineExpose({
         :content="props.content"
         :theme-name="props.theme"
         :settings="props.settings"
+        @repaginated="emit('repaginated')"
       />
     </div>
     <!-- 打印前提示：系统对话框无法代用户取消页眉页脚 -->

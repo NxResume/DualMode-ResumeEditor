@@ -4,7 +4,7 @@ type MaybeElRef = Ref<any>
 interface Anchor {
   /** 源码行号（1-based，与 CodeMirror / data-source-line 一致） */
   line: number
-  /** 相对滚动容器内容顶部的 Y（布局坐标，已按 scale 校正） */
+  /** 相对滚动容器内容顶部的 Y（与 scrollTop 同一坐标系） */
   y: number
 }
 
@@ -29,44 +29,21 @@ function scrollRange(el: HTMLElement): number {
 }
 
 /**
- * 预览区用 CSS scale 缩放纸张：getBoundingClientRect 是视觉坐标，
- * scrollTop 是布局坐标。把视觉差值除以 scale 再加 scrollTop，才能对齐。
- */
-function getContentScale(scroller: HTMLElement): number {
-  const scaler = scroller.querySelector('.preview-scaler') as HTMLElement | null
-  if (scaler) {
-    const raw = getComputedStyle(scaler).scale
-    if (raw && raw !== 'none') {
-      const n = Number.parseFloat(raw)
-      if (Number.isFinite(n) && n > 0)
-        return n
-    }
-  }
-  const page = scroller.querySelector('.rs-page-item') as HTMLElement | null
-  if (page && page.offsetWidth > 0) {
-    const visual = page.getBoundingClientRect().width
-    if (visual > 0)
-      return visual / page.offsetWidth
-  }
-  return 1
-}
-
-/**
- * 一趟锚点收集的公共只读上下文：scale 与容器 rect 在同一趟内不变，
- * 提前算一次而不是每个锚点算一次（getComputedStyle / gBCR 都会强制布局，
- * 乘上锚点数 × 每帧滚动事件就是肉眼可见的卡顿）。
+ * 元素顶边相对滚动容器内容顶的 Y。
+ *
+ * 预览区用 CSS scale 缩放纸张，但**滚动容器本身不在 transform 里**（.preview-stage
+ * 包着 .preview-scaler），所以它的 scrollTop / scrollHeight 都是缩放后的视觉像素，
+ * 与 getBoundingClientRect 同一坐标系 —— 直接相加即可，不要再除以 scale。
+ * （旧实现按「scrollTop 是布局坐标」除以 scale，缩放不是 100% 时锚点整体错位：
+ *  140% 时同一条源码行在两侧视口的偏差就有 200px+，200% 时到 550px。）
  */
 interface PassContext {
-  scroller: HTMLElement
-  scale: number
   baseTop: number
   scrollTop: number
 }
 
 function makePassContext(scroller: HTMLElement): PassContext {
   return {
-    scroller,
-    scale: getContentScale(scroller),
     baseTop: scroller.getBoundingClientRect().top,
     scrollTop: scroller.scrollTop,
   }
@@ -74,7 +51,7 @@ function makePassContext(scroller: HTMLElement): PassContext {
 
 /** 元素顶边相对滚动容器内容顶的布局 Y */
 function contentY(el: HTMLElement, ctx: PassContext): number {
-  return (el.getBoundingClientRect().top - ctx.baseTop) / ctx.scale + ctx.scrollTop
+  return el.getBoundingClientRect().top - ctx.baseTop + ctx.scrollTop
 }
 
 /** 预览侧：markdown 渲染写入的 data-source-line */
@@ -124,6 +101,69 @@ function targetByRatio(from: HTMLElement, to: HTMLElement): number {
   const fromMax = scrollRange(from)
   const ratio = fromMax > 0 ? from.scrollTop / fromMax : 0
   return ratio * scrollRange(to)
+}
+
+/**
+ * 预览侧「内容真正结束」的 Y（与 scrollTop 同一坐标系）。
+ * 不能直接用 scrollHeight：它含画布底部内边距与末页未填满的空白，
+ * 拿它当结尾会让预览滚进死区（右侧多出一大段空白）。
+ * 取最后一个 markdown 块（data-source-line）的底边。
+ */
+function previewContentEndY(scroller: HTMLElement): number {
+  const nodes = scroller.querySelectorAll<HTMLElement>('[data-source-line]')
+  const baseTop = scroller.getBoundingClientRect().top
+  for (let i = nodes.length - 1; i >= 0; i--) {
+    const rect = nodes[i]!.getBoundingClientRect()
+    if (rect.height > 0)
+      return rect.bottom - baseTop + scroller.scrollTop
+  }
+  return scroller.scrollHeight
+}
+
+/**
+ * 该侧「文档结尾」对应的 scrollTop。
+ * - 编辑器：滚动范围紧贴内容（CM6 的 scrollHeight 就是文档高度），直接取 scrollRange；
+ * - 预览：分页间隙 / 末页留白 / 画布内边距都算在 scrollHeight 里，必须用内容真正的结束位置，
+ *   否则「到底」会停在最后一行之下的一大段空白上。
+ */
+function endScrollTop(scroller: HTMLElement, isEditor: boolean): number {
+  const max = scrollRange(scroller)
+  if (isEditor)
+    return max
+  return Math.min(max, Math.max(0, previewContentEndY(scroller) - scroller.clientHeight))
+}
+
+/**
+ * 末端对齐：把 from 末端半个视口内的锚点结果，线性过渡到「to 的文档结尾」。
+ *
+ * 锚点插值只能吸收**两个锚点之间**的间距，而文档末尾这段后面再没有锚点可依：
+ * 预览的分页间隙、页边距、末页剩余空白全部堆在最后一个锚点之后。两侧内容在尾部的
+ * 「密度」又必然不同（预览行距/分页 vs 编辑器匀密行高），于是 from 滚到底时
+ * to 还差一截（行距越大差得越多）—— 就是「左边到底了、右边没到底」，
+ * 行距大时预览末尾几行甚至被切在视口外，得再单独滚一次右侧才看得到。
+ *
+ * 收拢区只取末端**半个视口**：中段行程保持逐行对齐不受影响，只在真正接近
+ * 文档结尾、且两侧几何已经对不拢的最后一段做线性过渡。过渡终点是 to 的内容结尾
+ * （最后一行底边贴住 to 视口底），保证两侧同时「看到底」。
+ */
+function blendToEnd(
+  from: HTMLElement,
+  to: HTMLElement,
+  anchorTarget: number,
+  fromIsEditor: boolean,
+): number {
+  const fromEnd = endScrollTop(from, fromIsEditor)
+  if (fromEnd <= 0)
+    return anchorTarget
+
+  const zone = Math.min(from.clientHeight * 0.5, fromEnd)
+  const zoneStart = fromEnd - zone
+  if (from.scrollTop <= zoneStart)
+    return anchorTarget
+
+  const toEnd = endScrollTop(to, !fromIsEditor)
+  const t = Math.min(1, (from.scrollTop - zoneStart) / zone)
+  return anchorTarget + t * (toEnd - anchorTarget)
 }
 
 /**
@@ -195,6 +235,15 @@ export function useScrollSync(leftRef: MaybeElRef, rightRef: MaybeElRef) {
   /** 待执行的同步（一帧最多跑一次，最新发起的方向胜出） */
   let pending: (() => void) | null = null
   let rafId: number | null = null
+  /** resync 自己的 rAF（不占 pending 槽位，见 resync 注释） */
+  let resyncRafId: number | null = null
+  /**
+   * 分页重建后的「待回同步」标记。重建（行高/字体/边距变化触发）会改变预览内容高度，
+   * 浏览器把预览 scrollTop 钳回可滚范围并派发 scroll 事件 —— 那不是用户滚动，
+   * 若照常按「预览→编辑器」同步会把编辑器拽到错位的地方。
+   * 标记存续期间吞掉预览侧事件，回同步完成后清除。
+   */
+  let awaitingResync = false
   /**
    * 最近一次程序写入的期望值。scrollTop 赋值触发的对侧 scroll 事件是异步派发的，
    * 布尔标志在事件到达前就被清掉、挡不住回声；按「元素 + 期望值 + 时间窗」识别，
@@ -209,7 +258,7 @@ export function useScrollSync(leftRef: MaybeElRef, rightRef: MaybeElRef) {
       && Math.abs(scroller.scrollTop - programmatic.top) <= ECHO_TOLERANCE_PX
   }
 
-  /** 把 fromRoot 的滚动位置同步给 toRoot（优先锚点，否则比例） */
+  /** 把 fromRoot 的滚动位置同步给 toRoot（锚点插值 + 末端对齐，无锚点时退回比例） */
   function syncFrom(fromRoot: HTMLElement | null, toRoot: HTMLElement | null, fromIsEditor: boolean) {
     if (!fromRoot || !toRoot)
       return
@@ -219,7 +268,9 @@ export function useScrollSync(leftRef: MaybeElRef, rightRef: MaybeElRef) {
     if (!from || !to)
       return
 
-    const target = targetByAnchors(from, to, fromIsEditor)
+    // 锚点插值负责中段；blendToEnd 把最后一个视口向文档结尾收拢，
+    // 否则预览末尾的分页空白永远滚不到，左侧到底时右侧还差一截
+    const target = blendToEnd(from, to, targetByAnchors(from, to, fromIsEditor), fromIsEditor)
     const clamped = Math.min(scrollRange(to), Math.max(0, target))
     if (Math.abs(to.scrollTop - clamped) <= APPLY_EPSILON_PX)
       return
@@ -260,6 +311,9 @@ export function useScrollSync(leftRef: MaybeElRef, rightRef: MaybeElRef) {
     const scroller = findScroller(root)
     if (!scroller || e.target !== scroller || isEcho(scroller))
       return
+    // 分页重建引起的 scrollTop 钳制不是用户滚动，等 resync 接管
+    if (awaitingResync)
+      return
     schedule(() => syncFrom(root, leftRef.value, false))
   }
 
@@ -285,6 +339,11 @@ export function useScrollSync(leftRef: MaybeElRef, rightRef: MaybeElRef) {
       cancelAnimationFrame(rafId)
       rafId = null
     }
+    if (resyncRafId !== null) {
+      cancelAnimationFrame(resyncRafId)
+      resyncRafId = null
+    }
+    awaitingResync = false
     pending = null
     if (!started)
       return
@@ -293,5 +352,31 @@ export function useScrollSync(leftRef: MaybeElRef, rightRef: MaybeElRef) {
     rightRef.value?.removeEventListener('scroll', onRightScroll, listenOptions)
   }
 
-  return { start, stop }
+  /**
+   * 分页重建后主动做一次「编辑器 → 预览」回同步。
+   *
+   * 行高/字体/边距变化会整棵重建预览 DOM：每行的 y 全变了，但没有任何 scroll
+   * 事件发生（用户没动），两栏从这一刻起错位，直到下次滚动才"自愈"。
+   * 重建同时可能把预览 scrollTop 钳回可滚范围 —— 那个事件已在 onRightScroll
+   * 里按 awaitingResync 吞掉，这里以编辑器为基准把预览拉回对齐位。
+   *
+   * 独立于 pending 槽位：用户滚动的同步任务（方向不定）不该被它覆盖，
+   * 两者同帧先后执行时以这里的最终结果为准即可。
+   */
+  function resync() {
+    // 跟随滚动关闭时没有监听，两栏本来就不互相同步
+    if (!started)
+      return
+    awaitingResync = true
+    if (resyncRafId !== null)
+      cancelAnimationFrame(resyncRafId)
+    // 等一帧：让重建引起的 scrollTop 钳制事件先派发完，几何稳定后再取值
+    resyncRafId = requestAnimationFrame(() => {
+      resyncRafId = null
+      syncFrom(leftRef.value, rightRef.value, true)
+      awaitingResync = false
+    })
+  }
+
+  return { start, stop, resync }
 }
