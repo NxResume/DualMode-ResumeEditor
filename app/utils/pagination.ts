@@ -20,10 +20,12 @@ export const DEFAULT_CONFIG: PaginationConfig = {
 }
 
 // 特殊主题列表（首页无顶部 padding）
-// 与 resume-theme 包中 `[data-resume-theme=…] .markdown-body .rs-page-item` 的规则保持一致
+// 与 resume-theme 包中 `[data-resume-theme=…] .markdown-body .rs-page-item:first-child{padding-top:0}` 的规则保持一致
 const SPECIAL_THEMES: string[] = [
   'blueSimplicity',
   'blackToppedSimple',
+  'techIndigo',
+  'modernBusiness',
 ]
 
 /** 超高且不可拆分元素被独立放一页时打上的标记 */
@@ -55,9 +57,9 @@ export function canSplitElement(element: HTMLElement, config: PaginationConfig):
 }
 
 /** 测量哨兵：零高度的块级元素，标出内容真实的上下边界 */
-const SENTINEL_ATTR = 'data-pg-sentinel'
+export const SENTINEL_ATTR = 'data-pg-sentinel'
 
-function createSentinel(): HTMLElement {
+export function createSentinel(): HTMLElement {
   const sentinel = document.createElement('div')
   sentinel.setAttribute(SENTINEL_ATTR, '')
   sentinel.style.cssText = 'height:0;margin:0;padding:0;border:0'
@@ -102,7 +104,7 @@ function measureFlowHeights(start: HTMLElement, elements: HTMLElement[], end: HT
   return heights
 }
 
-function createNewPage(): HTMLElement {
+export function createNewPage(): HTMLElement {
   const page = document.createElement('div')
   page.className = 'rs-page-item'
   return page

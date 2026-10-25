@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { FitOnePageResult } from '~/utils/fitOnePage'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { useBeforeLeaveConfirm } from '~/composables/useBeforeLeaveConfirm'
@@ -14,6 +15,7 @@ const emit = defineEmits<{
   (e: 'update:content', content?: string): void
   (e: 'update:image-position', imagePosition?: any): void
   (e: 'repaginated'): void
+  (e: 'fitResult', result: FitOnePageResult | null): void
 }>()
 
 const { t } = useI18n()
@@ -81,6 +83,7 @@ defineExpose({
         :theme-name="props.theme"
         :settings="props.settings"
         @repaginated="emit('repaginated')"
+        @fit-result="emit('fitResult', $event)"
       />
     </div>
     <!-- 打印前提示：系统对话框无法代用户取消页眉页脚 -->

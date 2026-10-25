@@ -18,3 +18,4 @@ migrations/data*.sql
 
 # Hermes 本地计划/草稿（不入库）
 .hermes/
+.zcode/

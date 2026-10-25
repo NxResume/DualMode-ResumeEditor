@@ -143,6 +143,7 @@ export const resumeSettings = sqliteTable(
     pageThemeColor: text('pageThemeColor').notNull().default('0,0,0'),
     imagePosition: text('imagePosition').notNull(),
     isScrollable: integer('isScrollable').notNull().default(0),
+    fitOnePage: integer('fitOnePage').notNull().default(0),
     editorMode: text('editorMode').notNull().default('source'),
     createdAt: stamp('createdAt').notNull().default(sql`(unixepoch() * 1000)`),
     updatedAt: stamp('updatedAt').notNull(),

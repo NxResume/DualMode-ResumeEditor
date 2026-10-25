@@ -15,6 +15,13 @@
       "when": 1792050155812,
       "tag": "0001_thankful_midnight",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1792941656811,
+      "tag": "0002_fixed_roughhouse",
+      "breakpoints": true
     }
   ]
 }

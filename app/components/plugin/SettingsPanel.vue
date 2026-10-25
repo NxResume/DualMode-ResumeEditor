@@ -63,6 +63,16 @@ const idPhotoCompress = useIdPhotoCompressEnabled()
             @update:model-value="(val: any) => updateData('settings.isScrollable', val)"
           />
         </div>
+        <div class="field">
+          <span class="field-label">{{ t('plugin.fitOnePage') }}</span>
+          <Switch
+            id="settings-fit-one-page" :model-value="!!data.settings?.fitOnePage"
+            @update:model-value="(val: any) => updateData('settings.fitOnePage', !!val)"
+          />
+        </div>
+        <p class="field-hint">
+          {{ t('plugin.fitOnePageHint') }}
+        </p>
       </section>
 
       <section class="panel-section">

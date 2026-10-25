@@ -33,6 +33,7 @@ export default defineEventHandler(async (event) => {
         pageThemeColor: body.pageThemeColor,
         imagePosition: JSON.stringify(body.imagePosition),
         isScrollable: body.isScrollable ? 1 : 0,
+        fitOnePage: body.fitOnePage ? 1 : 0,
         editorMode: body.editorMode,
         updatedAt: new Date(),
       }).where(eq(schema.resumeSettings.resumeId, id)).returning()
@@ -49,6 +50,7 @@ export default defineEventHandler(async (event) => {
         pageThemeColor: body.pageThemeColor || '0,0,0',
         imagePosition: JSON.stringify(body.imagePosition || { top: 66, left: 391, scale: '0.8 0.8' }),
         isScrollable: body.isScrollable ? 1 : 0,
+        fitOnePage: body.fitOnePage ? 1 : 0,
         editorMode: body.editorMode || 'source',
         updatedAt: new Date(),
       }).returning()

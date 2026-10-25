@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { FitOnePageResult } from '~/utils/fitOnePage'
+
 const props = defineProps<{
   content?: string
   themeName?: string
@@ -6,8 +8,10 @@ const props = defineProps<{
   settings?: ResumeSettings
 }>()
 // 分页整棵重建后通知外部：预览每行的 y 都变了，跟随滚动需要以编辑器为基准回同步一次
+// fitResult：智能一页的适配结果（关闭时为 null），供页面显示状态 / 超出提示
 const emit = defineEmits<{
   (e: 'repaginated'): void
+  (e: 'fitResult', result: FitOnePageResult | null): void
 }>()
 const theme = 'markdown-body'
 const wrapperRef = ref<HTMLElement | null>(null)
@@ -24,15 +28,35 @@ async function paginateNow() {
     await document.fonts.ready
   await new Promise(resolve => setTimeout(resolve, 0))
 
-  if (!wrapperRef.value)
+  const wrapper = wrapperRef.value
+  if (!wrapper)
     return
 
-  autoPaginate(wrapperRef.value, md.value.html, {
+  // 智能一页：先在同一页面上下文里算出行高 / 字号参数，再把处理后的 HTML 交给常规分页。
+  // 放得下自然只有一页；超过压缩极限则按最大压缩继续分页，由外部提示用户精简内容。
+  let html = md.value.html
+  let fit: FitOnePageResult | null = null
+  if (props.settings?.fitOnePage) {
+    fit = fitOnePage(wrapper, html, { lineHeight: props.settings.pageLineHeight })
+    html = fit.content
+  }
+  else {
+    clearLineHeightOverride(wrapper)
+  }
+
+  autoPaginate(wrapper, html, {
     ...DEFAULT_CONFIG,
     themeClass: theme,
     themeName: props.themeName,
     padding: props.settings?.pagePadding,
   })
+
+  // 打印导出只克隆 .rs-page-item 节点，行高覆盖必须内联到每一页上才能自包含
+  if (fit) {
+    for (const page of Array.from(wrapper.querySelectorAll<HTMLElement>('.rs-page-item')))
+      applyLineHeightOverride(page, fit.lineHeight)
+  }
+  emit('fitResult', fit)
 
   // 重建完成：通知外部回同步滚动（行高/字体/边距/内容变化都会走到这里）
   emit('repaginated')
@@ -71,6 +95,7 @@ watch(() => [
   props.settings?.pagePadding,
   props.settings?.pageLineHeight,
   props.settings?.fontname,
+  props.settings?.fitOnePage,
 ], () => {
   imageRepaginateUsed = false
   paginateDebounced()
@@ -155,6 +180,23 @@ onMounted(() => {
 /* 空行渲染出的空白块：1 个块 = 1 个行盒的高度（跟随字号与行高设置） */
 .md-gap {
   height: calc(var(--resume-line-height, 1.9) * 1em);
+}
+
+/* 应用级微调：主题包 h3 默认 margin 0/2px，标题与上下正文贴得太紧；
+   选择器多带 .rs-page-item 保证压过主题包且打印稿（拷贝本样式表）一致。
+   与相邻 h2 的边距会折叠，只有紧贴列表/段落时这 5px 才生效 */
+.markdown-body .rs-page-item h3 {
+  margin-top: 5px;
+  margin-bottom: 7px;
+}
+
+/* h3 下首段（项目简介）与后续列表再留一点缝（主题默认 p 的 margin-bottom 为 0） */
+.markdown-body .rs-page-item h3 + p {
+  margin-bottom: 2px;
+}
+
+.markdown-body .rs-page-item h2 + p {
+  margin-bottom: 2px;
 }
 
 #id-photo {

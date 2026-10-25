@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { EditCodeMirror, EditMarkdownPreview } from '#components'
+import type { FitOnePageResult } from '~/utils/fitOnePage'
 import { useResumeData } from '~/composables/useResumeData'
 import { A4_HEIGHT_PX, A4_WIDTH_PX } from '~/utils'
 
@@ -130,6 +131,31 @@ watch(canvasRef, (node) => {
 }, { immediate: true })
 
 onUnmounted(() => pageObserver?.disconnect())
+
+/* ------------------------------------------------------------------ */
+/* 智能一页：开关是简历设置（随自动保存落盘），适配结果由预览子组件每次分页后回报 */
+/* ------------------------------------------------------------------ */
+const fitResult = ref<FitOnePageResult | null>(null)
+const fitOn = computed(() => !!currentResume.value?.settings?.fitOnePage)
+const fitOverflow = computed(() => fitOn.value && !!fitResult.value && !fitResult.value.fits)
+const updateField = useResumeFieldUpdate(() => currentResume.value, updateResumeData)
+
+function toggleFitOnePage() {
+  updateField('settings.fitOnePage', !fitOn.value)
+}
+
+// 只在真的动了参数时显示「行高 x · 字号 y%」；内容本来就一页时不打扰
+const fitStatus = computed(() => {
+  const result = fitResult.value
+  if (!fitOn.value || !result)
+    return ''
+  if (!result.fits)
+    return t('plugin.fitOnePageOverflow')
+  const userLineHeight = currentResume.value?.settings?.pageLineHeight ?? result.lineHeight
+  if (result.fontScale >= 1 && result.lineHeight >= userLineHeight)
+    return ''
+  return t('plugin.fitOnePageStatus', { lh: result.lineHeight, scale: Math.round(result.fontScale * 100) })
+})
 
 function zoomStep(delta: number) {
   const next = Math.round(scalePre.value * 100) + delta
@@ -288,6 +314,15 @@ if (import.meta.client) {
         <div class="pane-strip">
           <span class="strip-title">{{ t('plugin.preview') }}</span>
           <span v-if="pageCount" class="strip-meta">{{ t('plugin.pageCount', { n: pageCount }) }}</span>
+          <button
+            class="fit-pill" :class="{ 'is-on': fitOn, 'is-warn': fitOverflow }" type="button"
+            :title="t('plugin.fitOnePageHint')" :aria-pressed="fitOn"
+            @click="toggleFitOnePage"
+          >
+            <span class="i-ri-contract-up-down-line" />
+            {{ t('plugin.fitOnePage') }}
+          </button>
+          <span v-if="fitStatus" class="strip-meta" :class="{ 'is-warn': fitOverflow }">{{ fitStatus }}</span>
           <div class="zoom-group">
             <button class="zoom-btn" type="button" :title="t('plugin.zoomOut')" @click="zoomStep(-10)">
               −
@@ -337,7 +372,7 @@ if (import.meta.client) {
                   }" @update:content="(e) => {
                     if (currentResume.content && e)
                       currentResume.content = e
-                  }" @repaginated="resync"
+                  }" @repaginated="resync" @fit-result="fitResult = $event"
                 />
               </ClientOnly>
             </div>
@@ -424,6 +459,42 @@ if (import.meta.client) {
   font-size: 11.5px;
   font-variant-numeric: tabular-nums;
   color: hsl(var(--muted-foreground));
+}
+
+.strip-meta.is-warn {
+  color: hsl(var(--destructive));
+}
+
+/* 智能一页开关：和页数挨着放，一眼看到「几页」就能顺手压成一页 */
+.fit-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 24px;
+  padding: 0 9px;
+  border-radius: 999px;
+  font-size: 12px;
+  color: hsl(var(--foreground) / 0.75);
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background-color 150ms,
+    color 150ms;
+}
+
+.fit-pill:hover {
+  background: hsl(var(--accent));
+  color: hsl(var(--foreground));
+}
+
+.fit-pill.is-on {
+  background: hsl(var(--primary) / 0.12);
+  color: hsl(var(--primary));
+}
+
+.fit-pill.is-on.is-warn {
+  background: hsl(var(--destructive) / 0.12);
+  color: hsl(var(--destructive));
 }
 
 .pane-divider {

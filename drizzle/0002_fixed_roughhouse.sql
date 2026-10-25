@@ -1,0 +1,1 @@
+ALTER TABLE `resumesettings` ADD `fitOnePage` integer DEFAULT 0 NOT NULL;

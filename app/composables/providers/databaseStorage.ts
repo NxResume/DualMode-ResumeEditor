@@ -27,6 +27,7 @@ interface SettingsApiData {
   pageThemeColor: string
   imagePosition: string
   isScrollable: boolean
+  fitOnePage: boolean
   editorMode: 'source' | 'wysiwyg'
 }
 

@@ -18,6 +18,8 @@ export interface ResumeSettings {
   pageThemeColor: string
   imagePosition: { top: number, left: number, scale: number | string }
   isScrollable: boolean
+  /** 智能一页：开启后自动收紧行高、等比缩字号，把简历压进一页 A4 */
+  fitOnePage: boolean
   editorMode: 'source' | 'wysiwyg'
 }
 

@@ -25,6 +25,8 @@ interface ResumeSettings {
   pageThemeColor: string
   imagePosition: { top: number, left: number, scale: number | string }
   isScrollable: boolean
+  /** 智能一页：开启后自动收紧行高、等比缩字号，把简历压进一页 A4 */
+  fitOnePage: boolean
   editorMode: 'source' | 'wysiwyg'
   // 可扩展其它字段
 }
@@ -58,6 +60,7 @@ function getDefaultSettings(): ResumeSettings {
     pageThemeColor: 'default',
     imagePosition: { top: 37, left: 581, scale: '0.8 0.8' },
     isScrollable: true,
+    fitOnePage: false,
     editorMode: 'source',
   }
 }
