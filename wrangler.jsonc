@@ -4,8 +4,8 @@
 // 前置准备（只做一次）：
 //   1) 创建 D1 数据库（已创建：resume）：
 //        wrangler d1 create resume
-//   2) 建表 + 迁移数据（MySQL → D1）：
-//        wrangler d1 execute resume --remote --file=migrations/d1.sql
+//   2) 建表 + 全部迁移（依次执行 drizzle/ 下所有 .sql）：
+//        pnpm db:d1:apply
 //   3) 部署：
 //        pnpm build:cf && wrangler pages deploy dist
 //

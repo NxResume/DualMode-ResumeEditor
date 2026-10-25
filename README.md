@@ -18,6 +18,7 @@
 
 - **GitHub / Google / Gitee / Linux.do 登录**，并支持邮箱密码注册登录，多端同步
 - **Markdown 编辑 & 实时预览**，支持所见即所得与源码切换；左右滚动可按源码行锚点跟随对齐
+- **智能一页**，一键把简历自动压进一页 A4：先收紧行高、再等比缩字号，取「能放下的最大值」，关闭即还原
 - **多主题切换**（独立包 `resume-theme`），内置多款美观主题，支持主题色 / 背景自定义
 - **多种导出方式**：打印为 PDF（推荐，浏览器另存）、图片式 PDF、单页 PNG / 多页 ZIP
 - **证件照上传与编辑**，支持拖拽、缩放、重置（云端存 R2，本地存 `.data/r2-photos`）
@@ -80,12 +81,15 @@ wrangler d1 create resume
 # 2. 创建 R2 桶（仅首次；已创建：resume-photos）
 wrangler r2 bucket create resume-photos
 
-# 3. 应用表结构到远程 D1
+# 3. 应用全部迁移到远程 D1（依次执行 drizzle/ 下所有 .sql）
 pnpm db:d1:apply
 
 # 4. 构建并部署
 pnpm deploy:cf
 ```
+
+> `db:d1:apply` 用于**全新部署**。已部署过的环境升级时不要重跑全部迁移（表/列已存在会报错），只执行新增的增量迁移，例如：
+> `wrangler d1 execute resume --remote --file=./drizzle/0002_fixed_roughhouse.sql`
 
 Secrets（`AUTH_SECRET`、OAuth Client ID/Secret、`MAIL_USER` / `MAIL_PASS` 等）在 Pages Dashboard → Settings → Environment variables 配置，不进 git。公开变量如 `AUTH_ORIGIN` 可写在 `wrangler.jsonc` 的 `vars` 中。
 

@@ -18,6 +18,7 @@ A modern, feature-rich resume editor built with Nuxt 4 & Vue 3, supporting Markd
 
 - **GitHub / Google / Gitee / Linux.do OAuth**, plus email/password registration and login, for multi-device sync
 - **Markdown editing & real-time preview** (WYSIWYG/source switch); optional left–right scroll sync by source-line anchors
+- **Fit-to-one-page**: squeeze the resume onto a single A4 page with one click — tightens line height first, then scales fonts down proportionally, always taking the largest values that still fit; toggle off to restore
 - **Multiple themes** via the standalone [`resume-theme`](https://www.npmjs.com/package/resume-theme) package; theme color / background customization
 - **Multiple export modes**: Print as PDF (recommended, browser Save as PDF), raster PDF, single-page PNG / multi-page ZIP
 - **ID photo upload & edit**, drag/scale/reset (cloud: private R2; local: `.data/r2-photos`)
@@ -114,12 +115,15 @@ wrangler d1 create resume
 # 2. Create the R2 bucket (first time only; already created: resume-photos)
 wrangler r2 bucket create resume-photos
 
-# 3. Apply the schema to remote D1
+# 3. Apply all migrations to remote D1 (runs every .sql under drizzle/ in order)
 pnpm db:d1:apply
 
 # 4. Build and deploy
 pnpm deploy:cf
 ```
+
+> `db:d1:apply` is for **fresh deployments**. When upgrading an existing deployment, do not re-run all migrations (they fail on existing tables/columns); apply only the new incremental files, e.g.
+> `wrangler d1 execute resume --remote --file=./drizzle/0002_fixed_roughhouse.sql`
 
 Secrets (`AUTH_SECRET`, OAuth Client ID/Secret, `MAIL_USER` / `MAIL_PASS`, etc.) are configured in Pages Dashboard → Settings → Environment variables, not committed to git. Public vars such as `AUTH_ORIGIN` may live in `wrangler.jsonc` `vars`.
 
