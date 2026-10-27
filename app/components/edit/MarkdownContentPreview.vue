@@ -187,11 +187,6 @@ onMounted(() => {
    与相邻 h2 的边距会折叠，只有紧贴列表/段落时这 5px 才生效 */
 .markdown-body .rs-page-item h3 {
   margin-top: 5px;
-  margin-bottom: 7px;
-}
-
-/* h3 下首段（项目简介）与后续列表再留一点缝（主题默认 p 的 margin-bottom 为 0） */
-.markdown-body .rs-page-item h3 + p {
   margin-bottom: 2px;
 }
 
